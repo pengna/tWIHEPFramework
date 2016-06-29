@@ -277,6 +277,22 @@ Muon& Muon::operator=(Muon& other)
 } //= non-const muon
 
 /******************************************************************************         
+ * void Muon::SetCuts(TEnv* config, TString muonType)                         * 
+ *                                                                            *         
+ * Set up the cuts for muonType                                               *
+ *                                                                            *         
+ * Input:  TEnv* config, TString muonType                                     *
+ * Output: None                                                               *
+ ******************************************************************************/
+void Muon::SetCuts(TEnv* config, TString muonType)
+{
+  _minPtCuts[muonType] = config -> GetValue("ObjectID.Muon."+muonType+".MinPt", 100.0);
+  _maxEtaCuts[muonType] = config -> GetValue("ObjectID.Muon."+muonType+".MaxEta", 0.0);
+  _maxRelIsoCuts[muonType] = config -> GetValue("ObjectID.Muon."+muonType+".MaxRelIso", 100.0);
+
+}
+
+/******************************************************************************         
  * void Muon::Fill(EventTree *evtr, Int_t iE)                                 *         
  *                                                                            *         
  * Fill Muon vector from tree                                                 *         
@@ -369,9 +385,7 @@ Bool_t Muon::Fill(std::vector<Jet>& jets, TEnv *config, EventTree *evtr,int iE,T
   // **************************************************************
   Bool_t passRelIso = kTRUE;
 
-  Double_t maxIso = config -> GetValue("ObjectID.Muon."+muonType+".MaxRelIso",0.25);
-  
-  if (relIsoR04() > maxIso) passRelIso = kFALSE;
+  if (relIsoR04() > _maxRelIsoCuts[muonType]) passRelIso = kFALSE;
   
   // **************************************************************
   // Pt and Eta Cuts
@@ -380,14 +394,10 @@ Bool_t Muon::Fill(std::vector<Jet>& jets, TEnv *config, EventTree *evtr,int iE,T
   Bool_t passMinPt  = kTRUE;
   Bool_t passMaxEta = kTRUE;
   
-  // Get requirements from config file
-  Double_t maxEta = config -> GetValue("ObjectID.Muon."+muonType+".MaxEta", 100.0);
-  Double_t minPt  = config -> GetValue("ObjectID.Muon."+muonType+".MinPt",  0.0);
-
   // Test Requirements
-  if(muPt <= minPt)               passMinPt  = kFALSE;
-  if(TMath::Abs(muEta) >= maxEta) passMaxEta = kFALSE;
-  
+  if(muPt <= _minPtCuts[muonType])               passMinPt  = kFALSE;
+  if(TMath::Abs(muEta) >= _maxEtaCuts[muonType]) passMaxEta = kFALSE;
+
   //  if(     "Tight"      == muonType) return( passMinPt && passMaxEta  && IsTight() && Isolation() && !GetOverlapWithJet() && IsCombinedMuon());
   if(     "Tight"      == muonType) return( passMinPt && passMaxEta  && passTightId() && passRelIso);
   else if("Veto"       == muonType)return( passMinPt && passMaxEta);//no isolation req. or inner det or jet overlap.

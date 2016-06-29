@@ -70,6 +70,8 @@ public:
   Muon& operator=(const Muon& other);
   // = Muon non-const
   Muon& operator=(Muon& other);
+
+  void SetCuts(TEnv *config, TString muonType);
     
   inline void SetpassTightId(Bool_t passTightId){_passTightId = passTightId;};
   inline Bool_t GetpassTightId() const {return _passTightId;};
@@ -168,6 +170,12 @@ private:
   Double_t _dz;
   Double_t _TLayers;
   Double_t _relIsoR04;
+
+  //////////////////////////////////
+  // Definitions of the objects go here. This way we don't need to access the configuration file for every particle
+  map<TString,Double_t> _minPtCuts;
+  map<TString,Double_t> _maxEtaCuts;
+  map<TString,Double_t> _maxRelIsoCuts;
 
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system

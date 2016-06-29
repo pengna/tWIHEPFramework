@@ -169,6 +169,9 @@ class EventContainer
   // Initialize this class 
   void Initialize(EventTree* eventTree, TruthTree* truthTree);
  
+  //Set up the object definitions
+  void SetupObjectDefinitions();
+
   //void InitializeFastSim(Trig::D3PDBunchCrossingToolSA* m_tool,  FastSimTree* fsTree, TruthTree* truthTree, TriggerTree* triggerTree, InfoTree* infoTree, DecisionTree* decisionTree, ElectronPreTagTree* ElectronPreTagTree, DiElectronsPreTagTree* DiElectronsPreTagTree, ElectronMuonPreTagTree* ElectronMuonPreTagTree, MuonPreTagTree* MuonPreTagTree, DiMuonsPreTagTree* DiMuonsPreTagTree, ElectronLooseTree* ElectronLooseTree, DiElectronsLooseTree* DiElectronsLooseTree, ElectronMuonLooseTree* ElectronMuonLooseTree, MuonLooseTree* MuonLooseTree, DiMuonsLooseTree* DiMuonsLooseTree, BunchConfTree* treeBunchConfTree );
 
   // Create TLorentz Vectors for the particles in the interaction
@@ -589,6 +592,11 @@ private:
   Double_t _treeEventWeight;           // Event weight read in from the tree
   Double_t _outputEventWeight;         // Output event weight passed to the histograms
  
+  // Event objects. By putting these here we can define them once along with their cuts instead of creating them 
+  // once for each event and accessing the config for each particle.
+  Muon newMuon;
+  Electron newElectron;
+
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system
   // Must come at end of class definition

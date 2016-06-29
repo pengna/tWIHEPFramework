@@ -68,6 +68,9 @@ class Electron: public Particle
   _isoChargedHadrons = 0.0; _isoNeutralHadrons = 0.0; _isoPhotons = 0.0; _isoPU = 0.0;
   }
 
+  //Set up the cuts
+  void SetCuts(TEnv* config, TString electronType);
+
   // Fill the electron from an EventTree
   Bool_t Fill(std::vector<Jet>& jets, EventTree *evtr, Int_t iE, TEnv* config, TString electronType, Bool_t isSimulation=false);
 
@@ -147,6 +150,14 @@ class Electron: public Particle
   Double_t _isoNeutralHadrons;
   Double_t _isoPhotons;
   Double_t _isoPU;
+
+  ///////////////////////////////////////////
+  // Maps containing the cut values to be placed on the different type of selected leptons
+  std::map<TString,Double_t> _maxEtaCuts;
+  std::map<TString,Double_t> _minPtCuts;
+  std::map<TString,Double_t> _minEtaGapCuts;
+  std::map<TString,Double_t> _maxEtaGapCuts;
+  
 
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system

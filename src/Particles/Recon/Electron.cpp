@@ -222,6 +222,25 @@ Electron& Electron::operator=(Electron& other)
  * Input:  Event Tree                                                         *
  * Output: kTRUE if this electron passes electron ID cuts                     *
  ******************************************************************************/
+void Electron::SetCuts(TEnv* config, TString electronType)
+{
+  _maxEtaCuts[electronType] =    config -> GetValue("ObjectID.Electron." + electronType + ".MaxEta", 100.);
+  _minPtCuts[electronType] =   	 config -> GetValue("ObjectID.Electron." + electronType + ".MinPt", 0.);
+  _minEtaGapCuts[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".MinEtaGap", 100.);
+  _maxEtaGapCuts[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".MaxEtaGap", -100.);
+
+
+} // End SetCuts
+
+
+/******************************************************************************
+ * void Electron::Fill(EventTree *evtr,int iE)                                *
+ *                                                                            *
+ * Fill electron vector from tree                                             *
+ *                                                                            *
+ * Input:  Event Tree                                                         *
+ * Output: kTRUE if this electron passes electron ID cuts                     *
+ ******************************************************************************/
 Bool_t Electron::Fill(std::vector<Jet>& jets, EventTree *evtr, Int_t iE, TEnv* config, TString electronType, Bool_t isSimulation)
 {
 
@@ -267,8 +286,8 @@ Bool_t Electron::Fill(std::vector<Jet>& jets, EventTree *evtr, Int_t iE, TEnv* c
 
 
   // Get isolation requirement from config file (default is etcone20)
-  TString isoAlgoQ = "ObjectID.Electron." + electronType + ".IsoAlgo";
-  TString isoAlgo  = config -> GetValue(isoAlgoQ, "ptetcone30");
+  //  TString isoAlgoQ = "ObjectID.Electron." + electronType + ".IsoAlgo";
+  //TString isoAlgo  = config -> GetValue(isoAlgoQ, "ptetcone30");
 /*  
   // The only choices for isolation are currently etcone20 and none
   if( "etcone20" == isoAlgo ) {
@@ -305,13 +324,9 @@ Bool_t Electron::Fill(std::vector<Jet>& jets, EventTree *evtr, Int_t iE, TEnv* c
   Bool_t passMinPt  = kTRUE;
   Bool_t passMaxEta = kTRUE;
   
-  // Get requirements from config file
-  Double_t maxEta = config -> GetValue("ObjectID.Electron." + electronType + ".MaxEta", 100.);
-  Double_t minPt  = config -> GetValue("ObjectID.Electron." + electronType + ".MinPt",  0.0);
-  
   // Test requirements
-  if(elPt <= minPt)               passMinPt  = kFALSE;
-  if(TMath::Abs(elEta) >= maxEta) passMaxEta = kFALSE;
+  if(elPt <= _minPtCuts[electronType])               passMinPt  = kFALSE;
+  if(TMath::Abs(elEta) >= _maxEtaCuts[electronType]) passMaxEta = kFALSE;
   
   // **************************************************************
   // Gap Electrons
@@ -319,12 +334,8 @@ Bool_t Electron::Fill(std::vector<Jet>& jets, EventTree *evtr, Int_t iE, TEnv* c
   // If event passes or fails requirements
   Bool_t passNoGapElectron  = kTRUE;
   
-  // Get requirements from config file
-  Double_t minEtaGap = config -> GetValue("ObjectID.Electron." + electronType + ".MinEtaGap", 100.);
-  Double_t maxEtaGap = config -> GetValue("ObjectID.Electron." + electronType + ".MaxEtaGap", -100.);
-
   // Test requirements and set variable
-  if( (TMath::Abs(elEta) >= minEtaGap) && (TMath::Abs(elEta) <= maxEtaGap) ) passNoGapElectron = kFALSE;
+  if( (TMath::Abs(elEta) >= _minEtaGapCuts[electronType]) && (TMath::Abs(elEta) <= _maxEtaGapCuts[electronType]) ) passNoGapElectron = kFALSE;
   //SetNoGapElectron(passNoGapElectron);
   
   // **************************************************************
@@ -333,7 +344,7 @@ Bool_t Electron::Fill(std::vector<Jet>& jets, EventTree *evtr, Int_t iE, TEnv* c
   //if(     "Tight"      == electronType) return(GetIsRobusterTight() && passMinPt && passMaxEta && GetNoGapElectron() && Isolation());
   if(     "Tight"      == electronType) return( passMinPt && passMaxEta);
   //if(     "PtEtaCut"   == electronType) return(passMinPt && passMaxEta && IsRobusterTight());
-  else if("Veto"       == electronType) return(passMinPt && passMaxEta);//no tight or isolation req.
+  else if("Veto"       == electronType) return( passMinPt && passMaxEta);//no tight or isolation req.
   //else if("Isolated"   == electronType) return(GetIsolation()  && GetNoGapElectron()&& OverlapUse());
   //else if("UnIsolated" == electronType) return(!GetIsolation() && GetIsRobusterTight() && passMinPt && passMaxEta && GetNoGapElectron());
   //else if("All"        == electronType) return(kTRUE);

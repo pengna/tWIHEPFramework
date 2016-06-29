@@ -335,6 +335,25 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
   return;
 } //Initialize()
 
+/******************************************************************************
+ * void EventContainer::SetupObjectDefinitions(TEnv config)                   *
+ *                                                                            *
+ * Sets up the different object definitions for each object                   *
+ *                                                                            *
+ * Input:  None                                                               *
+ * Output: None                                                               *
+ ******************************************************************************/
+void EventContainer::SetupObjectDefinitions(){
+  newMuon.SetCuts(GetConfig(),"Tight");
+  newMuon.SetCuts(GetConfig(),"All");
+  newMuon.SetCuts(GetConfig(),"Veto");
+
+  newElectron.SetCuts(GetConfig(),"Tight");
+  newElectron.SetCuts(GetConfig(),"All");
+  newElectron.SetCuts(GetConfig(),"Veto");
+
+
+}
 
 /******************************************************************************
  * void EventContainer::InitializeFastSim()                                   *
@@ -468,7 +487,6 @@ Int_t EventContainer::ReadEvent()
     // Electrons-->refilled and sorted later in method!!
     ///////////////////////////////////////////
 
-    Electron newElectron;
     // All electrons
     for(Int_t io = 0; io < _eventTree->patElectron_pt->size(); io++) {
       newElectron.Clear();
@@ -549,7 +567,6 @@ Int_t EventContainer::ReadEvent()
     ///////////////////////////////////////////
     // Muons
     ///////////////////////////////////////////  
-    Muon newMuon;
     //NOTE: although the missingEt is sent into all the muon loops, it is ONLY shifted in the all muons loop
     // All muon
     for(Int_t io = 0;io < _eventTree -> Muon_pt->size(); io++) {

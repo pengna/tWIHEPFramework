@@ -928,6 +928,8 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
   //else            EventContainer::Initialize(m_tool, treeEventTree, treeTruthTree, treeTriggerTree, treeInfoTree, treeDecisionTree, treeElectronPreTagTree, treeDiElectronsPreTagTree, treeElectronMuonPreTagTree, treeMuonPreTagTree, treeDiMuonsPreTagTree, treeElectronLooseTree, treeDiElectronsLooseTree, treeElectronMuonLooseTree, treeMuonLooseTree, treeDiMuonsLooseTree,treeBunchConfTree );
   EventContainer::Initialize(treeEventTree, treeTruthTree);
 
+  EventContainer::SetupObjectDefinitions();
+
   EventContainer::SetEventCount(evtOffSet);
 
   return 0;
