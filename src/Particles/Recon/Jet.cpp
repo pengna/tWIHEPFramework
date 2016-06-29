@@ -1,0 +1,475 @@
+/******************************************************************************
+ * Jet.cpp                                                                    *
+ *                                                                            *
+ * Store information about final state jets                                   *
+ *                                                                            *
+ * Derived from Particle class                                                *
+ *                                                                            *
+ * Public Member Functions of Jet class                                       *
+ *    Jet()                              -- Default Constructor               *
+ *    Jet()                              -- Parameterized Constructor         *
+ *    ~Jet()                             -- Destructor                        *
+ *    Clear()                            -- Set contents to default           *
+ *    Fill                               -- Fill jet from event tree          *
+ *    FillFastSim                        -- Fill jet from FastSim tree        *
+ *    SetEtM0                            -- Set ET for EM layer 0             *
+ *    GetEtM0                            -- Set ET for EM layer 0             *
+ *    EtEM0                              -- Set ET for EM layer 0             *
+ *    ApplyJESCorrection                 -- Shift jet energy by some amount   *
+ *    operator+=                         -- Overload +=                       *
+ *    operator+                          -- Overload +                        *
+ *    operator=                          -- Overload = Particle               *
+ *    operator=                          -- Overload = const Jet              *
+ *    operator=                          -- Overload =                        *
+ *                                                                            *
+ * Private Data Members of Jet class                                          *
+ *    Double_t _EtEm0                     -- Et for ME layer 0                *
+ *                                                                            *
+ * History                                                                    *
+ *      16 Nov 2006 - Created by R. Schwienhorst                              *
+ *      17 Nov 2006 - Modified by P. Ryan - cleanup and reorganized           *
+ *      20 Mar 2007 - RS: Add filling from fastsim tree                       *
+ *      29 Nov 2007 - RS: Add b-tagging choice when filling                   *
+ *      11 Jan 2008 - RS: Fill only if object passes ID cuts                  *
+ *      14 Jan 2008 - RS: For TRFIP2D, add systematics                        *
+ *      08 May 2009 - J. Holzbauer: added quarkFlavorLabel tag                *
+ *****************************************************************************/
+#include "SingleTopRootAnalysis/Particles/Recon/Jet.hpp"
+#include "SingleTopRootAnalysis/Particles/Recon/Electron.hpp"
+
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <vector>
+#include <TRandom3.h>
+#include<TString.h>
+
+
+using namespace std;
+//using namespace Analysis;
+
+//
+// give me a random number generator.
+// put it here and make it static so that I don't create multiple copies
+static TRandom3 jet_myran;
+static TRandom3 jet_jer_myran;
+
+// Integrate classes into the Root system
+ClassImp(Jet)
+
+/******************************************************************************
+ * Jet::Jet()                                                                 *
+ *                                                                            *
+ * Default Constructor                                                        *
+ *                                                                            *
+ * Input:  None                                                               *
+ * Output: None                                                               *
+ ******************************************************************************/
+  Jet::Jet() : Particle::Particle(),
+_numberOfConstituents(0), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0)
+{
+} //Jet()
+
+/******************************************************************************
+ * Jet::~Jet()                                                                *
+ *                                                                            *
+ * Destructor                                                                 *
+ *                                                                            *
+ * Input:  None                                                               *
+ * Output: None                                                               *
+ ******************************************************************************/
+Jet::~Jet()
+{
+} //~Jet()
+
+/******************************************************************************
+ * Jet::Jet(const Jet& other)                                                 *
+ *                                                                            *
+ * Copy Constructor Jet const                                                 *
+ *                                                                            *
+ * Input:  Jet                                                                *
+ * Output: None                                                               *
+ ******************************************************************************/
+Jet::Jet(const Jet& other): Particle(other),
+_numberOfConstituents		(other.GetnumberOfConstituents()), 
+_chargedMultiplicity		(other.GetchargedMultiplicity()),  
+_bDiscriminator 		(other.GetbDiscriminator()), 
+_pileupId 			(other.GetpileupId()), 
+_mass 				(other.Getmass()), 
+_uncorrPt 			(other.GetuncorrPt()), 
+_neutralHadEnergyFraction	(other.GetneutralHadEnergyFraction()), 
+_neutralEmEmEnergyFraction 	(other.GetneutralEmEmEnergyFraction()),
+ _chargedHadronEnergyFraction 	(other.GetchargedHadronEnergyFraction()), 
+_chargedEmEnergyFraction	(other.GetchargedEmEnergyFraction()), 
+_muonEnergyFraction		(other.GetmuonEnergyFraction()), 
+_electronEnergy			(other.GetelectronEnergy()), 
+_photonEnergy			(other.GetphotonEnergy())
+{
+} //Jet()
+
+/******************************************************************************
+ * Jet::Jet(const Particle& other)                                            *
+ *                                                                            *
+ * Copy Constructor Particle const                                            *
+ *                                                                            *
+ * Input:  Particle                                                           *
+ * Output: None                                                               *
+ ******************************************************************************/
+Jet::Jet(const Particle& other): Particle(other),
+_numberOfConstituents(0), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0)
+{
+ 
+} //Jet()
+
+
+/******************************************************************************
+ * Jet& Jet::operator+=(const Jet& other)                                     *
+ *                                                                            *
+ * Overload +=                                                                *
+ *                                                                            *
+ * Input:  Jet                                                                *
+ * Output: Jet                                                                *
+ ******************************************************************************/
+Jet& Jet::operator+=(const Jet& other)
+{
+  
+  Particle::operator+=(other);
+  return *this;
+} //+=
+
+/******************************************************************************
+ * Jet& Jet::operator+(const Jet& other)                                      *
+ *                                                                            *
+ * Overload +                                                                 *
+ *                                                                            *
+ * Input:  Jet                                                                *
+ * Output: Jet                                                                *
+ ******************************************************************************/
+Jet Jet::operator+(const Jet& other)
+{
+  Particle particleTemp = Particle::operator+(other);
+  Jet jetTemp = particleTemp;
+  return jetTemp;
+
+} //+
+
+/******************************************************************************
+ * Jet& Jet::operator=(const Jet& other)                                      *
+ *                                                                            *
+ * Overload = Particle                                                        *
+ *                                                                            *
+ * Input:  Particle                                                           *
+ * Output: Jet                                                                *
+ ******************************************************************************/
+Jet& Jet::operator=(const Particle& other)
+{
+  
+  Particle::operator=(other);
+  SetnumberOfConstituents(0), 
+  SetchargedMultiplicity(0),  
+  SetbDiscriminator ( -999.0), 
+  SetpileupId ( 0.0), 
+  Setmass ( 0.0), 
+  SetuncorrPt ( 0.0), 
+  SetneutralHadEnergyFraction(0.0), 
+  SetneutralEmEmEnergyFraction ( 0.0), 
+  SetchargedHadronEnergyFraction (0.0), 
+  SetchargedEmEnergyFraction(0.0), 
+  SetmuonEnergyFraction(0.0), 
+  SetelectronEnergy(0.0), 
+  SetphotonEnergy(0.0);
+
+  return *this;
+} //= Particle
+
+/******************************************************************************
+ * Jet& Jet::operator=(const Jet& other)                                      *
+ *                                                                            *
+ * Overload = const Jet                                                       *
+ *                                                                            *
+ * Input:  Jet                                                                *
+ * Output: Jet                                                                *
+ ******************************************************************************/
+Jet& Jet::operator=(const Jet& other)
+{
+  
+  Particle::operator=(other);
+  SetnumberOfConstituents		(other.GetnumberOfConstituents());
+  SetchargedMultiplicity		(other.GetchargedMultiplicity()); 
+  SetbDiscriminator 			(other.GetbDiscriminator());
+  SetpileupId 				(other.GetpileupId());
+  Setmass 				(other.Getmass());
+  SetuncorrPt 				(other.GetuncorrPt());
+  SetneutralHadEnergyFraction		(other.GetneutralHadEnergyFraction());
+  SetneutralEmEmEnergyFraction 		(other.GetneutralEmEmEnergyFraction());
+  SetchargedHadronEnergyFraction 	(other.GetchargedHadronEnergyFraction());
+  SetchargedEmEnergyFraction		(other.GetchargedEmEnergyFraction());
+  SetmuonEnergyFraction			(other.GetmuonEnergyFraction());
+  SetelectronEnergy			(other.GetelectronEnergy());
+  SetphotonEnergy			(other.GetphotonEnergy());
+  return *this;
+} //= const
+
+/******************************************************************************
+ * Jet& Jet::operator=(const Jet& other)                                      *
+ *                                                                            *
+ * Overload = non-const Jet                                                   *
+ *                                                                            *
+ * Input:  Jet                                                                *
+ * Output: Jet                                                                *
+ ******************************************************************************/
+Jet& Jet::operator=(Jet& other)
+{
+  Particle::operator=(other);
+  SetnumberOfConstituents		(other.GetnumberOfConstituents());
+  SetchargedMultiplicity		(other.GetchargedMultiplicity()); 
+  SetbDiscriminator 			(other.GetbDiscriminator());
+  SetpileupId 				(other.GetpileupId());
+  Setmass 				(other.Getmass());
+  SetuncorrPt 				(other.GetuncorrPt());
+  SetneutralHadEnergyFraction		(other.GetneutralHadEnergyFraction());
+  SetneutralEmEmEnergyFraction 		(other.GetneutralEmEmEnergyFraction());
+  SetchargedHadronEnergyFraction 	(other.GetchargedHadronEnergyFraction());
+  SetchargedEmEnergyFraction		(other.GetchargedEmEnergyFraction());
+  SetmuonEnergyFraction			(other.GetmuonEnergyFraction());
+  SetelectronEnergy			(other.GetelectronEnergy());
+  SetphotonEnergy			(other.GetphotonEnergy());
+  return *this;
+} //= non-const
+
+/******************************************************************************         
+ * void Jet::Fill(EventTree *evtr, Int_t iE,const TString& tagName)           *         
+ *                                                                            *         
+ * Fill jet vector from tree                                                  *         
+ *                                                                            *         
+ * Input:  Event Tree pointer                                                 *         
+ *         - which jet                                                        *
+ *         - tagName, either default or IP2D                                  *
+ * Output: True if this jet passes jet ID cuts                                *         
+ ******************************************************************************/
+
+Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Jet>& jetjetors, EventTree *evtr, Int_t iE, TEnv* config, const TString& tagName, Double_t btagCut)
+{
+
+  Double_t jetPt, jetEta,jetPhi,jetE, jetCharge, jetM;
+  jetPt     = evtr -> Jet_pt     -> operator[](iE);
+  jetEta    = evtr -> Jet_eta    -> operator[](iE);
+  jetPhi    = evtr -> Jet_phi    -> operator[](iE);
+  jetE      = evtr -> Jet_energy -> operator[](iE);
+
+  if(jetE > 0){
+    SetPtEtaPhiE(jetPt,jetEta,jetPhi,jetE);
+  }else{
+    SetPtEtaPhiE(1,1,1,3);
+  }
+
+  SetnumberOfConstituents		(evtr -> Jet_numberOfConstituents     	-> operator[](iE));
+  SetchargedMultiplicity		(evtr -> Jet_chargedMultiplicity     	-> operator[](iE)); 
+  SetbDiscriminator 			(evtr -> Jet_pfCombinedInclusiveSecondaryVertexV2BJetTags     	-> operator[](iE));
+  SetpileupId 				(evtr -> Jet_pileupId     		-> operator[](iE));
+  Setmass 				(evtr -> Jet_mass     			-> operator[](iE));
+  SetuncorrPt 				(evtr -> Jet_Uncorr_pt     		-> operator[](iE));
+  SetneutralHadEnergyFraction		(evtr -> Jet_neutralHadEnergyFraction	-> operator[](iE));
+  SetneutralEmEmEnergyFraction 		(evtr -> Jet_neutralEmEnergyFraction  -> operator[](iE));
+  SetchargedHadronEnergyFraction 	(evtr -> Jet_chargedHadronEnergyFraction-> operator[](iE));
+  SetchargedEmEnergyFraction		(evtr -> Jet_chargedEmEnergyFraction    -> operator[](iE));
+  SetmuonEnergyFraction			(evtr -> Jet_muonEnergyFraction     	-> operator[](iE));
+  SetelectronEnergy			(evtr -> Jet_electronEnergy     	-> operator[](iE));
+  SetphotonEnergy			(evtr -> Jet_photonEnergy     		-> operator[](iE));
+/*
+  SetPdgId      ( evtr -> Jet_flavor_truth_trueflav -> operator[](iE));
+  SetIsBadLoose ( evtr -> Jet_isBadLoose            -> operator[](iE));
+  ///////////////////////////////////////////////////////////////////////////////
+  //
+  // b-tagging choices
+  /////////////////////////////////////////////////////////////////////////////////
+  // Upated for version 14
+  //currently no TRF b-taggers, so using a cut on weights
+  
+  std::vector<Double_t> bweight;
+  bweight.clear();
+  //cout<<evtr -> Jet_flavor_weight -> operator[](iE)<<endl;
+  bweight.push_back(evtr -> Jet_flavor_weight -> operator[](iE));//0
+  bweight.push_back(evtr -> Jet_flavor_weight_IP1D -> operator[](iE));//1
+  bweight.push_back(evtr -> Jet_flavor_weight_IP2D -> operator[](iE));//2
+  bweight.push_back(evtr -> Jet_flavor_weight_IP3D -> operator[](iE));//3
+  bweight.push_back(evtr -> Jet_flavor_weight_SV1 -> operator[](iE));//4
+  bweight.push_back(evtr -> Jet_flavor_weight_SV2 -> operator[](iE));//5
+  //for JetProb, we actually use -ln(JetProb)
+  bweight.push_back(-TMath::Log10(evtr -> Jet_flavor_weight_JetProb -> operator[](iE)));//6
+  bweight.push_back(evtr -> Jet_flavor_weight_TrackCounting2D -> operator[](iE));//7
+  bweight.push_back(evtr -> Jet_flavor_weight_SV0 -> operator[](iE));//8 
+  bweight.push_back(evtr -> Jet_flavor_weight_JetFitterCOMBNN-> operator[](iE));//9
+  SetBWeight(bweight);
+  //cout<<bweight.size()<<endl;
+  
+  double tagCut = 0;
+
+  tagCut = btagCut;
+
+  if(tagName=="default" || tagName=="bTagged" || tagName=="IP3DSV1") {
+    if(evtr -> Jet_flavor_weight -> operator[](iE) > tagCut) SetTagged(kTRUE);
+    else SetTagged(kFALSE);
+  } // if
+  else if(tagName=="SV0") {
+    if(evtr->Jet_flavor_weight_SV0->operator[](iE) > tagCut) SetTagged(kTRUE);
+    else SetTagged(kFALSE);
+  } 
+  else {
+    cout<<"<ERROR>: Error in jet.cpp: invalid tagger, "<<tagName<<endl;
+    exit(8);
+  }
+*/
+  /////////////////////////////////////////////////////////////////////////////
+  // Jet Pt and Eta Cuts
+  /////////////////////////////////////////////////////////////////////////////
+  double maxEta  = config -> GetValue("ObjectID.Jet.MaxEta",100.);
+  double BmaxEta = config -> GetValue("ObjectID.BJet.MaxEta",100.);
+  //double UmaxEta = config -> GetValue("ObjectID.UJet.MaxEta",100.);
+  double minPt   = config -> GetValue("ObjectID.Jet.MinPt",0.);
+  double BminPt  = config -> GetValue("ObjectID.BJet.MinPt",0.);
+  //double UminPt  = config -> GetValue("ObjectID.UJet.MinPt",0.);
+/* 
+  if( jetPt <= minPt){
+    SetPassPt(kFALSE);
+  }else{
+     SetPassPt(kTRUE);
+  }
+
+  if(TMath::Abs(DetEta()) >= maxEta ){
+    SetPassEta(kFALSE);
+  }else{
+     SetPassEta(kTRUE);
+  }
+
+  if(IsTagged()) {
+    if( jetPt <= BminPt){
+      SetTagged(kFALSE);
+    }
+    if(TMath::Abs(DetEta()) >= BmaxEta ){
+      SetTagged(kFALSE);
+    }
+  }
+
+  if( !PassPt() ||  jetE < 0 || !PassEta()) return kFALSE;  // Check Pt and Eta Cut
+  else return kTRUE;
+*/
+  return kTRUE;
+
+} //Fill()
+
+/******************************************************************************         
+ * void Jet::FillFastSim(FastSimTree *tr, Int_t iE,const TString& tagName )   *         
+ *                                                                            *         
+ * Fill jet vector from fastsim tree                                          *         
+ *                                                                            *         
+ * Input:  - FastSim tree pointer                                             *         
+ *         - which jet                                                        *
+ *         - tagName, either default or IP2D                                  *
+ * Output: True if this jet passes jet ID cuts                                *         
+ ******************************************************************************/
+Bool_t Jet::FillFastSim( std::vector<MCJet>& MCBJets, std::vector<MCJet>& MCCJets, std::vector<MCTau>& MCTaus, std::vector<Electron>& electrons, FastSimTree *tr,Int_t iE,TEnv* config,const TString& tagName, Double_t btagCut, Double_t mistagCut, Double_t eshift)
+{  
+  Double_t jetPt, jetEta,jetPhi,jetE, jetCharge;
+  jetPt     = tr -> PJet_p_T    -> operator[](iE);
+  jetEta    = tr -> PJet_eta    -> operator[](iE);
+  jetPhi    = tr -> PJet_phi    -> operator[](iE);
+  jetE      = tr -> PJet_E      -> operator[](iE);
+  jetCharge = tr -> PJet_charge -> operator[](iE); 
+  
+  SetPtEtaPhiE(jetPt,jetEta,jetPhi,jetE);
+  SetCharge(jetCharge);
+
+  if(eshift != 0){
+    
+    Double_t diffx,diffy,diffz,diffe;
+    
+    //  cout<<"OLD "<<Px()<<"  "<<Py()<<"  "<<Pz()<<"  "<<E()<<endl;
+    //  cout<<"OLD "<<Pt()<<"  "<<Eta()<<"  "<<Phi()<<endl;
+    
+    diffx = eshift * Px();
+    diffy = eshift * Py();
+    diffz = eshift * Pz();
+    diffe = eshift * E();
+    SetPxPyPzE(diffx + Px(),
+	       diffy + Py(),
+	       diffz + Pz(),
+	       diffe + E());
+    
+    //cout<<diffx<<"  "<<diffy<<"  "<<diffz<<"  "<<diffe<<"  "<<eshift<<endl;
+    //cout<<"NEW "<<Px()<<"  "<<Py()<<"  "<<Pz()<<"  "<<E()<<endl;
+    //cout<<"NEW "<<Pt()<<"  "<<Eta()<<"  "<<Phi()<<endl;
+    
+    // if met pointers have been provided, update those also
+    //cout<<"OLDMET "<<metx<<"  "<<mety<<endl;
+    
+    // cout<<"NEWMET "<<*metx<<"  "<<*mety<<endl;
+   
+  }
+  //##########################################################################
+  //b-tagging.  Insert info when available, based on reco tree.
+  //##########################################################################
+
+
+
+  //##########################################################################
+  //PdgId()
+  //
+  //identifies jet with a MC quark.  5=bquark, 4=cquark, 15=tau(mc), 0=lightquark or gluon, etc
+  //
+  //This section identifies the MC particle (b, c, tau, or other (light quark)
+  //that the jet is closest to and labels it as that, by pdgid, where light quark
+  //is 0.  Jets are labeled starting with b, then c, then tau, and then, if none
+  //of these match, as light quark.  This follows proceedure in b-tagging csc note.
+  //Jet must be within deltaR of 0.3 of particle to be matched, and mc particle
+  //must have Pt > 5 GeV, also per the csc note.
+  //
+  //Currently modified to use the Jet_Truth_Label variable from tree
+  //Currently no charge information carried in this label
+  //
+  //NOTE: This PDGId() method returns the flavor of the MC particle associated
+  //with the jet (wrt position).  It is NOT nessesarily the jet's flavor, but
+  //a reasonable assumption BASED ON MC AND RECO INFORMATION
+  //##########################################################################
+
+  Double_t DeltaRCurrent = 0;
+  Double_t EtaCurrent  = 0;
+  Double_t PhiCurrent  = 0;
+  Double_t PtCurrent   = 0;
+  //SetPdgId(999);//not set yet
+  
+  //SetPdgId(tr -> Jet_Truth_Label -> operator[](iE));//not set yet
+  
+  
+  //////////////////////////////////////////////////
+  // Overlap with Electron
+  //////////////////////////////////////////////////
+  // Get Minimum separation between the electron and jet from the config file
+  Double_t electronDeltaRMin = config -> GetValue("ObjectID.Jet.ElectronDeltaRMin", 0.0);
+  Double_t electronDeltaR = 0.0;
+  std::vector<Electron>::iterator electronIterator;
+  for(electronIterator = electrons.begin(); electronIterator != electrons.end(); electronIterator++){
+    electronDeltaR = electronIterator->DeltaR(*this);
+    // If jet is too close to any electron set overlap to 1 and break
+    if(electronDeltaR < electronDeltaRMin ){
+      //SetOverlapWithElectron(1);
+      break;
+    } //if
+  } //for
+  
+  //
+  // now check jet object ID cuts
+  double maxEta=config->GetValue("ObjectID.Jet.MaxEta",100.);
+  double minPt=config->GetValue("ObjectID.Jet.MinPt",0.);
+  
+  
+  //if(jetPt<minPt) return kFALSE;
+  //if(TMath::Abs(jetEta)>maxEta) return kFALSE;
+
+  // Set to false if jet fails pT requirement, eta reqiurement, is overlapped with electron
+  //if( jetPt <= minPt || TMath::Abs(jetEta) >= maxEta  || GetOverlapWithElectron() ) return kFALSE;
+  //else return kTRUE;
+  return kTRUE;
+  
+} //FillFastSim()
+
