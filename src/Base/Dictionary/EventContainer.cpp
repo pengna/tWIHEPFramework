@@ -352,6 +352,7 @@ void EventContainer::SetupObjectDefinitions(){
   newElectron.SetCuts(GetConfig(),"All");
   newElectron.SetCuts(GetConfig(),"Veto");
 
+  newJet.SetCuts(GetConfig());
 
 }
 
@@ -490,7 +491,7 @@ Int_t EventContainer::ReadEvent()
     // All electrons
     for(Int_t io = 0; io < _eventTree->patElectron_pt->size(); io++) {
       newElectron.Clear();
-      useObj=newElectron.Fill(jets, _eventTree, io,GetConfig(),"All",isSimulation);
+      useObj=newElectron.Fill(_eventTree, io,"All",isSimulation);
       if(useObj) { 
 	electrons.push_back(newElectron);
       }  
@@ -507,47 +508,73 @@ Int_t EventContainer::ReadEvent()
       //}
 
       newElectron.Clear();
-      useObj=newElectron.Fill(jets, _eventTree,  io,GetConfig(),"Tight",isSimulation);
+      useObj=newElectron.Fill(_eventTree,  io,"Tight",isSimulation);
       if(useObj) {
         tightElectrons.push_back(newElectron);
       }
 
       newElectron.Clear();
-      useObj=newElectron.Fill(jets, _eventTree,  io,GetConfig(),"Veto",isSimulation);
+      useObj=newElectron.Fill(_eventTree,  io,"Veto",isSimulation);
       if(useObj) {
         vetoElectrons.push_back(newElectron);
       }
 
     } //for
     ///////////////////////////////////////////
+    // Muons
+    ///////////////////////////////////////////  
+    //NOTE: although the missingEt is sent into all the muon loops, it is ONLY shifted in the all muons loop
+    // All muon
+    for(Int_t io = 0;io < _eventTree -> Muon_pt->size(); io++) {
+      newMuon.Clear();
+      useObj = newMuon.Fill(_eventTree, io,"All", isSimulation);
+      if(useObj) {
+	muons.push_back(newMuon);
+      } // if useObj
+
+      newMuon.Clear();
+      useObj = newMuon.Fill(_eventTree, io,"Tight", isSimulation);
+      if(useObj) {
+        tightMuons.push_back(newMuon);
+      } // if useObj
+
+      newMuon.Clear();
+      useObj = newMuon.Fill(_eventTree, io,"Veto", isSimulation);
+      if(useObj) {
+        vetoMuons.push_back(newMuon);
+      } // if useObj
+
+    } //for muon loop
+
+    ///////////////////////////////////////////
     // Jets
     ///////////////////////////////////////////
-   Jet newJet;
-   closeindex = 999;
-   ejordr = 999;
-   bestjetdr = 999;
-   jeteoverlap = kFALSE;
-   //cout <<"EVENT"<<endl;
-   Double_t ejoverlap = GetConfig() -> GetValue("ObjectID.Jet.ElectronDeltaRMin", 0.0);
-   for(Int_t io = 0;io < _eventTree -> Jet_pt->size(); io++) {
-     newJet.Clear();
-     jeteoverlap = kFALSE;
-     closeindex = 999;
-     ejordr = 999;
-     bestjetdr = 999;
-     missingEt = -888; 
-
-     useObj = newJet.Fill(1.0,1.0, jetjetors, _eventTree, io, GetConfig(), _bTagAlgo, GetBTagCut());
-
-     missingEt = TMath::Sqrt(pow(missingEx,2) + pow(missingEy,2));//so MET gets JES adjustment toogEx=top_met.MET_ExMiss();
+    closeindex = 999;
+    ejordr = 999;
+    bestjetdr = 999;
+    jeteoverlap = kFALSE;
+    //cout <<"EVENT"<<endl;
+    Double_t ejoverlap = GetConfig() -> GetValue("ObjectID.Jet.ElectronDeltaRMin", 0.0);
+    for(Int_t io = 0;io < _eventTree -> Jet_pt->size(); io++) {
+      newJet.Clear();
+      jeteoverlap = kFALSE;
+      closeindex = 999;
+      ejordr = 999;
+      bestjetdr = 999;
+      missingEt = -888; 
+      
+      useObj = newJet.Fill(1.0,1.0, tightMuons, tightElectrons, _eventTree, io);
+      //      useObj = newJet.Fill(1.0,1.0, _eventTree, io);
+      
+      missingEt = TMath::Sqrt(pow(missingEx,2) + pow(missingEy,2));//so MET gets JES adjustment toogEx=top_met.MET_ExMiss();
      /////////////////////////////////////
-
+      
      //   alljets.push_back(newJet);
      if(useObj) {
        jets.push_back(newJet);
  
-       //if(newJet.IsTagged()) taggedJets.push_back(newJet);
-       //else unTaggedJets.push_back(newJet);
+       if(newJet.IsTagged()) taggedJets.push_back(newJet);
+       else unTaggedJets.push_back(newJet);
    
         //NOTE: PdgId of +/-1 is used for light quark jets when charge information is available and 
 	//uncharged particles that are not labeled as b, c, or tau are given an ID of 0
@@ -561,34 +588,8 @@ Int_t EventContainer::ReadEvent()
 	//if(newJet.GetAbsPdgId() == 4)    cLabeledJets.push_back(newJet);
 	//if(newJet.GetAbsPdgId() == 15)   tauLabeledJets.push_back(newJet);
 	//if((newJet.GetAbsPdgId() == 1) || (newJet.GetAbsPdgId() == 0) )  lightQuarkLabeledJets.push_back(newJet);
-      } // if useObj
-   } //for
-
-    ///////////////////////////////////////////
-    // Muons
-    ///////////////////////////////////////////  
-    //NOTE: although the missingEt is sent into all the muon loops, it is ONLY shifted in the all muons loop
-    // All muon
-    for(Int_t io = 0;io < _eventTree -> Muon_pt->size(); io++) {
-      newMuon.Clear();
-      useObj = newMuon.Fill(jets, GetConfig(), _eventTree, io,"All", isSimulation);
-      if(useObj) {
-	muons.push_back(newMuon);
-      } // if useObj
-
-      newMuon.Clear();
-      useObj = newMuon.Fill(jets, GetConfig(), _eventTree, io,"Tight", isSimulation);
-      if(useObj) {
-        tightMuons.push_back(newMuon);
-      } // if useObj
-
-      newMuon.Clear();
-      useObj = newMuon.Fill(jets, GetConfig(), _eventTree, io,"Veto", isSimulation);
-      if(useObj) {
-        vetoMuons.push_back(newMuon);
-      } // if useObj
-
-    } //for muon loop
+     } // if useObj
+    } //jets
 
 /*
     missingEx = _eventTree -> MissingEt_etx / 1000.0;

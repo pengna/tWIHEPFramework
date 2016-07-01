@@ -238,17 +238,36 @@ Jet& Jet::operator=(Jet& other)
 } //= non-const
 
 /******************************************************************************         
+ * void Jet::SetCuts(TEnv* config)                                            *
+ *                                                                            *         
+ * Set the cuts to be used on the jet objects                                 *
+ *                                                                            *         
+ * Input:  TEnv* config                                                       * 
+ *         - Contains the cuts to be applied to each jet                      *
+ * Output: None                                                               *
+ ******************************************************************************/
+
+void Jet::SetCuts(TEnv * config)
+{
+  _maxEtaCut = 		config -> GetValue("ObjectID.Jet.MaxEta",100.);
+  _minPtCut = 		config -> GetValue("ObjectID.Jet.MinPt",0.);
+  _bMaxEtaCut = 	config -> GetValue("ObjectID.BJet.MaxEta",100.);
+  _bMinPtCut = 		config -> GetValue("ObjectID.BJet.MinPt",0.);
+  _bTagCut = 		config -> GetValue("ObjectID.BJet.BTagCut",0.0);
+  _closestLeptonCut = 	config -> GetValue("ObjectID.Jet.LepCleanR",0.0);
+}
+
+/******************************************************************************         
  * void Jet::Fill(EventTree *evtr, Int_t iE,const TString& tagName)           *         
  *                                                                            *         
  * Fill jet vector from tree                                                  *         
  *                                                                            *         
  * Input:  Event Tree pointer                                                 *         
  *         - which jet                                                        *
- *         - tagName, either default or IP2D                                  *
  * Output: True if this jet passes jet ID cuts                                *         
  ******************************************************************************/
 
-Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Jet>& jetjetors, EventTree *evtr, Int_t iE, TEnv* config, const TString& tagName, Double_t btagCut)
+Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE)
 {
 
   Double_t jetPt, jetEta,jetPhi,jetE, jetCharge, jetM;
@@ -323,38 +342,51 @@ Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Jet>& jetjetor
   /////////////////////////////////////////////////////////////////////////////
   // Jet Pt and Eta Cuts
   /////////////////////////////////////////////////////////////////////////////
-  double maxEta  = config -> GetValue("ObjectID.Jet.MaxEta",100.);
-  double BmaxEta = config -> GetValue("ObjectID.BJet.MaxEta",100.);
-  //double UmaxEta = config -> GetValue("ObjectID.UJet.MaxEta",100.);
-  double minPt   = config -> GetValue("ObjectID.Jet.MinPt",0.);
-  double BminPt  = config -> GetValue("ObjectID.BJet.MinPt",0.);
-  //double UminPt  = config -> GetValue("ObjectID.UJet.MinPt",0.);
-/* 
-  if( jetPt <= minPt){
-    SetPassPt(kFALSE);
-  }else{
-     SetPassPt(kTRUE);
-  }
 
-  if(TMath::Abs(DetEta()) >= maxEta ){
-    SetPassEta(kFALSE);
-  }else{
-     SetPassEta(kTRUE);
-  }
+  Bool_t passPt = jetPt > _minPtCut;
+  Bool_t passEta = TMath::Abs(jetEta) < _maxEtaCut;
 
-  if(IsTagged()) {
-    if( jetPt <= BminPt){
-      SetTagged(kFALSE);
-    }
-    if(TMath::Abs(DetEta()) >= BmaxEta ){
-      SetTagged(kFALSE);
-    }
-  }
+  /////////////////////////////////////////////////////////////////////////
+  // Jet ID
+  /////////////////////////////////////////////////////////////////////////
+  
+  
+  Bool_t neutralID = (TMath::Abs(jetEta) > 3. || (neutralHadEnergyFraction() < 0.99 &&  neutralEmEmEnergyFraction() < 0.99 && numberOfConstituents() > 1));
+  Bool_t chargedID = (TMath::Abs(jetEta) > 2.4 || (chargedHadronEnergyFraction() > 0. && chargedMultiplicity() > 0. && chargedEmEnergyFraction() < 0.99));
+  Bool_t neutralHighEtaID = (TMath::Abs(jetEta) < 3. || (neutralEmEmEnergyFraction() < 0.9 && (numberOfConstituents() - chargedMultiplicity()) > 10));
 
-  if( !PassPt() ||  jetE < 0 || !PassEta()) return kFALSE;  // Check Pt and Eta Cut
-  else return kTRUE;
-*/
-  return kTRUE;
+  Bool_t passesJetID = neutralID && chargedID && neutralHighEtaID;
+
+  /////////////////////////////////////////////////////////////////////////
+  // Jet Cleaning
+  /////////////////////////////////////////////////////////////////////////
+
+  Bool_t passesCleaning = kTRUE;
+ 
+  Double_t closestLepton = 999.;
+
+  for (auto const & ele : selectedElectrons){
+    if (ele.DeltaR(*this) < closestLepton) closestLepton = ele.DeltaR(*this);
+  }
+  for (auto const & mu : selectedMuons){
+    if (mu.DeltaR(*this) < closestLepton) closestLepton = mu.DeltaR(*this);
+  }
+  if (closestLepton < _closestLeptonCut) passesCleaning = kFALSE;
+
+  /////////////////////////////////////////////////////////////////////////
+  // B-tag related cuts
+  /////////////////////////////////////////////////////////////////////////
+
+  Bool_t passbPt = jetPt > _bMinPtCut;
+  Bool_t passbEta = TMath::Abs(jetEta) < _bMaxEtaCut;
+  Bool_t passTagCut = bDiscriminator() > _bTagCut;
+
+  if (passbPt && passbEta && passTagCut) SetTagged(kTRUE);
+  else SetTagged(kFALSE);
+
+  if (passPt && passEta && passesJetID && passesCleaning) return kTRUE;
+  
+  return kFALSE;
 
 } //Fill()
 

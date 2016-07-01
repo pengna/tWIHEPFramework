@@ -215,11 +215,12 @@ Electron& Electron::operator=(Electron& other)
 } //= non-const Electron
 
 /******************************************************************************
- * void Electron::Fill(EventTree *evtr,int iE)                                *
+ * void Electron::SetCuts(TEnv* config, TString electron)                     *
  *                                                                            *
- * Fill electron vector from tree                                             *
+ * Set up the cuts to be made on the different types of electron              *
  *                                                                            *
- * Input:  Event Tree                                                         *
+ * Input:  config with cuts                                                   *
+ *         string of what type of electron, Veto, Tight etc                   *
  * Output: kTRUE if this electron passes electron ID cuts                     *
  ******************************************************************************/
 void Electron::SetCuts(TEnv* config, TString electronType)
@@ -241,7 +242,7 @@ void Electron::SetCuts(TEnv* config, TString electronType)
  * Input:  Event Tree                                                         *
  * Output: kTRUE if this electron passes electron ID cuts                     *
  ******************************************************************************/
-Bool_t Electron::Fill(std::vector<Jet>& jets, EventTree *evtr, Int_t iE, TEnv* config, TString electronType, Bool_t isSimulation)
+Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t isSimulation)
 {
 
   // **************************************************************
@@ -361,7 +362,7 @@ Bool_t Electron::Fill(std::vector<Jet>& jets, EventTree *evtr, Int_t iE, TEnv* c
  * Input:  FastSim Tree                                                       *
  * Output: kTRUE if this electron passes electron ID cuts                     *
  ******************************************************************************/
-Bool_t Electron::FillFastSim(std::vector<Jet>& jets, FastSimTree *tr, Int_t iE,TEnv* config,TString electronType)
+Bool_t Electron::FillFastSim(FastSimTree *tr, Int_t iE,TEnv* config,TString electronType)
 {
 } //FillFastSim
 

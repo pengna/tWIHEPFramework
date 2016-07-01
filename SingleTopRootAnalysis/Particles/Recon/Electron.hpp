@@ -72,10 +72,10 @@ class Electron: public Particle
   void SetCuts(TEnv* config, TString electronType);
 
   // Fill the electron from an EventTree
-  Bool_t Fill(std::vector<Jet>& jets, EventTree *evtr, Int_t iE, TEnv* config, TString electronType, Bool_t isSimulation=false);
+  Bool_t Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t isSimulation=false);
 
   // also fill from a fastsim tree
-  Bool_t FillFastSim(std::vector<Jet>& jets, FastSimTree *tr, Int_t iE,TEnv* config,TString electronType);
+  Bool_t FillFastSim(FastSimTree *tr, Int_t iE,TEnv* config,TString electronType);
 
   //inline void SetthetaID(Double_t thetaID){_thetaID = thetaID;};
   //inline Double_t GetthetaID() const {return _thetaID;};

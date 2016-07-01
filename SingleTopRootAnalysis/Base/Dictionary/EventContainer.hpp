@@ -596,6 +596,7 @@ private:
   // once for each event and accessing the config for each particle.
   Muon newMuon;
   Electron newElectron;
+  Jet newJet;
 
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system

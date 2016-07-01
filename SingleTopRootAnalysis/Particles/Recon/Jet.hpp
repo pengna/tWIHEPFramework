@@ -34,8 +34,8 @@
 #include "SingleTopRootAnalysis/Particles/Truth/MCJet.hpp"
 #include "SingleTopRootAnalysis/Particles/Truth/MCTau.hpp"
 #include "SingleTopRootAnalysis/Particles/Recon/Particle.hpp"
-//#include "SingleTopRootAnalysis/Particles/Recon/Electron.hpp"
-//#include "SingleTopRootAnalysis/Particles/Recon/Muon.hpp"
+#include "SingleTopRootAnalysis/Particles/Recon/Electron.hpp"
+#include "SingleTopRootAnalysis/Particles/Recon/Muon.hpp"
 #include "SingleTopRootAnalysis/Trees/EventTree.hpp"
 #include "SingleTopRootAnalysis/Trees/FastSimTree.hpp"
 //#include "SingleTopRootAnalysis/Base/Dictionary/MultijetJESUncertaintyProvider.hpp"
@@ -47,6 +47,7 @@
 //using namespace Analysis;
 
 class Electron;
+class Muon;
 
 class Jet: public Particle
 {
@@ -64,11 +65,14 @@ class Jet: public Particle
   ~Jet();
 
   // Set all contents to their defaults
-  inline void Clear() { Particle::Clear(); _numberOfConstituents=0; _chargedMultiplicity=0;  _bDiscriminator = -999.0; _pileupId = 0.0; _mass = 0.0; _uncorrPt = 0.0; _neutralHadEnergyFraction=0.0; _neutralEmEmEnergyFraction = 0.0; _chargedHadronEnergyFraction =0.0; _chargedEmEnergyFraction=0.0; _muonEnergyFraction=0.0; _electronEnergy=0.0; _photonEnergy=0.0;
+  inline void Clear() { Particle::Clear(); _numberOfConstituents=0; _chargedMultiplicity=0;  _bDiscriminator = -999.0; _pileupId = 0.0; _mass = 0.0; _uncorrPt = 0.0; _neutralHadEnergyFraction=0.0; _neutralEmEmEnergyFraction = 0.0; _chargedHadronEnergyFraction =0.0; _chargedEmEnergyFraction=0.0; _muonEnergyFraction=0.0; _electronEnergy=0.0; _photonEnergy=0.0; _tagged = kFALSE;
 }
 
+  void SetCuts(TEnv* config);
+
   // Fill the jet from an EventTree 
-  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Jet>& jetjetors, EventTree *evtr, Int_t iE, TEnv* config, const TString& tagName, Double_t btagCut);
+  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE);
+  //  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE);
   // Also fill from FastSim tree:
   Bool_t FillFastSim( std::vector<MCJet>& MCBJets, std::vector<MCJet>& MCCJets, std::vector<MCTau>& MCTaus,  std::vector<Electron>& electrons, FastSimTree *tr,Int_t iE,TEnv *config,const TString& tagName="default", Double_t btagCut = 999, Double_t mistagCut = 999, Double_t eshift = 0 );
  
@@ -80,9 +84,9 @@ class Jet: public Particle
   inline Int_t GetchargedMultiplicity() const {return _chargedMultiplicity;};
   inline Int_t chargedMultiplicity() const {return _chargedMultiplicity;};
 
-  inline void SetbDiscriminator(Int_t bDiscriminator){_bDiscriminator = bDiscriminator;};
-  inline Int_t GetbDiscriminator() const {return _bDiscriminator;};
-  inline Int_t bDiscriminator() const {return _bDiscriminator;};
+  inline void SetbDiscriminator(Double_t bDiscriminator){_bDiscriminator = bDiscriminator;};
+  inline Double_t GetbDiscriminator() const {return _bDiscriminator;};
+  inline Double_t bDiscriminator() const {return _bDiscriminator;};
 
   inline void SetpileupId(Double_t pileupId){_pileupId = pileupId;};
   inline Double_t GetpileupId() const {return _pileupId;};
@@ -124,6 +128,10 @@ class Jet: public Particle
   inline Double_t GetuncorrPt() const {return _uncorrPt;};
   inline Double_t uncorrPt() const {return _uncorrPt;};
 
+  inline void SetTagged(Bool_t isTagged){_tagged = isTagged;};
+  inline Bool_t IsTagged() const {return _tagged;};
+  inline Bool_t tagged() const {return _tagged;};
+
   // Overloaded Operators
   // +=
   Jet& operator+=(const Jet& other);
@@ -150,7 +158,17 @@ class Jet: public Particle
   Double_t _muonEnergyFraction;   
   Double_t _electronEnergy;   
   Double_t _photonEnergy;   
-  Double_t _uncorrPt;   
+  Double_t _uncorrPt; 
+  Bool_t _tagged;
+
+  // Cuts applied to the jet objects
+  Double_t _maxEtaCut;
+  Double_t _minPtCut;
+  Double_t _bMaxEtaCut;
+  Double_t _bMinPtCut;
+  Double_t _bTagCut;
+  Double_t _closestLeptonCut;
+  
  
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system

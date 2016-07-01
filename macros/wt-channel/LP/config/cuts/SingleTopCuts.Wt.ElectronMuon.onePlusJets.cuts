@@ -35,8 +35,8 @@ Cut.Jet.Pt.1.Min:  30
 Cut.Jet.Pt.1.Max: 999
 # ############## Tagged Jet Cuts #################
 # Tagged Jet multiplicity cuts
-Cut.Tagged.Jet.Number.Min: 999
-Cut.Tagged.Jet.Number.Max: 999
+Cut.Tagged.Jet.Number.Min: 1
+Cut.Tagged.Jet.Number.Max: 1
 
 ################ Global Event Cuts #####################
 # Missing ET

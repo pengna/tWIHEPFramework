@@ -28,6 +28,7 @@
 //#include "SingleTopRootAnalysis/Cuts/Other/CutTriangularSumDeltaPhiLepMET.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutEMuOverlap.hpp"
 #include "SingleTopRootAnalysis/Cuts/Jet/CutJetN.hpp"
+#include "SingleTopRootAnalysis/Cuts/TaggedJet/CutTaggedJetN.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Jet/CutJetPt1.hpp"
 
 //#include "SingleTopRootAnalysis/Cuts/Other/CutMissingEt.hpp"
@@ -187,6 +188,8 @@ int main(int argc, char **argv)
   //}
   //mystudy.AddCut(new CutJetPt1(particlesObj));
   mystudy.AddCut(new CutJetN(particlesObj));
+
+  mystudy.AddCut(new CutTaggedJetN(particlesObj));
   //mystudy.AddCut(new CutTriangularSumDeltaPhiLepMET(particlesObj));  
   //if (isemu){
   //  mystudy.AddCut(new CutHTJET1(particlesObj));

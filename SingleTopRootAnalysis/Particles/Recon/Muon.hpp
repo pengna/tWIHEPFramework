@@ -55,9 +55,9 @@ public:
   inline void Clear() { Particle::Clear(); _passTightId = kFALSE; _passLooseId = kFALSE;_isSoft = kFALSE; _isHighPt = kFALSE; _isoCharged = 0.0; _isoSum = 0.0; _isoCharParPt = 0.0; _isoNeutralHadron = 0.0;  _isoPhoton = 0.0;  _isoPU = 0.0; _chi2=0.0; _dxy=0.0; _validHits = 0.0; _validHitsInner = 0.0; _matchedStat=0.0; _TLayers=0.0; _relIsoR04=0.0;};
 
   // Fill the muon from an EventTree
-  Bool_t Fill(std::vector<Jet>& jets, TEnv *config, EventTree *evtr,int iE,TString muonType, Bool_t isSimulation);
+  Bool_t Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation);
   // also fill from a fastsim tree
-  Bool_t FillFastSim(std::vector<Jet>& jets, TEnv *config, FastSimTree *tr, Int_t iE,TString muonType);
+  Bool_t FillFastSim(TEnv *config, FastSimTree *tr, Int_t iE,TString muonType);
 
  // Overloaded operators:
   // +=

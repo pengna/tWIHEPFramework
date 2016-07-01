@@ -300,7 +300,7 @@ void Muon::SetCuts(TEnv* config, TString muonType)
  * Input:  Event Tree                                                         *         
  * Output: kTRUE if the muon passes object ID cuts                            *         
  ******************************************************************************/
-Bool_t Muon::Fill(std::vector<Jet>& jets, TEnv *config, EventTree *evtr,int iE,TString muonType, Bool_t isSimulation)
+Bool_t Muon::Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation)
 {
   // **************************************************************
   // Check muon type
@@ -344,8 +344,8 @@ Bool_t Muon::Fill(std::vector<Jet>& jets, TEnv *config, EventTree *evtr,int iE,T
   // Isolation Cuts
   // **************************************************************
   // Get isolation requirement from config file (default is etcone30)
-  TString isoAlgoQ = "ObjectID.Muon." + muonType + ".IsoAlgo";
-  TString isoAlgo  = config -> GetValue(isoAlgoQ, "etcone20");
+  //TString isoAlgoQ = "ObjectID.Muon." + muonType + ".IsoAlgo";
+  //TString isoAlgo  = config -> GetValue(isoAlgoQ, "etcone20");
   
   //// The choices for isolation are DeltaR, etcone20, etcone30, and none
   //if( "deltaR" == isoAlgo){
@@ -418,7 +418,7 @@ Bool_t Muon::Fill(std::vector<Jet>& jets, TEnv *config, EventTree *evtr,int iE,T
  * Input:  FastSim Tree                                                       *         
  * Output: kTRUE if the muon passes object ID cuts                            *         
  ******************************************************************************/
-Bool_t Muon::FillFastSim(std::vector<Jet>& jets, TEnv *config,FastSimTree *tr,int iE,TString muonType)
+Bool_t Muon::FillFastSim(TEnv *config,FastSimTree *tr,int iE,TString muonType)
 {
 
 } //FillFastSim()
