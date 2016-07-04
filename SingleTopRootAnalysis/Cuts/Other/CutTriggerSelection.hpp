@@ -28,6 +28,7 @@
 #include "SingleTopRootAnalysis/Base/Dictionary/HistoCut.hpp"
 #include "SingleTopRootAnalysis/Base/Dictionary/EventContainer.hpp"
 
+#include <sstream>
 
 class CutTriggerSelection : public HistoCut 
 {
@@ -57,6 +58,7 @@ private:
   myTH1F* _hTriggerSelectionBefore;    // Histogram Missing Et
   myTH1F* _hTriggerSelectionAfter;     // Histogram Missing Et
   int _whichtrigger;
+  TString _triggerChannel;
 
 };
 

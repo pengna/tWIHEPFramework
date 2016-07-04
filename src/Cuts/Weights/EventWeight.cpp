@@ -177,7 +177,7 @@ void EventWeight::BookHistogram()
   strNumber<<"Weight.Source."<<sNumber;
   //string wq = "Weight.Source."+strNumber.str();
   //wq += strNumber.str();
-
+  cout << strNumber.str().c_str() << endl;
   Double_t xsecstuff = conf -> GetValue(strNumber.str().c_str(), 0.0);
 
   //NOTE: 0.0 is a default value.  Will assume if xsecstuff is 0.0 that there is no cross-section available and the global weight will be set to 1.0.
@@ -221,6 +221,8 @@ Bool_t EventWeight::Apply()
      EventContainer *EventContainerObj = GetEventContainer();
    // Set output event weight- no difference
 
+     EventTree* tree = EventContainerObj->GetEventTree();
+
   Double_t wgt = EventContainerObj -> GetGlobalEventWeight();
  Double_t mnwgt = 1;
   //
@@ -235,6 +237,7 @@ Bool_t EventWeight::Apply()
       // For comparison
       //mnwgt = 1;
     }
+    //    cout << tree->EVENT_genWeight << " " << tree->bWeight << " " << tree->PUWeight << "weight" << endl;
     //  Double_t mnwgt = EventContainerObj->GetTruthTree()->eventWeightMCatNLO;
     // cout<<"the weight is "<<mnwgt<<endl;
 
@@ -290,7 +293,7 @@ Bool_t EventWeight::Apply()
     _hPileUpWgtWeight->FillWithoutWeight(mnwgt);
     **/
  // }
- 
+ // cout << wgt << endl;
   EventContainerObj -> SetOutputEventWeight(wgt);
   EventContainerObj -> SetEventPileupWeight(pileupEventWeight);
   //  cout<<"weight "<<EventContainerObj -> GetOutputEventWeight()<<endl;;

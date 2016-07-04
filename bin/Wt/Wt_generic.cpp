@@ -42,7 +42,7 @@
 //#include "SingleTopRootAnalysis/Cuts/Other/CutPrimaryVertex.hpp"
 //
 //#include "SingleTopRootAnalysis/Cuts/Other/CutZveto.hpp"
-//#include "SingleTopRootAnalysis/Cuts/Other/CutTriggerSelection.hpp"
+#include "SingleTopRootAnalysis/Cuts/Other/CutTriggerSelection.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutHFOR.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutBadPileupEvent.hpp"
 
@@ -170,7 +170,7 @@ int main(int argc, char **argv)
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Tight"));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Veto"));  // make the muon plots, hopefully.
   //mystudy.AddCut(new CutPrimaryVertex(particlesObj));
-  //mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
+  mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
   //mystudy.AddCut(new CutElectronTighterPt(particlesObj, "Tight")); 
   mystudy.AddCut(new CutMuonN(particlesObj, "Tight"));     //require that lepton to be isolated, central, high pt
 
