@@ -177,8 +177,9 @@ void EventWeight::BookHistogram()
   strNumber<<"Weight.Source."<<sNumber;
   //string wq = "Weight.Source."+strNumber.str();
   //wq += strNumber.str();
-  cout << strNumber.str().c_str() << endl;
+  //  cout << EventContainerObj->GetEventTree()->GetEntries() << endl;
   Double_t xsecstuff = conf -> GetValue(strNumber.str().c_str(), 0.0);
+  Double_t testNEvents = conf -> GetValue("Events.Source.100000",0.0);
 
   //NOTE: 0.0 is a default value.  Will assume if xsecstuff is 0.0 that there is no cross-section available and the global weight will be set to 1.0.
 
