@@ -39,7 +39,7 @@
 //#include "SingleTopRootAnalysis/Cuts/Other/CutHTJET1.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Lepton/CutLeptonOppositeCharge.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutLarBurst.hpp"
-//#include "SingleTopRootAnalysis/Cuts/Other/CutPrimaryVertex.hpp"
+#include "SingleTopRootAnalysis/Cuts/Other/CutPrimaryVertex.hpp"
 //
 //#include "SingleTopRootAnalysis/Cuts/Other/CutZveto.hpp"
 #include "SingleTopRootAnalysis/Cuts/Other/CutTriggerSelection.hpp"
@@ -83,6 +83,7 @@ int main(int argc, char **argv)
   Bool_t doFast = kFALSE;
   string mcStr="";
   Bool_t doMC = kFALSE;
+  Bool_t doPileup = kFALSE;
   string evtListFileName="";
   int whichtrig = -1;
   
@@ -110,6 +111,7 @@ int main(int argc, char **argv)
     }//if MCatNLO
     if (!strcmp(argv[i], "-PileUpWgt")) {
       mcStr=mcStr+"PileUpWgt";
+      doPileup = kTRUE;
       cout << "Driver: Use PileUpWgt " << endl;
     }//if PileUpWgt
     if (!strcmp(argv[i], "-UseTotalEvtFromFile")) {
@@ -164,12 +166,12 @@ int main(int argc, char **argv)
   /////////////////////////////////////////////////////////////////////////////////
   // ******** Cuts and Histograms applied to all studies ********
 
-  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, false));
+  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup));
 
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"All"));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Tight"));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Veto"));  // make the muon plots, hopefully.
-  //mystudy.AddCut(new CutPrimaryVertex(particlesObj));
+  mystudy.AddCut(new CutPrimaryVertex(particlesObj));
   mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
   //mystudy.AddCut(new CutElectronTighterPt(particlesObj, "Tight")); 
   mystudy.AddCut(new CutMuonN(particlesObj, "Tight"));     //require that lepton to be isolated, central, high pt

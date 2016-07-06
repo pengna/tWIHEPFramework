@@ -574,6 +574,15 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
 	  SetSourceName(sname.c_str());
 	  continue;
 	}
+	// If the tree name is something unusual, change the chain here
+	else if(fileInChainName.find("InTree") != string::npos) {
+	  cout << "<AnalysisMain::ParseCmdLine> " << "Setting source tree to name to: " << fileInChainName.c_str() << endl;
+	  string::size_type pos = fileInChainName.rfind(":");
+	  string snu = fileInChainName.substr(pos+2);
+	  delete chainEV0;
+	  TChain *chainEV0 = new TChain(TString(snu));
+	  continue;
+	}
 	// The line starting with Number: contains the source number
 	else if(fileInChainName.find("Number") != string::npos) {
 	  cout << "<AnalysisMain::ParseCmdLine> " << "Setting source number to: "<< fileInChainName.c_str() << endl;

@@ -181,6 +181,12 @@ void EventWeight::BookHistogram()
   Double_t xsecstuff = conf -> GetValue(strNumber.str().c_str(), 0.0);
   Double_t testNEvents = conf -> GetValue("Events.Source.100000",0.0);
 
+  //Get the lumi of the data from the config file
+  Double_t lumi = conf -> GetValue("Weight.Lumi",100);
+  
+  //Now multiply the xsec by the lumi
+  xsecstuff *= lumi;
+
   //NOTE: 0.0 is a default value.  Will assume if xsecstuff is 0.0 that there is no cross-section available and the global weight will be set to 1.0.
 
   if(EventContainerObj -> GetDebugLevel() > 1) {
@@ -277,6 +283,7 @@ Bool_t EventWeight::Apply()
 
  //only apply pileup weight if specified
  if(isPileUpWgt()) {
+   pileupEventWeight = tree->PUWeight;
    wgt *= pileupEventWeight;
  }
 
