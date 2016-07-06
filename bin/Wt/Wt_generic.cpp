@@ -84,6 +84,7 @@ int main(int argc, char **argv)
   string mcStr="";
   Bool_t doMC = kFALSE;
   Bool_t doPileup = kFALSE;
+  Bool_t dobWeight = kFALSE;
   string evtListFileName="";
   int whichtrig = -1;
   
@@ -113,6 +114,11 @@ int main(int argc, char **argv)
       mcStr=mcStr+"PileUpWgt";
       doPileup = kTRUE;
       cout << "Driver: Use PileUpWgt " << endl;
+    }//if PileUpWgt
+    if (!strcmp(argv[i], "-BWgt")) {
+      mcStr=mcStr+"BWgt";
+      dobWeight = kTRUE;
+      cout << "Driver: Use b weight " << endl;
     }//if PileUpWgt
     if (!strcmp(argv[i], "-UseTotalEvtFromFile")) {
       mcStr=mcStr+"UseTotalEvtFromFile";
@@ -166,7 +172,7 @@ int main(int argc, char **argv)
   /////////////////////////////////////////////////////////////////////////////////
   // ******** Cuts and Histograms applied to all studies ********
 
-  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup));
+  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight));
 
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"All"));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Tight"));  // make the muon plots, hopefully.

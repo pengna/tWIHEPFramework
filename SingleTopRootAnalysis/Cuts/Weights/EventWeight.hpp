@@ -41,7 +41,7 @@ class EventWeight : public HistoCut
 public:
 
   // Parameterized Constructor
-  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false);
+  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false);
   
   // Default Destructor
   ~EventWeight();
@@ -57,8 +57,10 @@ public:
   // methods for weighting for MC generatd with MCatNLO
   void setMCatNLO(Bool_t val=true) { _useMCatNLO=val; };
   void setPileUpWgt(Bool_t val=true) { _usePileUpWgt=val; };
+  void setbWeight(Bool_t val=true) { _usebWeight=val; };
   Bool_t isMCatNLO() const { return _useMCatNLO; };
   Bool_t isPileUpWgt() const { return _usePileUpWgt; };
+  Bool_t isbWeight() const { return _usebWeight; };
 
     // methods for weighting for MC generatd with NoWeight
   void setNoWeight(Bool_t val=true) { _useNoWeight=val; };
@@ -72,12 +74,14 @@ private:
   //  vector<double> vecPileUpWgt;  // vector to store vertex Pile up reweighting weights
   Bool_t _useMCatNLO;  // set to true if this MC is MC@NLO and we need to use the corresponding weight
   Bool_t _usePileUpWgt;  // set to true if this MC is MC@NLO and we need to use the corresponding weight
+  Bool_t _usebWeight;  // set to true if using b-tag weights
   Bool_t _useNoWeight;  //No weight except MCatNLO weight
   // Histograms
   myTH1F* _hTreeWeight;   // Histogram of input tree weights
   myTH1F* _hGlobalWeight; // Histogram of global weights
   myTH1F* _hMCatNLOWeight; // Histogram of MCatNLO weight
   myTH1F* _hPileUpWeight; // Histogram of PileUpWgt weight
+  myTH1F* _hbWeight; // Histogram of b weight
   myTH1F* _hOutputWeight; // Histogram of output weights
   Double_t _totalMCatNLOEvents;
 

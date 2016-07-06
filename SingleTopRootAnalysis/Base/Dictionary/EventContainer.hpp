@@ -312,6 +312,11 @@ class EventContainer
   inline Double_t GetEventPileupWeight() const {return _EventPileupWeight;}; 
   inline Double_t EventPileupWeight() const {return GetEventPileupWeight();}; 
 
+ //b weight per event
+  inline void SetEventbWeight(const Double_t& bweight) {_EventbWeight = bweight;}; //tagging prob per event
+  inline Double_t GetEventbWeight() const {return _EventbWeight;}; 
+  inline Double_t EventbWeight() const {return GetEventbWeight();}; 
+
 
  //Tagging probabiliy weight per event
   inline void SetEventTagWeight(const Double_t& taggingweight) {_EventTagWeight = taggingweight;}; //tagging prob per event
@@ -367,6 +372,7 @@ class EventContainer
   Float_t _EventTagWeight_Lqup;//tagging weight per event applying the Lq SF up shift
   Float_t _EventTagWeight_Lqdown;//tagging weight per event applying the Lq SF down shift
   Float_t _EventPileupWeight;
+  Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
 
   //MultijetJESUncertaintyProvider myJES;
   // CalibrationDataVariables CalibVar;

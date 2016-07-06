@@ -43,7 +43,7 @@ using namespace std;
  * Input:  Particle class                                                     *
  * Output: None                                                               *
  ******************************************************************************/
-EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup)
+EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight)
 {
   //pileup is NOT applied by default.  Instead it is applied by the user, and stored in the tree for later application
 
@@ -91,6 +91,9 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
   }
   if(pileup) setPileUpWgt(true);
   else setPileUpWgt(false);
+
+  if (bWeight) setbWeight(true);
+  else setbWeight(false);
 
   ostringstream strFileData;
   ostringstream strFileMC;
@@ -157,9 +160,14 @@ void EventWeight::BookHistogram()
   _hMCatNLOWeight -> SetYAxisTitle("Events");
 
   // Histogram of pile up Weight(vtx). This is one of the global weights
-  _hPileUpWeight =  DeclareTH1F("PileUpWgtWeight","Event Weight for PileUpWgt",100,-10.,10.);
+  _hPileUpWeight =  DeclareTH1F("PileUpWgtWeight","Event Weight for PileUpWgt",100,0.,10.);
   _hPileUpWeight -> SetXAxisTitle("PileUpWgt Weight");
   _hPileUpWeight -> SetYAxisTitle("Events");
+
+  // Histogram of pile up Weight(vtx). This is one of the global weights
+  _hbWeight =  DeclareTH1F("bWeight","Event Weight for b tagging",100,0.,10.);
+  _hbWeight -> SetXAxisTitle("b Weight");
+  _hbWeight -> SetYAxisTitle("Events");
 
   // Histogram of Output Weights
   _hOutputWeight =  DeclareTH1F("OutputWeight","Output Event Weight",100,-10.,10.);
@@ -179,7 +187,6 @@ void EventWeight::BookHistogram()
   //wq += strNumber.str();
   //  cout << EventContainerObj->GetEventTree()->GetEntries() << endl;
   Double_t xsecstuff = conf -> GetValue(strNumber.str().c_str(), 0.0);
-  Double_t testNEvents = conf -> GetValue("Events.Source.100000",0.0);
 
   //Get the lumi of the data from the config file
   Double_t lumi = conf -> GetValue("Weight.Lumi",100);
@@ -287,6 +294,13 @@ Bool_t EventWeight::Apply()
    wgt *= pileupEventWeight;
  }
 
+ float bEventWeight(1.0);
+ 
+ if (isbWeight()){
+   bEventWeight = tree->bWeight;
+   wgt *= bEventWeight;
+ }
+
  // if(isPileUpWgt()) {
     //This version is based on primary vertex number and no longer used
     /**
@@ -304,6 +318,7 @@ Bool_t EventWeight::Apply()
  // cout << wgt << endl;
   EventContainerObj -> SetOutputEventWeight(wgt);
   EventContainerObj -> SetEventPileupWeight(pileupEventWeight);
+  EventContainerObj -> SetEventbWeight(bEventWeight);
   //  cout<<"weight "<<EventContainerObj -> GetOutputEventWeight()<<endl;;
   // Fill Histograms
 
@@ -311,6 +326,7 @@ Bool_t EventWeight::Apply()
   _hGlobalWeight -> FillWithoutWeight(EventContainerObj -> GetGlobalEventWeight());
   _hOutputWeight -> FillWithoutWeight(EventContainerObj -> GetEventWeight());
   _hPileUpWeight -> FillWithoutWeight(EventContainerObj -> GetEventPileupWeight());
+  _hbWeight	 -> FillWithoutWeight(EventContainerObj -> GetEventbWeight());
 
   return kTRUE;
   

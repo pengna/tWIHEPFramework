@@ -1,3 +1,3 @@
 #!/bin/bash
-bin/Wt/Wt_generic.x -config SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist config/files/tWTesting.list -hfile hists/SingleTop.105200_1.t.LP2fb_v5.MC.mm1+j.muonMSSmeardown.WtDilepton.root -skimfile skims/SingleTop.105200_1.t.LP2fb_v5.MC.mm1+j.muonMSSmeardown.WtDilepton.rootskimBkgd.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon 2>errorLog
+bin/Wt/Wt_generic.x -config SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist config/files/tWTesting.list -hfile hists/SingleTop.105200_1.t.LP2fb_v5.MC.mm1+j.muonMSSmeardown.WtDilepton.root -skimfile skims/SingleTop.105200_1.t.LP2fb_v5.MC.mm1+j.muonMSSmeardown.WtDilepton.rootskimBkgd.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon -PileUpWgt -BWgt 2>errorLog
 
