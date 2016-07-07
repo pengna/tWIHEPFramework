@@ -145,10 +145,16 @@ Bool_t CutTriggerSelection::Apply()
 
   Int_t triggerBit = 0.;
 
+  Int_t electronTrigger = EventContainerObj->HLT_Ele23_WPLoose_Gsf;
+  Int_t muonTrigger = EventContainerObj->HLT_IsoMu18;
   if (_whichtrigger == 0) triggerBit = EventContainerObj->HLT_Ele23_WPLoose_Gsf;
   if (_whichtrigger == 1) triggerBit = EventContainerObj->HLT_IsoMu18;
   
-  if (triggerBit != 0.) passesTrigger = kTRUE;
+  if (_whichtrigger == 0) passesTrigger = electronTrigger != 0. and muonTrigger == 0;
+  if (_whichtrigger == 1) passesTrigger = electronTrigger == 0. and muonTrigger != 0;
+
+
+  //if (triggerBit != 0.) passesTrigger = kTRUE;
 
   // Fill the histograms before the cuts
   _hTriggerSelectionBefore -> Fill(triggerBit);
