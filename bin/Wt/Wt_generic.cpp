@@ -24,6 +24,8 @@
 //#include "SingleTopRootAnalysis/Histogramming/Topological/HistogrammingWtDiLepTopology.hpp"
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingMuon.hpp"
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingElectron.hpp"
+#include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingMET.hpp"
+#include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingMtW.hpp"
 // Include cuts classes
 //#include "SingleTopRootAnalysis/Cuts/Other/CutTriangularSumDeltaPhiLepMET.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutEMuOverlap.hpp"
@@ -196,8 +198,11 @@ int main(int argc, char **argv)
   //}
   //mystudy.AddCut(new CutJetPt1(particlesObj));
   mystudy.AddCut(new CutJetN(particlesObj));
-
+  
   mystudy.AddCut(new CutTaggedJetN(particlesObj));
+
+  mystudy.AddCut(new HistogrammingMET(particlesObj));
+  mystudy.AddCut(new HistogrammingMtW(particlesObj));
   //mystudy.AddCut(new CutTriangularSumDeltaPhiLepMET(particlesObj));  
   //if (isemu){
   //  mystudy.AddCut(new CutHTJET1(particlesObj));

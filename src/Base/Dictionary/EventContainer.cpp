@@ -484,6 +484,16 @@ Int_t EventContainer::ReadEvent()
     //}
     //nPvtx = ncount;
     //Pvtxall_n = _eventTree->Vertex_n;
+
+    ///////////////////////////////////////////
+    // Fill MET info
+    ///////////////////////////////////////////
+    missingEt = _eventTree->Met_type1PF_pt;
+    missingEx = _eventTree->Met_type1PF_px;
+    missingPhi = _eventTree->Met_type1PF_phi;
+    missingEy = _eventTree->Met_type1PF_py;
+
+    
     ///////////////////////////////////////////
     // Electrons-->refilled and sorted later in method!!
     ///////////////////////////////////////////
@@ -561,7 +571,7 @@ Int_t EventContainer::ReadEvent()
       closeindex = 999;
       ejordr = 999;
       bestjetdr = 999;
-      missingEt = -888; 
+      //      missingEt = -888; 
       
       useObj = newJet.Fill(1.0,1.0, tightMuons, tightElectrons, _eventTree, io);
       //      useObj = newJet.Fill(1.0,1.0, _eventTree, io);
