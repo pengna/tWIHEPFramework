@@ -1052,7 +1052,7 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
 
   cout << "<AnalysisMain::Loop> " << endl;
   cout << "<AnalysisMain::Loop> " <<"           ------------------------------- "  << endl;
-  cout << "<AnalysisMain::Loop> " <<"          |      Processing Summay        |"  << endl;
+  cout << "<AnalysisMain::Loop> " <<"          |      Processing Summary        |"  << endl;
   cout << "<AnalysisMain::Loop> " <<"           ------------------------------- "  << endl;
   cout << "<AnalysisMain::Loop> " <<"          |  # of events:    " << setw(10)    << setprecision(4) <<eventCounter   << "  " << " |"  << endl;
 
