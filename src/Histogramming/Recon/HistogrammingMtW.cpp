@@ -62,7 +62,7 @@ HistogrammingMtW::~HistogrammingMtW()
 void HistogrammingMtW::BookHistogram(){
   
   //Histogram of mTW
-  _hMtW = DeclareTH1F("mTW", "Transverse W mass",200,0.,200.);
+  _hMtW = DeclareTH1F("mTW", "Transverse W mass",40,0.,200.);
   _hMtW->SetXAxisTitle("m_{T,W} [GeV]");
   _hMtW->SetYAxisTitle("Events");
   //cout<<"end of HistogrammingMtW::BookHistogram"<<endl;
