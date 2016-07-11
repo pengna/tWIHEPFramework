@@ -1,0 +1,89 @@
+# Combining the MC information into a single configuration file, because it's way too complicated as it is. 
+# The Weight.Source.ID is now the cross section * BR only. Lumi is included as an additional variable in this file so that changes in lumi can be applied easily.
+# 5th July 2015 - Duncan Leggat
+#########################################
+#I will be using my own codes because what is a D3PD.
+#########################################
+
+# The luminosity of the sample to be processed. For some reason before it was already in all of the weights, which is not ideal.
+Weight.Lumi: 2300.
+
+# 100000 - tW_top_5fs inclusive
+Weight.Source.100000: 35.85
+Events.Source.100000: 1000000
+
+# 10001 - tW_antitop
+Weight.Source.100001: 35.6
+Events.Source.100001: 999400
+
+# 100002 - tChan
+Weight.Source.100002: 70.69
+Events.Source.100002: 19938230
+
+# 100003 - ttbar
+Weight.Source.100003: 831.76
+Events.Source.100003: 97907991
+
+# 100004 - zPlusJetsHighMass
+Weight.Source.100004: 6025.2
+Events.Source.100004: 29067019
+
+# 100005 - zPlusJetsLowMass
+Weight.Source.100005: 18610.
+Events.Source.100005: 30899063
+
+# 100006 - wPlusJets
+Weight.Source.100006: 20508.9
+Events.Source.100006: 47161328
+
+#100007 - WW
+Weight.Source.100007: 118.7
+Events.Source.100007: 988418
+
+#100008 - WZ
+Weight.Source.100008: 66.1
+Events.Source.100008: 1000000
+
+#100009 - ZZ
+Weight.Source.100009: 31.8
+Events.Source.100009: 985600
+
+#100010 - sChan
+Weight.Source.100010: 3.36
+Events.Source.100010: 998400
+
+#100011 - qcd100_200
+Weight.Source.100011: 27990000.
+Events.Source.100011: 82095800
+
+#100012 - qcd200_300
+Weight.Source.100012: 1712000.
+Events.Source.100012: 18784379
+
+#100013 - qcd300_500
+Weight.Source.100013: 347700.
+Events.Source.100013: 16909004
+
+#100014 - qcd500_700
+Weight.Source.100014: 32100.
+Events.Source.100014: 19294591
+
+#100015 - qcd700_1000
+Weight.Source.100015: 6831.
+Events.Source.100015: 15531969
+
+#100016 - qcd1000_1500
+Weight.Source.100016: 1207.
+Events.Source.100016: 5000610
+
+#100017 - qcd1500_2000
+Weight.Source.100017: 119.9
+Events.Source.100017: 2711608
+
+#100018 - qcd2000_inf
+Weight.Source.100018: 25.24
+Events.Source.100018: 721306
+
+
+
+
