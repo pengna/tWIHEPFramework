@@ -554,6 +554,12 @@ Int_t EventContainer::ReadEvent()
         vetoMuons.push_back(newMuon);
       } // if useObj
 
+      newMuon.Clear();
+      useObj = newMuon.Fill(_eventTree, io,"Unisolated", isSimulation);
+      if(useObj) {
+	unIsolatedMuons.push_back(newMuon);
+      } // if useObj
+
     } //for muon loop
 
     ///////////////////////////////////////////
