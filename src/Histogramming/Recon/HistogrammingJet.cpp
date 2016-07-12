@@ -237,6 +237,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj1  -> Fill(evc->jets[0].Pt());
     _hEtaObj1 -> Fill(evc->jets[0].Eta());
     _hPhiObj1 -> Fill(evc->jets[0].Phi());
+    _hTagObj1 -> Fill(evc->jets[0].bDiscriminator());
   } //if
 
   // Jet 2
@@ -244,6 +245,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj2  -> Fill(evc->jets[1].Pt());
     _hEtaObj2 -> Fill(evc->jets[1].Eta());
     _hPhiObj2 -> Fill(evc->jets[1].Phi());
+    _hTagObj2 -> Fill(evc->jets[1].bDiscriminator());
   } //if
   
   // Jet 3
@@ -251,6 +253,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj3  -> Fill(evc->jets[2].Pt());
     _hEtaObj3 -> Fill(evc->jets[2].Eta());
     _hPhiObj3 -> Fill(evc->jets[2].Phi());
+    _hTagObj3 -> Fill(evc->jets[2].bDiscriminator());
   } //if
 
   // Jet 4
@@ -258,6 +261,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj4  -> Fill(evc->jets[3].Pt());
     _hEtaObj4 -> Fill(evc->jets[3].Eta());
     _hPhiObj4 -> Fill(evc->jets[3].Phi());
+    _hTagObj4 -> Fill(evc->jets[3].bDiscriminator());
   } //if
 
   // Jet 5
@@ -265,6 +269,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj5  -> Fill(evc->jets[4].Pt());
     _hEtaObj5 -> Fill(evc->jets[4].Eta());
     _hPhiObj5 -> Fill(evc->jets[4].Phi());
+    _hTagObj5 -> Fill(evc->jets[4].bDiscriminator());
   } //if
 
   // Jet 6
@@ -272,6 +277,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj6  -> Fill(evc->jets[5].Pt());
     _hEtaObj6 -> Fill(evc->jets[5].Eta());
     _hPhiObj6 -> Fill(evc->jets[5].Phi());
+    _hTagObj6 -> Fill(evc->jets[5].bDiscriminator());
   } //if
 
   // Jet 7
@@ -279,6 +285,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj7  -> Fill(evc->jets[6].Pt());
     _hEtaObj7 -> Fill(evc->jets[6].Eta());
     _hPhiObj7 -> Fill(evc->jets[6].Phi());
+    _hTagObj7 -> Fill(evc->jets[6].bDiscriminator());
   } //if
 
   // Loop over all jets and histogram their properties
