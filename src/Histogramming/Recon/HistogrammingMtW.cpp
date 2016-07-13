@@ -84,10 +84,10 @@ Bool_t HistogrammingMtW::Apply()
   EventContainer *evc = GetEventContainer();
   
   if (evc->tightMuons.size() > 0){
-    _hMtW -> Fill(TMath::Abs(2*evc->missingEt*evc->tightMuons[0].Pt()*(1-cos(evc->missingPhi - evc->tightMuons[0].Phi()))));
+    _hMtW -> Fill(std::sqrt(2*evc->missingEt*evc->tightMuons[0].Pt()*(1-cos(evc->missingPhi - evc->tightMuons[0].Phi()))));
   }
   else if (evc->tightElectrons.size() > 0){
-    _hMtW -> Fill(TMath::Abs(2*evc->missingEt*evc->tightElectrons[0].Pt()*(1-cos(evc->missingPhi - evc->tightElectrons[0].Phi()))));
+    _hMtW -> Fill(std::sqrt(2*evc->missingEt*evc->tightElectrons[0].Pt()*(1-cos(evc->missingPhi - evc->tightElectrons[0].Phi()))));
   }
 
   //  }

@@ -54,6 +54,7 @@ private:
   myTH1F* _hMET;  // Histogram of MET
   myTH1F* _hMEX;  // Histogram of MEX
   myTH1F* _hMEY;  // Histogram of MEY
+  myTH1F* _hMETPhi;  // Histogram of MET phi
   myTH1F* _hSumEt;  // Histogram of SumEt
 
 };
