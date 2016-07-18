@@ -12,6 +12,8 @@ taskname = "EvtSel"
 workpath    = os.getcwd()+"/"+analysis +"/"
 frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
 jobDir      = workpath+"/"+"Jobs"
+fileListDirectory = "fullSmallJobs/"
+smallerJobs = True
 AnalyzerDir = workpath+"/"+"Analyzer"
 task        = analysis+"_"+taskname
 rootplizer  = "Rootplizer_"+task+".cc"
@@ -36,6 +38,25 @@ sample=[
 "wz",
 "zz"
 ]
+nJobs = {
+"qcd1000_1500":2,
+"qcd100_200":20,
+"qcd1500_2000":1,
+"qcd2000_inf":1,
+"qcd200_300":5,
+"qcd300_500":5,
+"qcd500_700":5,
+"qcd700_1000":4,
+"sChan":1,
+"tChan":7,
+"ttbar":25,
+"tW_top":1,
+"tW_antitop":1,
+"wPlusJets":12,
+"ww":1,
+"wz":1,
+"zz":1
+}
 #####
 ##   The script itsself
 #####
@@ -65,7 +86,7 @@ def prepareSubmitJob(submitFileName,cshFileName, outPutFileName, errorFileName):
 	print >> cshFile, "Error        = ",errorFileName
 	print >> cshFile, "Queue"
 
-def prepareCshJob(sample,shFile,frameworkDir,workpath):
+def prepareCshJob(sample,shFile,frameworkDir,workpath,samplePost=""):
         subFile      = file(shFile,"w")
 	print >> subFile, "#!/bin/bash"
 	print >> subFile, "/bin/hostname"
@@ -80,7 +101,7 @@ def prepareCshJob(sample,shFile,frameworkDir,workpath):
         #print >> subFile, "eval \`scramv1 runtime -sh\`"
         print >> subFile, "cd "+frameworkDir
 	#print >> subFile, "cp ${jobDir}/getAhist.C ."
-	print >> subFile, frameworkDir+"bin/Wt/Wt_generic.x -config "+frameworkDir+"SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist "+frameworkDir+"config/files/full/"+sample+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+"+hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+"Skim.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon -PileUpWgt -BWgt"
+	print >> subFile, frameworkDir+"bin/Wt/Wt_generic.x -config "+frameworkDir+"SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+"Skim.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon -PileUpWgt -BWgt"
         #print >> subFile, "root -b -q -l "+rootplizer+"'(\""+input+"\",\""+output+"\")'"
  
 #for iroot in range(nroot):
@@ -96,17 +117,35 @@ for k in sample:
 	os.popen('mkdir -p '+workpath + sampleName + "/skims")
 	os.popen('mkdir -p '+workpath + sampleName + "/logs")
 
-	submitFileName = workpath + sampleName + "/scripts/" + sampleName + ".submit"
-	shFileName = workpath + sampleName + "/scripts/" + sampleName +  ".sh"
-	logFileName = workpath + sampleName + "/logs/" + sampleName + ".log"
-	errorFileName = workpath + sampleName + "/logs/" + sampleName + ".error"
-	
-	prepareSubmitJob(submitFileName, shFileName, logFileName, errorFileName)
-	prepareCshJob(sampleName,shFileName,frameworkDir,workpath)
+	if not smallerJobs:
 
-	submitPath = sampleName + "/scripts/" + sampleName + ".submit"
+		submitFileName = workpath + sampleName + "/scripts/" + sampleName + ".submit"
+		shFileName = workpath + sampleName + "/scripts/" + sampleName +  ".sh"
+		logFileName = workpath + sampleName + "/logs/" + sampleName + ".log"
+		errorFileName = workpath + sampleName + "/logs/" + sampleName + ".error"
+		
+		prepareSubmitJob(submitFileName, shFileName, logFileName, errorFileName)
+		prepareCshJob(sampleName,shFileName,frameworkDir,workpath)
+		
+		submitPath = sampleName + "/scripts/" + sampleName + ".submit"
+		
+		print >> allJobFile, "condor_submit "+ submitPath + " -group cms -name job@schedd01.ihep.ac.cn"
 
-	print >> allJobFile, "condor_submit "+ submitPath + " -group cms -name job@schedd01.ihep.ac.cn"
+	else:
+		for j in range(nJobs[sampleName]):
+			submitFileName = workpath + sampleName + "/scripts/" + sampleName + str(j) + ".submit"
+			shFileName = workpath + sampleName + "/scripts/" + sampleName + str(j) + ".sh"
+			logFileName = workpath + sampleName + "/logs/" + sampleName + str(j) + ".log"
+			errorFileName = workpath + sampleName + "/logs/" + sampleName + str(j) + ".error"
+			
+			prepareSubmitJob(submitFileName, shFileName, logFileName, errorFileName)
+			prepareCshJob(sampleName,shFileName,frameworkDir,workpath,str(j))
+
+			submitPath = sampleName + "/scripts/" + sampleName + str(j) + ".submit"
+			
+			print >> allJobFile, "condor_submit "+ submitPath + " -group cms -name job@schedd01.ihep.ac.cn"
+
+
 
 print >> MergeFile, "cd",outputDirectory
 print >> MergeFile, "hadd Merged_rootplas.root",MergeSourceFile
