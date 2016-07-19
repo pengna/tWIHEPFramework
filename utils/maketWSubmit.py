@@ -101,7 +101,7 @@ def prepareCshJob(sample,shFile,frameworkDir,workpath,samplePost=""):
         #print >> subFile, "eval \`scramv1 runtime -sh\`"
         print >> subFile, "cd "+frameworkDir
 	#print >> subFile, "cp ${jobDir}/getAhist.C ."
-	print >> subFile, frameworkDir+"bin/Wt/Wt_generic.x -config "+frameworkDir+"SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+"Skim.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon -PileUpWgt -BWgt"
+	print >> subFile, frameworkDir+"bin/Wt/Wt_generic.x -config "+frameworkDir+"SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon -PileUpWgt -BWgt"
         #print >> subFile, "root -b -q -l "+rootplizer+"'(\""+input+"\",\""+output+"\")'"
  
 #for iroot in range(nroot):
@@ -145,9 +145,9 @@ for k in sample:
 			
 			print >> allJobFile, "condor_submit "+ submitPath + " -group cms -name job@schedd01.ihep.ac.cn"
 
+	print >> MergeFile, "hadd -f "+analysis+"/"+sampleName + "/hists/merged"+sampleName+".root  "+analysis+"/"+sampleName + "/hists/"+sampleName+"*"
 
-
-print >> MergeFile, "cd",outputDirectory
-print >> MergeFile, "hadd Merged_rootplas.root",MergeSourceFile
+#print >> MergeFile, "cd",outputDirectory
+#print >> MergeFile, "hadd Merged_rootplas.root",MergeSourceFile
 
 print >> allJobFile, "cd -"

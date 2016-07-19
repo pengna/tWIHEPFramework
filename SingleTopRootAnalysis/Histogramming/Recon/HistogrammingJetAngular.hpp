@@ -70,6 +70,13 @@ private:
   myTH1F* _hJet2METDelPhi; // delta phi between the sub-leading untagged jet and the MET
   myTH1F* _hbJetMETDelPhi; // delta phi between the b jet and the MET
   myTH1F* _hJetsMETDelPhi; // delta phi between the untagged jets and the MET
+  myTH1F* _hLepMETDelPhi; // delta phi between NET and lepton. Not really a jet angle, but whatevs.
+
+  //Also going to make some combination plots here. Because JetAngular is a terrible name for this class anyway.
+  myTH1F* _diJetMass; // mass of the untagged jet pair
+  myTH1F* _threeJetMass; // mass of the three jet system
+  myTH1F* _mTt; //Transverse mass of the reconstructed top
+  myTH1F* _ptSys; // p_T of the system
 
   Jet bJet;
   Jet leadingJet;

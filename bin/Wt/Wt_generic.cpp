@@ -26,6 +26,7 @@
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingElectron.hpp"
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingMET.hpp"
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingMtW.hpp"
+#include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingJetAngular.hpp"
 // Include cuts classes
 //#include "SingleTopRootAnalysis/Cuts/Other/CutTriangularSumDeltaPhiLepMET.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutEMuOverlap.hpp"
@@ -207,6 +208,7 @@ int main(int argc, char **argv)
 
   mystudy.AddCut(new HistogrammingMET(particlesObj));
   mystudy.AddCut(new HistogrammingMtW(particlesObj));
+  mystudy.AddCut(new HistogrammingJetAngular(particlesObj));
   //mystudy.AddCut(new CutTriangularSumDeltaPhiLepMET(particlesObj));  
   //if (isemu){
   //  mystudy.AddCut(new CutHTJET1(particlesObj));
