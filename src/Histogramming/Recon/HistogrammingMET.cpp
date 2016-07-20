@@ -84,7 +84,7 @@ void HistogrammingMET::BookHistogram(){
   _hSumEt->SetYAxisTitle("Events");
 
   // Histogram of MET phi
-  _hMETPhi = DeclareTH1F("MET Phi","Phi of missing transverse energy",50,-3.3,3.3);
+  _hMETPhi = DeclareTH1F("METPhi","Phi of missing transverse energy",50,-3.3,3.3);
   _hMETPhi->SetXAxisTitle("#Phi_{MET} [GeV]");
   _hMETPhi->SetYAxisTitle("Events");
 
