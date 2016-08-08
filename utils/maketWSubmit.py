@@ -36,7 +36,9 @@ sample=[
 "wPlusJets",
 "ww",
 "wz",
-"zz"
+"zz",
+"zPlusJetsLowMass",
+"zPlusJetsHighMass"
 ]
 nJobs = {
 "qcd1000_1500":2,
@@ -55,7 +57,9 @@ nJobs = {
 "wPlusJets":12,
 "ww":1,
 "wz":1,
-"zz":1
+"zz":1,
+"zPlusJetsLowMass":8,
+"zPlusJetsHighMass":7
 }
 #####
 ##   The script itsself
@@ -145,7 +149,7 @@ for k in sample:
 			
 			print >> allJobFile, "condor_submit "+ submitPath + " -group cms -name job@schedd01.ihep.ac.cn"
 
-	print >> MergeFile, "hadd -f "+analysis+"/"+sampleName + "/hists/merged"+sampleName+".root  "+analysis+"/"+sampleName + "/hists/"+sampleName+"*"
+	print >> MergeFile, "hadd -f "+analysis+"/"+sampleName + "/hists/merged"+sampleName+".root  "+analysis+"/"+sampleName + "/hists/"+sampleName+"*hists.root"
 
 #print >> MergeFile, "cd",outputDirectory
 #print >> MergeFile, "hadd Merged_rootplas.root",MergeSourceFile

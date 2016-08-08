@@ -56,15 +56,15 @@ text2.SetTextSize(0.0610687)
 
 
 samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
-samples = ["tW_top","tW_antitop","tChan","zz","wz","ww","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
+#samples = ["tW_top","tW_antitop","tChan","zz","wz","ww","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 hists = ["tW","singleTop","VV","ttbar","wPlusJets","zPlusJets","qcd"]
-hists = ["tW","singleTop","VV","ttbar","qcd"]
+#hists = ["tW","singleTop","VV","ttbar","qcd"]
 
 histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan":"singleTop","zz":"VV","zPlusJetsLowMass":"zPlusJets","zPlusJetsHighMass":"zPlusJets","wz":"VV","ww":"VV","wPlusJets":"wPlusJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd"}
 colourPerSample = {"tW_top":kGreen+2,"tW_antitop":kGreen+2,"tChan":kYellow,"zPlusJetsLowMass":kBlue,"zPlusJetsHighMass":kBlue,"wz":kPink,"ww":kPink,"zz":kPink,"wPlusJets":kTeal,"ttbar":kRed,"qcd700_1000":kGray,"qcd500_700":kGray,"qcd300_500":kGray,"qcd200_300":kGray,"qcd2000_inf":kGray,"qcd1500_2000":kGray,"qcd100_200":kGray,"qcd1000_1500":kGray,"sChan":kOrange,"VV":kPink,"qcd":kGray,"tW":kGreen+2,"zPlusJets":kBlue,"singleTop":kYellow}
 
 reducedHists = ["tW","ttbar","zPlusJets"]
-reducedHists = ["tW","ttbar"]
+#reducedHists = ["tW","ttbar"]
 
 inFiles = {}
 
@@ -88,7 +88,7 @@ for obj in inFiles["tW_top"].GetListOfKeys():
                 
 
 for plotName in plotPaths:
-    continue
+
     saveName = plotName
     if not plotName.find("/") == -1:
         saveName = ""
@@ -163,7 +163,7 @@ for plotName in plotPaths:
     maxi = mcstack.GetMaximum() #if not doData or dataHist.GetMaximum() < mcstack.GetMaximum() else dataHist.GetMaximum()
     if doData and dataHist.GetMaximum() > mcstack.GetMaximum(): maxi = dataHist.GetMaximum()
 
-    mcstack.Draw("")
+    mcstack.Draw("hist")
     if doData: mcstack.GetXaxis().SetLabelSize(0.0)
 
     mcstack.GetXaxis().SetTitle(histMap[hists[0]].GetXaxis().GetTitle())
@@ -260,9 +260,10 @@ for plotName in plotPaths:
         histMap[histName].SetLineColor(colourPerSample[histName])
         if histMap[histName].Integral() > 0.:
             histMap[histName].Scale(1./histMap[histName].Integral())
-        histMap[histName].Draw("same")
+        histMap[histName].Draw("hist same")
         if histMap[histName].GetMaximum() > histMax: histMax = histMap[histName].GetMaximum()
 
+    previousMax = histMap["tW"].GetMaximum()
     histMap["tW"].SetMaximum(histMax * 1.3)
     leggy.Draw()
 
@@ -272,10 +273,10 @@ for plotName in plotPaths:
     reducedCanvy.cd()
 
     reducedLeggy = TLegend(0.7,0.7,0.94,0.94)
-
+    histMap["tW"].SetMaximum(previousMax)
     histMax = 0.
     for hist in reducedHists:
-        histMap[hist].Draw("same")
+        histMap[hist].Draw("hist same")
         if histMap[hist].GetMaximum() > histMax: histMax = histMap[hist].GetMaximum()
         reducedLeggy.AddEntry(histMap[hist],hist,'f')
 
@@ -303,13 +304,17 @@ for plot in plotPaths:
         writtenName += part + "\\_"
         writtenName = writtenName[:-2]
 
+    latexFile.write("\\frame{\n\\frametitle{"+writtenName+"}\n")
+    
+    nPlots = 0
     for log in ["","_log","comp","reducedComp"]:
         post = log
         if log == "_log": post = " log"
-        latexFile.write("\\frame{\n\\frametitle{"+writtenName+post+"}\n")
-        latexFile.write("\\includegraphics[width=0.95\\textwidth]{"+saveName+log+".png}")
+        latexFile.write("\\includegraphics[width=0.45\\textwidth]{"+saveName+log+".png}")
+        if  nPlots == 1: latexFile.write(" \\\\")
         latexFile.write("\n")
-        latexFile.write("}\n")
+        nPlots+=1
+    latexFile.write("}\n")
 
 latexFile.write("\\end{document}")
 #latexFile.Close()
