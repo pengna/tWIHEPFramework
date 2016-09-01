@@ -23,6 +23,12 @@ Cut.Muon.Tight.Number.Min:  1
 Cut.Muon.Tight.Number.Max:  1
 Cut.Muon.Tight.LeadingPt:  26
 Cut.Muon.Tight.SubLeadingPt:  20
+################# UnIsolated Muon Cuts #########################
+# Number of  Muons
+Cut.Muon.UnIsolated.Number.Min:  1
+Cut.Muon.UnIsolated.Number.Max:  1
+Cut.Muon.UnIsolated.LeadingPt:  26
+Cut.Muon.UnIsolated.SubLeadingPt:  20
 ################ Veto Muon Cuts ########################
 # Number of Veto Muons
 Cut.Muon.Veto.Number.Min:  1

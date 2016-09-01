@@ -385,7 +385,14 @@ Bool_t Muon::Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation)
   // **************************************************************
   Bool_t passRelIso = kTRUE;
 
-  if (relIsoR04() > _maxRelIsoCuts[muonType]) passRelIso = kFALSE;
+  //  std::cout << relIsoR04() << " " << _maxRelIsoCuts[muonType] << " " << muonType << " ";
+
+  if (relIsoR04() > _maxRelIsoCuts[muonType]) {passRelIso = kFALSE;
+    //    std::cout << "false";
+  }
+  //  else std::cout << "true";
+
+  //  std::cout << " " << passRelIso << std::endl;
   
   // **************************************************************
   // Pt and Eta Cuts

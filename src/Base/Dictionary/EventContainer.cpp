@@ -346,6 +346,7 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
 void EventContainer::SetupObjectDefinitions(){
   newMuon.SetCuts(GetConfig(),"Tight");
   newMuon.SetCuts(GetConfig(),"All");
+  newMuon.SetCuts(GetConfig(),"UnIsolated");
   newMuon.SetCuts(GetConfig(),"Veto");
 
   newElectron.SetCuts(GetConfig(),"Tight");

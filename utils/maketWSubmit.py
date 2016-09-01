@@ -12,7 +12,7 @@ taskname = "EvtSel"
 workpath    = os.getcwd()+"/"+analysis +"/"
 frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
 jobDir      = workpath+"/"+"Jobs"
-fileListDirectory = "fullSmallJobs/"
+fileListDirectory = "fullSmallerJobs/"
 smallerJobs = True
 AnalyzerDir = workpath+"/"+"Analyzer"
 task        = analysis+"_"+taskname
@@ -41,25 +41,25 @@ sample=[
 "zPlusJetsHighMass"
 ]
 nJobs = {
-"qcd1000_1500":2,
-"qcd100_200":20,
-"qcd1500_2000":1,
-"qcd2000_inf":1,
-"qcd200_300":5,
-"qcd300_500":5,
-"qcd500_700":5,
-"qcd700_1000":4,
-"sChan":1,
-"tChan":7,
-"ttbar":25,
-"tW_top":1,
-"tW_antitop":1,
-"wPlusJets":12,
-"ww":1,
-"wz":1,
-"zz":1,
-"zPlusJetsLowMass":8,
-"zPlusJetsHighMass":7
+"qcd1000_1500":13,
+"qcd100_200":193,
+"qcd1500_2000":10,
+"qcd2000_inf":6,
+"qcd200_300":46,
+"qcd300_500":50,
+"qcd500_700":48,
+"qcd700_1000":36,
+"sChan":3,
+"tChan":48,
+"ttbar":242,
+"tW_top":3,
+"tW_antitop":3,
+"wPlusJets":115,
+"ww":3,
+"wz":3,
+"zz":3,
+"zPlusJetsLowMass":76,
+"zPlusJetsHighMass":69
 }
 #####
 ##   The script itsself
