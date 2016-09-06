@@ -6,17 +6,18 @@
 
 import sys
 
-datasets = ["tW_top","tW_antitop","ttbar","ww","wz","zz","zPlusJetsHighMass","zPlusJetsLowMass","tChan","sChan","wPlusJets","qcd100_200","qcd200_300","qcd300_500","qcd500_700","qcd700_1000","qcd1000_1500","qcd1500_2000","qcd2000_inf"]
+datasets = ["tW_top","tW_antitop","ttbar","ww","wz","zz","zPlusJetsHighMass","zPlusJetsLowMass","tChan","sChan","wPlusJets","qcd100_200","qcd200_300","qcd300_500","qcd500_700","qcd700_1000","qcd1000_1500","qcd1500_2000","qcd2000_inf","singleMuon"]
 #datasets = ["tW_top"]
-datasetID = {"tW_top":100000,"tW_antitop":100001,"ttbar":100004,"ww":100007,"wz":100008,"zz":100009,"zPlusJetsHighMass":100004,"zPlusJetsLowMass":100005,"tChan":100002,"sChan":100010,"wPlusJets":100006,"qcd100_200":100011,"qcd200_300":100012,"qcd300_500":100013,"qcd500_700":100014,"qcd700_1000":100015,"qcd1000_1500":100016,"qcd1500_2000":100017,"qcd2000_inf":100018}
-nFilesDataset = {"tW_top":23,"tW_antitop":27,"ttbar":2413,"ww":26,"wz":25,"zz":24,"zPlusJetsHighMass":682,"zPlusJetsLowMass":753,"tChan":478,"sChan":24,"wPlusJets":1145,"qcd100_200":1925,"qcd200_300":458,"qcd300_500":497,"qcd500_700":472,"qcd700_1000":356,"qcd1000_1500":125,"qcd1500_2000":99,"qcd2000_inf":55}
+#datasets = ["singleMuon"]
+datasetID = {"tW_top":100000,"tW_antitop":100001,"ttbar":100004,"ww":100007,"wz":100008,"zz":100009,"zPlusJetsHighMass":100004,"zPlusJetsLowMass":100005,"tChan":100002,"sChan":100010,"wPlusJets":100006,"qcd100_200":100011,"qcd200_300":100012,"qcd300_500":100013,"qcd500_700":100014,"qcd700_1000":100015,"qcd1000_1500":100016,"qcd1500_2000":100017,"qcd2000_inf":100018,"singleMuon":200000}
+nFilesDataset = {"tW_top":23,"tW_antitop":27,"ttbar":2413,"ww":26,"wz":25,"zz":24,"zPlusJetsHighMass":682,"zPlusJetsLowMass":753,"tChan":478,"sChan":24,"wPlusJets":1145,"qcd100_200":1925,"qcd200_300":458,"qcd300_500":497,"qcd500_700":472,"qcd700_1000":356,"qcd1000_1500":125,"qcd1500_2000":99,"qcd2000_inf":55,"singleMuon":1072}
 datasetDirs = {"tW_top":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/crab_Full2202_ST/160222_223524/0000/",
-"tW_antitop":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/crab_Full2202_SaT/160222_223547/0000.",
+"tW_antitop":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/crab_Full2202_SaT/160222_223547/0000/",
 "ttbar":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/TT_TuneCUETP8M1_13TeV-powheg-pythia8/crab_Full2202_TT/160222_223457/0000/",
 "ww":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/WW_TuneCUETP8M1_13TeV-pythia8/crab_Full2202_WW/160222_223947/0000/",
 "wz":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/WZ_TuneCUETP8M1_13TeV-pythia8/crab_Full2202_WZ/160222_224007/0000/",
 "zz":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/ZZ_TuneCUETP8M1_13TeV-pythia8/crab_Full2202_ZZ/160222_224032/0000/",
-"zPlusJetsHighMass":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/crab_Full2202_amcDY/160222_223759/0000",
+"zPlusJetsHighMass":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/crab_Full2202_amcDY/160222_223759/0000/",
 "zPlusJetsLowMass":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/crab_Full2202_amcDY1050/160222_223718/0000/",
 "tChan":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/crab_Full2202_STt/160222_223629/0000/",
 "sChan":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/crab_Full2202_STs/160222_223608/0000/",
@@ -25,10 +26,12 @@ datasetDirs = {"tW_top":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/ST_
 "qcd200_300":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_Full2202_QCD_HT200to300/160222_224121/0000/",
 "qcd300_500":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_Full2202_QCD_HT300to500/160222_224202/0000/",
 "qcd500_700":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_Full2202_QCD_HT500to700/160222_224225/0000/",
-"qcd700_1000":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_Full2202_QCD_HT700to1000/160222_224245/0000",
+"qcd700_1000":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_Full2202_QCD_HT700to1000/160222_224245/0000/",
 "qcd1000_1500":"publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_Full2202_QCD_HT1000to1500/160222_224313/0000/",
 "qcd1500_2000":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_Full2202_QCD_HT1500to2000/160222_224332/0000/",
-"qcd2000_inf":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_Full2202_QCD_HT2000toInf/160222_224406/0000/"}
+"qcd2000_inf":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/mc/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/crab_Full2202_QCD_HT2000toInf/160222_224406/0000/",
+"singleMuon":"/publicfs/cms/data/TopQuark/cms13TeV/Samples2202/data/SingleMuon/crab_Full2202_SMu_16Dec2015S_JsonGold/160224_170442/0000/"
+}
 
 import sys, math, mmap
 

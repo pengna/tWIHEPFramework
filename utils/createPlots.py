@@ -9,8 +9,11 @@ inDir = sys.argv[1]
 outDir = sys.argv[2]
 
 doData = False
+dataFolder = ""
 
-if len(sys.argv) > 3: doData = True
+if len(sys.argv) > 3: 
+    doData = True
+    dataFolder = sys.argv[3]
 
 #Do a load of set up for the plots here
 
@@ -73,7 +76,7 @@ plotNames = []
 for sample in samples:
     inFiles[sample] = TFile(inDir+sample+"/hists/merged"+sample+".root","READ")
     
-if doData: inFiles['data'] = TFile(inDir+"diMuon_plots.root","READ")
+if doData: inFiles['data'] = TFile(dataFolder+"/singleMuon/hists/mergedsingleMuon.root","READ")
 
 plotPaths = []
 
