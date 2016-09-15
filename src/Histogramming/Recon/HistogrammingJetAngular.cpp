@@ -33,9 +33,10 @@ using namespace std;
  * Input:  Particle class                                                     *
  * Output: None                                                               *
  ******************************************************************************/
-HistogrammingJetAngular::HistogrammingJetAngular(EventContainer *obj)
+HistogrammingJetAngular::HistogrammingJetAngular(EventContainer *obj, bool unisolated)
 {
   SetEventContainer(obj);
+  _unisolated = unisolated;
 } //HistogrammingJetAngular()
 
 /******************************************************************************
@@ -210,13 +211,23 @@ Bool_t HistogrammingJetAngular::Apply()
     std::cout << leadingJet.Pt() << " " << subleadingJet.Pt() << std::endl;
     }*/
 
-  if (evc->tightMuons.size() > 0){
-    lepton = evc->tightMuons[0];
+  if (!_unisolated){
+    if (evc->tightMuons.size() > 0){
+      lepton = evc->tightMuons[0];
+    }
+    else {
+      lepton = evc->tightElectrons[0];
+    }
   }
   else {
-    lepton = evc->tightElectrons[0];
+    if (evc->unIsolatedMuons.size() > 0){
+      lepton = evc->unIsolatedMuons[0];
+    }
+    else {
+      lepton = evc->unIsolatedElectrons[0];
+    }
   }
-
+    
   met.SetPtEtaPhiE(evc->missingEt,0,evc->missingPhi,evc->missingEt);
   
   _hUntaggedJetDelR   	-> Fill(leadingJet.DeltaR(subleadingJet));

@@ -34,7 +34,7 @@ class HistogrammingJetAngular : public HistoCut
 public:
 
   // Parameterized Constructor
-  HistogrammingJetAngular(EventContainer *obj);
+  HistogrammingJetAngular(EventContainer *obj, bool unisolated = false);
   
   // Destructor
   ~HistogrammingJetAngular();
@@ -77,6 +77,8 @@ private:
   myTH1F* _threeJetMass; // mass of the three jet system
   myTH1F* _mTt; //Transverse mass of the reconstructed top
   myTH1F* _ptSys; // p_T of the system
+
+  bool _unisolated; //Whether we are using tight or unisolated leptons
 
   Jet bJet;
   Jet leadingJet;

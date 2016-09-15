@@ -33,8 +33,9 @@ using namespace std;
  * Input:  Particle class                                                     *
  * Output: None                                                               *
  ******************************************************************************/
-HistogrammingMtW::HistogrammingMtW(EventContainer *obj)
+HistogrammingMtW::HistogrammingMtW(EventContainer *obj, bool unisolated)
 {
+  _unisolated = unisolated;
   SetEventContainer(obj);
 } //HistogrammingMtW()
 
@@ -83,12 +84,24 @@ Bool_t HistogrammingMtW::Apply()
   
   EventContainer *evc = GetEventContainer();
   
-  if (evc->tightMuons.size() > 0){
-    _hMtW -> Fill(std::sqrt(2*evc->missingEt*evc->tightMuons[0].Pt()*(1-cos(evc->missingPhi - evc->tightMuons[0].Phi()))));
+  if (!_unisolated){
+    if (evc->tightMuons.size() > 0){
+      lepton = evc->tightMuons[0];
+    }
+    else {
+      lepton = evc->tightElectrons[0];
+    }
   }
-  else if (evc->tightElectrons.size() > 0){
-    _hMtW -> Fill(std::sqrt(2*evc->missingEt*evc->tightElectrons[0].Pt()*(1-cos(evc->missingPhi - evc->tightElectrons[0].Phi()))));
+  else {
+    if (evc->unIsolatedMuons.size() > 0){
+      lepton = evc->unIsolatedMuons[0];
+    }
+    else {
+      lepton = evc->unIsolatedElectrons[0];
+    }
   }
+  
+  _hMtW -> Fill(std::sqrt(2*evc->missingEt*lepton.Pt()*(1-cos(evc->missingPhi - lepton.Phi()))));
 
   //  }
   //cout<<"End of HistogrammingMtW::Apply()"<<endl;
