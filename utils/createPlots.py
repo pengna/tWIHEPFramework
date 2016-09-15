@@ -11,9 +11,16 @@ outDir = sys.argv[2]
 doData = False
 dataFolder = ""
 
+useQCD = False
+qcdFolder = ""
+
 if len(sys.argv) > 3: 
     doData = True
     dataFolder = sys.argv[3]
+
+if len(sys.argv) > 4:
+    useQCD = True
+    qcdFolder = sys.argv[4]
 
 #Do a load of set up for the plots here
 
@@ -58,12 +65,14 @@ text2.SetTextFont(42)
 text2.SetTextSize(0.0610687)
 
 
-samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
+#samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
+samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
+#samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200"]
 #samples = ["tW_top","tW_antitop","tChan","zz","wz","ww","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 hists = ["tW","singleTop","VV","ttbar","wPlusJets","zPlusJets","qcd"]
 #hists = ["tW","singleTop","VV","ttbar","qcd"]
 
-histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan":"singleTop","zz":"VV","zPlusJetsLowMass":"zPlusJets","zPlusJetsHighMass":"zPlusJets","wz":"VV","ww":"VV","wPlusJets":"wPlusJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd"}
+histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan":"singleTop","zz":"VV","zPlusJetsLowMass":"zPlusJets","zPlusJetsHighMass":"zPlusJets","wz":"VV","ww":"VV","wPlusJets":"wPlusJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd","wPlusJetsMCatNLO":"wPlusJets"}
 colourPerSample = {"tW_top":kGreen+2,"tW_antitop":kGreen+2,"tChan":kYellow,"zPlusJetsLowMass":kBlue,"zPlusJetsHighMass":kBlue,"wz":kPink,"ww":kPink,"zz":kPink,"wPlusJets":kTeal,"ttbar":kRed,"qcd700_1000":kGray,"qcd500_700":kGray,"qcd300_500":kGray,"qcd200_300":kGray,"qcd2000_inf":kGray,"qcd1500_2000":kGray,"qcd100_200":kGray,"qcd1000_1500":kGray,"sChan":kOrange,"VV":kPink,"qcd":kGray,"tW":kGreen+2,"zPlusJets":kBlue,"singleTop":kYellow}
 
 reducedHists = ["tW","ttbar","zPlusJets"]
@@ -77,6 +86,8 @@ for sample in samples:
     inFiles[sample] = TFile(inDir+sample+"/hists/merged"+sample+".root","READ")
     
 if doData: inFiles['data'] = TFile(dataFolder+"/singleMuon/hists/mergedsingleMuon.root","READ")
+
+if useQCD: inFiles['qcdData'] = TFile(qcdFolder+"/singleMuon/hists/mergedsingleMuon.root","READ")
 
 plotPaths = []
 
@@ -119,6 +130,21 @@ for plotName in plotPaths:
             
         else:
             histMap[histoGramPerSample[sample]] = inFiles[sample].Get(plotName)
+
+    
+    if useQCD:
+        if inFiles['qcdData'].Get(plotName):
+            histMap['qcd'] = inFiles['qcdData'].Get(plotName)
+        elif inFiles['qcdData'].Get(plotName.split("Tight")[0]+"UnIsolated"+plotName.split("Tight")[1]):
+            print "Using alternate named data-driven QCD estimation plot"
+            histMap['qcd'] = inFiles['qcdData'].Get(plotName.split("Tight")[0]+"UnIsolated"+plotName.split("Tight")[1])
+        else:
+            print "Couldn't find "+plotName+" in the data enriched QCD sample so skipping this histogram."
+            continue
+        #If I need to do any scaling I will do it here I suppose.
+        print "Doing scaling:", histMap['qcd'].Integral(),
+        histMap['qcd'].Scale(0.5)
+        print histMap['qcd'].Integral()
 
     mcstack = THStack(plotName,plotName)
 
@@ -199,7 +225,7 @@ for plotName in plotPaths:
     latex.SetTextSize(0.04*0.76)
     latex.DrawLatex(0.35, 0.95 , extraText )
     
-    latex2.DrawLatex(0.95, 0.95, "2.1 fb^{-1} (13TeV)");
+    latex2.DrawLatex(0.95, 0.95, "2.3 fb^{-1} (13TeV)");
     
     text2.Draw()
     

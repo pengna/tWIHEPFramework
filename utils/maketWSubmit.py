@@ -8,18 +8,11 @@ import string
 #analysis and task
 analysis = "tW"
 taskname = "EvtSel"
-#for the queue
-workpath    = os.getcwd()+"/"+analysis +"/"
-frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
-jobDir      = workpath+"/"+"Jobs"
-fileListDirectory = "fullSmallerJobs/"
-smallerJobs = True
-AnalyzerDir = workpath+"/"+"Analyzer"
-task        = analysis+"_"+taskname
-rootplizer  = "Rootplizer_"+task+".cc"
-headplizer  = "Rootplizer_"+task+".h"
-#Directory of input files
-sample=[
+executable = "Wt_generic.x"
+configFile = "config/overall/SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config"
+invPostfix = ""
+mcPostfix = " -MCatNLO -mc"
+samplesMC=[
 "qcd1000_1500",
 "qcd100_200",
 "qcd1500_2000",
@@ -39,7 +32,40 @@ sample=[
 "zz",
 "zPlusJetsLowMass",
 "zPlusJetsHighMass",
+"wPlusJetsMCatNLO"
 ]
+samplesData=[
+"singleMuon"
+]
+sample = samplesMC
+if "inv" in sys.argv:
+	invPostfix = " -InvertIsolation"
+	analysis += "Inv"
+if "wJetsReg" in sys.argv:
+	configFile = "config/overall/wJets3j0t.config"
+	analysis += "3j0t"
+if "ttbarReg" in sys.argv:
+	configFile = "config/overall/ttbar3j2t.config"
+	analysis += "3j2t"
+if "wJetsReg" in sys.argv and "ttbarReg" in sys.argv:
+	print "Please only use one of ttbar and wJets -Reg! Exiting..."
+	sys.exit()
+if "data" in sys.argv:
+	mcPostfix = ""
+	analysis += "Data"
+	sample = samplesData
+#executable = "Wt_generic.x"
+#for the queue
+workpath    = os.getcwd()+"/"+analysis +"/"
+frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
+jobDir      = workpath+"/"+"Jobs"
+fileListDirectory = "fullSmallerJobs/"
+smallerJobs = True
+AnalyzerDir = workpath+"/"+"Analyzer"
+task        = analysis+"_"+taskname
+rootplizer  = "Rootplizer_"+task+".cc"
+headplizer  = "Rootplizer_"+task+".h"
+#Directory of input files
 nJobs = {
 "qcd1000_1500":13,
 "qcd100_200":193,
@@ -59,7 +85,9 @@ nJobs = {
 "wz":3,
 "zz":3,
 "zPlusJetsLowMass":76,
-"zPlusJetsHighMass":69
+"zPlusJetsHighMass":69,
+"wPlusJetsMCatNLO":60,
+"singleMuon":108
 }
 #####
 ##   The script itsself
@@ -72,13 +100,27 @@ if os.path.exists(AnalyzerDir):
         os.popen('rm -fr '+AnalyzerDir)
 #os.popen('mkdir -p '+cshFilePath)
 #os.popen('mkdir -p '+logFilePath)
+allSubmit = 0
+allMerge = 0
+if os.path.exists(os.getcwd()+"/all.sh"):
+	allSubmit = open(os.getcwd()+"/all.sh","a")
+	allMerge = open(os.getcwd()+"/mergeAll.sh","a")
+else:
+	allSubmit = open(os.getcwd()+"/all.sh","w")
+	allMerge = open(os.getcwd()+"/mergeAll.sh","w")
+	allSubmit.write("#!/bin/bash\n")
+	allMerge.write("#!/bin/bash\n")
+allSubmit.write("bash "+analysis+"Submit.sh\n")
+allMerge.write("bash "+analysis+"Merge.sh\n")
+allSubmit.close()
+allMerge.close()
 
-allJobFileName = "all.sh"
+allJobFileName = analysis+"Submit.sh"
 allJobFile      = file(allJobFileName,"w")
 print >> allJobFile, "#!/bin/bash"
 print >> allJobFile, "cd ",analysis
 
-MergeFileName = "merge.sh"
+MergeFileName = analysis+"merge.sh"
 MergeFile      = file(MergeFileName,"w")
 MergeSourceFile = " "
 def prepareSubmitJob(submitFileName,cshFileName, outPutFileName, errorFileName):
@@ -106,7 +148,7 @@ def prepareCshJob(sample,shFile,frameworkDir,workpath,samplePost=""):
         print >> subFile, "cd "+frameworkDir
 	#print >> subFile, "cp ${jobDir}/getAhist.C ."
 #	print >> subFile, frameworkDir+"bin/Wt/Wt_generic.x -config "+frameworkDir+"SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon -PileUpWgt -BWgt"
-	print >> subFile, frameworkDir+"bin/Wt/Wt_generic.x -config "+frameworkDir+"SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon"
+	print >> subFile, frameworkDir+"bin/Wt/"+executable+" -config "+frameworkDir+configFile+" -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -SelectTrigger Muon" + invPostfix + mcPostfix
         #print >> subFile, "root -b -q -l "+rootplizer+"'(\""+input+"\",\""+output+"\")'"
  
 #for iroot in range(nroot):
@@ -156,3 +198,4 @@ for k in sample:
 #print >> MergeFile, "hadd Merged_rootplas.root",MergeSourceFile
 
 print >> allJobFile, "cd -"
+print "Finished",analysis
