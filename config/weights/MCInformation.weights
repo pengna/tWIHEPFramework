@@ -84,6 +84,8 @@ Events.Source.100017: 2711608
 Weight.Source.100018: 25.24
 Events.Source.100018: 721306
 
-
+#100019 - wPlusJetsMCatNLO
+Weight.Source.100019: 20508.9
+Events.Source.100019: 24156124
 
 
