@@ -187,8 +187,8 @@ class AnalysisMain: public EventContainer, public CutListProcessor
   Float_t _EventTagWeightLqupb;
   Float_t _EventTagWeightLqdownb;
 
-Float_t _EventPileupWeightb;
-Float_t _EventPileupWeightb2;
+  Float_t _EventPileupWeightb;
+  Float_t _EventPileupWeightb2;
 
   Float_t _EventTagWeightb2;
   Float_t _EventTagWeightBupb2;

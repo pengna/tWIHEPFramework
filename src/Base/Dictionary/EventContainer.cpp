@@ -358,6 +358,29 @@ void EventContainer::SetupObjectDefinitions(){
 }
 
 /******************************************************************************
+ * void EventContainer::SetUseUnisolatedLeptons(                              *
+ *           Bool_t useUnisolatedLeptons, int whichtrig)                      *
+ *                                                                            *
+ * Used to switch between QCD estimation and non. This is important for       *
+ * the jet cleaning algorithm						      *
+ *                                                                            *
+ * Input:  None                                                               *
+ * Output: None                                                               *
+ ******************************************************************************/
+
+void EventContainer::SetUseUnisolatedLeptons(const Bool_t& useUnisolatedLeptons, int whichtrig){
+  _useUnisolatedLeptons = useUnisolatedLeptons;
+  if (whichtrig == 0){
+    electronsToUsePtr = useUnisolatedLeptons ? &unIsolatedElectrons : &isolatedElectrons;
+    muonsToUsePtr = useUnisolatedLeptons ? &isolatedMuons : &unIsolatedMuons;
+  }
+  else if (whichtrig == 1){
+    electronsToUsePtr = !useUnisolatedLeptons ? &unIsolatedElectrons : &isolatedElectrons;
+    muonsToUsePtr = !useUnisolatedLeptons ? &isolatedMuons : &unIsolatedMuons;
+  }
+} //SetUseUnisolatedLeptons
+
+/******************************************************************************
  * void EventContainer::InitializeFastSim()                                   *
  *                                                                            *
  * Initialize class                                                           *
@@ -580,7 +603,7 @@ Int_t EventContainer::ReadEvent()
       bestjetdr = 999;
       //      missingEt = -888; 
       
-      useObj = newJet.Fill(1.0,1.0, tightMuons, tightElectrons, _eventTree, io);
+      useObj = newJet.Fill(1.0,1.0, *muonsToUsePtr, *electronsToUsePtr, _eventTree, io);
       //      useObj = newJet.Fill(1.0,1.0, _eventTree, io);
       
       missingEt = TMath::Sqrt(pow(missingEx,2) + pow(missingEy,2));//so MET gets JES adjustment toogEx=top_met.MET_ExMiss();

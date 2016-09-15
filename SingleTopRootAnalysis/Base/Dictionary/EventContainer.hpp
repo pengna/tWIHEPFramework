@@ -225,6 +225,9 @@ class EventContainer
   // get whether we should do the Config tree or not
   inline Bool_t DoConfig(void) const { return _doConfig; };
 
+  void SetUseUnisolatedLeptons(const Bool_t& a=true, int whichtrig=1);
+  inline Bool_t UseUnisolatedLeptons(void) const {return _useUnisolatedLeptons; };
+
   // Set the global event weight
   inline void SetGlobalEventWeight(const Double_t& wt) { _globalEventWeight=wt; };
   // set the output event weight.
@@ -442,6 +445,10 @@ class EventContainer
   std::vector<Jet>        lightQuarkLabeledJets;
   std::vector<Neutrino>   neutrinos;
 
+  //Pointers to collections
+  std::vector<Electron> * electronsToUsePtr;
+  std::vector<Muon>     * muonsToUsePtr;
+
   std::vector<TLorentzVector>      jetmsSpecial;//MET tool
   
   // also store MET
@@ -588,6 +595,7 @@ private:
   Bool_t _doTruth;      // should we include the truth tree at all?
   Bool_t _doSkim;       // should we skim?
   Bool_t _doConfig;     // should we include the Bkgd tree at all?
+  Bool_t _useUnisolatedLeptons;   // should we use unisolated leptons? (for QCD estimation)
 
   // Info for source that we are reading (i.e. tb, tq, tW, tt_lepjets, tt_dilep, etc.
   TString _sourceName;    // Source Name
