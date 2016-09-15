@@ -339,6 +339,7 @@ Bool_t Muon::Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation)
   SetmatchedStat	(evtr -> Muon_matchedStat   	-> operator[](iE));
   SetTLayers		(evtr -> Muon_TLayers   	-> operator[](iE));
   SetrelIsoR04		(evtr -> Muon_relIsoDeltaBetaR04-> operator[](iE));
+  Setndof		(evtr -> Muon_ndof		-> operator[](iE));
  
   // **************************************************************
   // Isolation Cuts
@@ -400,15 +401,27 @@ Bool_t Muon::Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation)
   // If event passes or fails requirements
   Bool_t passMinPt  = kTRUE;
   Bool_t passMaxEta = kTRUE;
+
+  Bool_t passCustomID = kTRUE;
+  
+  //I don't know if the tight ID is the same as these custom ID variables, so I'm checking both.
+  if (chi2()/ndof() 	>= 10  ||
+      TLayers()		<= 5   ||
+      validHits()	<  1   ||
+      dxy()		>= 0.2 ||
+      dz()		>= 0.5 ||
+      validHitsInner()	<  1   ||
+      matchedStat()	<  2)
+    passCustomID = kFALSE;
   
   // Test Requirements
   if(muPt <= _minPtCuts[muonType])               passMinPt  = kFALSE;
   if(TMath::Abs(muEta) >= _maxEtaCuts[muonType]) passMaxEta = kFALSE;
 
   //  if(     "Tight"      == muonType) return( passMinPt && passMaxEta  && IsTight() && Isolation() && !GetOverlapWithJet() && IsCombinedMuon());
-  if(     "Tight"      == muonType) return (passMinPt && passMaxEta  && passTightId() && passRelIso);
+  if(     "Tight"      == muonType) return (passMinPt && passMaxEta  && passTightId() && passCustomID && passRelIso);
   else if("Veto"       == muonType) return (passMinPt && passMaxEta);//no isolation req. or inner det or jet overlap.
-  else if("UnIsolated" == muonType) return (passMinPt && passMaxEta  && passTightId() && ! passRelIso); //The same as tight muons, but with an inverted isolation requirement
+  else if("UnIsolated" == muonType) return (passMinPt && passMaxEta  && passTightId() && passCustomID && ! passRelIso); //The same as tight muons, but with an inverted isolation requirement
     //    std::cout << muPt << " " << minPt << " " << muEta << " " << maxEta << std::end;
   //else if("Isolated"   == muonType) return( GetIsolation()  && !GetOverlapWithJet() && IsCombinedMuon() && OverlapUse());
   //else if("UnIsolated" == muonType) return( !GetIsolation()  && passMinPt && passMaxEta && IsTight() && !GetOverlapWithJet()&& IsCombinedMuon());
