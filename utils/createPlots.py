@@ -67,6 +67,7 @@ text2.SetTextSize(0.0610687)
 
 #samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
+#samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 #samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200"]
 #samples = ["tW_top","tW_antitop","tChan","zz","wz","ww","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 hists = ["tW","singleTop","VV","ttbar","wPlusJets","zPlusJets","qcd"]
@@ -91,8 +92,11 @@ if useQCD: inFiles['qcdData'] = TFile(qcdFolder+"/singleMuon/hists/mergedsingleM
 
 plotPaths = []
 
+print inFiles.keys()
+
 for obj in inFiles["tW_top"].GetListOfKeys():
     tempThing = inFiles["tW_top"].Get(obj.GetName())
+    print obj.GetName()
     if not tempThing.ClassName().find("TH1") == -1 : plotPaths.append(tempThing.GetName())
     if not tempThing.ClassName().find("Directory") == -1:
         for k2 in tempThing.GetListOfKeys():
@@ -100,6 +104,8 @@ for obj in inFiles["tW_top"].GetListOfKeys():
             if not temp2.ClassName().find("TH1") == -1:
                 plotPaths.append(tempThing.GetName() + "/"+ temp2.GetName())
                 
+
+print "plotPath:",plotPaths
 
 for plotName in plotPaths:
 
@@ -126,6 +132,7 @@ for plotName in plotPaths:
 
     for sample in samples:
         if histoGramPerSample[sample] in histMap.keys():
+            print sample, histoGramPerSample[sample]
             histMap[histoGramPerSample[sample]].Add(inFiles[sample].Get(plotName))
             
         else:
@@ -133,6 +140,7 @@ for plotName in plotPaths:
 
     
     if useQCD:
+        qcdNormalisation = histMap['qcd'].Integral()
         if inFiles['qcdData'].Get(plotName):
             histMap['qcd'] = inFiles['qcdData'].Get(plotName)
         elif inFiles['qcdData'].Get(plotName.split("Tight")[0]+"UnIsolated"+plotName.split("Tight")[1]):
@@ -141,10 +149,12 @@ for plotName in plotPaths:
         else:
             print "Couldn't find "+plotName+" in the data enriched QCD sample so skipping this histogram."
             continue
+        if histMap['qcd'].Integral() > 0.:
+            histMap['qcd'].Scale(qcdNormalisation/histMap['qcd'].Integral())
         #If I need to do any scaling I will do it here I suppose.
-        print "Doing scaling:", histMap['qcd'].Integral(),
-        histMap['qcd'].Scale(0.5)
-        print histMap['qcd'].Integral()
+#        print "Doing scaling:", histMap['qcd'].Integral(),
+#        histMap['qcd'].Scale(0.5)
+#        print histMap['qcd'].Integral()
 
     mcstack = THStack(plotName,plotName)
 

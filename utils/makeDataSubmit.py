@@ -6,40 +6,11 @@ import string
 ##   Parameters to be specified by the user
 #####
 #analysis and task
-analysis = "tW"
+analysis = "tWData"
 taskname = "EvtSel"
 executable = "Wt_generic.x"
-#executable = "Wt_nVertOnly.x"
 configFile = "config/overall/SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config"
 invPostfix = ""
-mcPostfix = " -MCatNLO -mc -bTagReshape -lepSFs -PileUpWgt"
-makeSkims = False
-samplesMC=[
-"qcd1000_1500",
-"qcd100_200",
-"qcd1500_2000",
-"qcd2000_inf",
-"qcd200_300",
-"qcd300_500",
-"qcd500_700",
-"qcd700_1000",
-"sChan",
-"tChan",
-"ttbar",
-"tW_top",
-"tW_antitop",
-"wPlusJets",
-"ww",
-"wz",
-"zz",
-"zPlusJetsLowMass",
-"zPlusJetsHighMass",
-"wPlusJetsMCatNLO"
-]
-samplesData=[
-"singleMuon"
-]
-sample = samplesMC
 if "inv" in sys.argv:
 	invPostfix = " -InvertIsolation"
 	analysis += "Inv"
@@ -52,12 +23,7 @@ if "ttbarReg" in sys.argv:
 if "wJetsReg" in sys.argv and "ttbarReg" in sys.argv:
 	print "Please only use one of ttbar and wJets -Reg! Exiting..."
 	sys.exit()
-if "data" in sys.argv:
-	mcPostfix = ""
-	analysis += "Data"
-	sample = samplesData
-if "skims" in sys.argv:
-	makeSkims = False 
+
 #executable = "Wt_generic.x"
 #for the queue
 workpath    = os.getcwd()+"/"+analysis +"/"
@@ -70,6 +36,9 @@ task        = analysis+"_"+taskname
 rootplizer  = "Rootplizer_"+task+".cc"
 headplizer  = "Rootplizer_"+task+".h"
 #Directory of input files
+sample=[
+"singleMuon"
+]
 nJobs = {
 "qcd1000_1500":13,
 "qcd100_200":193,
@@ -90,7 +59,6 @@ nJobs = {
 "zz":3,
 "zPlusJetsLowMass":76,
 "zPlusJetsHighMass":69,
-"wPlusJetsMCatNLO":60,
 "singleMuon":108
 }
 #####
@@ -105,26 +73,20 @@ if os.path.exists(AnalyzerDir):
 #os.popen('mkdir -p '+cshFilePath)
 #os.popen('mkdir -p '+logFilePath)
 allSubmit = 0
-allMerge = 0
 if os.path.exists(os.getcwd()+"/all.sh"):
 	allSubmit = open(os.getcwd()+"/all.sh","a")
-	allMerge = open(os.getcwd()+"/mergeAll.sh","a")
 else:
 	allSubmit = open(os.getcwd()+"/all.sh","w")
-	allMerge = open(os.getcwd()+"/mergeAll.sh","w")
 	allSubmit.write("#!/bin/bash\n")
-	allMerge.write("#!/bin/bash\n")
 allSubmit.write("bash "+analysis+"Submit.sh\n")
-allMerge.write("bash "+analysis+"merge.sh\n")
 allSubmit.close()
-allMerge.close()
 
 allJobFileName = analysis+"Submit.sh"
 allJobFile      = file(allJobFileName,"w")
 print >> allJobFile, "#!/bin/bash"
 print >> allJobFile, "cd ",analysis
 
-MergeFileName = analysis+"merge.sh"
+MergeFileName = analysis+"MergeData.sh"
 MergeFile      = file(MergeFileName,"w")
 MergeSourceFile = " "
 def prepareSubmitJob(submitFileName,cshFileName, outPutFileName, errorFileName):
@@ -151,10 +113,7 @@ def prepareCshJob(sample,shFile,frameworkDir,workpath,samplePost=""):
         #print >> subFile, "eval \`scramv1 runtime -sh\`"
         print >> subFile, "cd "+frameworkDir
 	#print >> subFile, "cp ${jobDir}/getAhist.C ."
-#	print >> subFile, frameworkDir+"bin/Wt/Wt_generic.x -config "+frameworkDir+"SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon -PileUpWgt -BWgt"
-	skimString = ""
-	if makeSkims: skimString = " -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root "
-	print >> subFile, frameworkDir+"bin/Wt/"+executable+" -config "+frameworkDir+configFile+" -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -SelectTrigger Muon" + invPostfix + mcPostfix + skimString
+	print >> subFile, frameworkDir+"bin/Wt/"+executable+" -config "+frameworkDir+configFile+" -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -SelectTrigger Muon" + invPostfix
         #print >> subFile, "root -b -q -l "+rootplizer+"'(\""+input+"\",\""+output+"\")'"
  
 #for iroot in range(nroot):
@@ -204,4 +163,3 @@ for k in sample:
 #print >> MergeFile, "hadd Merged_rootplas.root",MergeSourceFile
 
 print >> allJobFile, "cd -"
-print "Finished",analysis
