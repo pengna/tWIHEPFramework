@@ -215,7 +215,7 @@ EventContainer::EventContainer():
   _debugLevel(0),   _doFastSim(false),_doSkim(false),
   _sourceName("NONE"),
   _globalEventWeight(1.), _treeEventWeight(1.), _outputEventWeight(1.),_EventPileupWeight(-1),
-  _config("Configuration"), _JESconfig("JESConfiguration"),_jesError(0.), _jesShift(0), _bTagAlgo("default"), _bTagCut(999), _misTagCut(999), jeteoverlap(kFALSE),closeindex(999),ejordr(999), bestjetdr(999), _isFirstEvent(true), isSimulation(kTRUE), _badJetEvent(kFALSE),  _celloutShift(0),_softjetShift(0),_pileupShift(0),_larShift(0), _JESconfigread(false),_jesUShift(0),_jesPtShift(0),_jesEtaShift(0)
+  _config("Configuration"), _JESconfig("JESConfiguration"),_jesError(0.), _jesShift(0), _bTagAlgo("default"), _bTagCut(999), _misTagCut(999), jeteoverlap(kFALSE),closeindex(999),ejordr(999), bestjetdr(999), _isFirstEvent(true), isSimulation(kTRUE), _badJetEvent(kFALSE),  _celloutShift(0),_softjetShift(0),_pileupShift(0),_larShift(0), _JESconfigread(false),_jesUShift(0),_jesPtShift(0),_jesEtaShift(0),_useUnisolatedLeptons(kFALSE),_trigID(0)
 {
  
 } //EventContainer()
@@ -331,7 +331,6 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
 //  uncertainty = Total;
 //
 
-  
   return;
 } //Initialize()
 
@@ -370,13 +369,14 @@ void EventContainer::SetupObjectDefinitions(){
 
 void EventContainer::SetUseUnisolatedLeptons(const Bool_t& useUnisolatedLeptons, int whichtrig){
   _useUnisolatedLeptons = useUnisolatedLeptons;
-  if (whichtrig == 0){
-    electronsToUsePtr = useUnisolatedLeptons ? &unIsolatedElectrons : &isolatedElectrons;
-    muonsToUsePtr = useUnisolatedLeptons ? &isolatedMuons : &unIsolatedMuons;
+  _trigID = whichtrig;
+  if (_trigID == 0){
+    electronsToUsePtr = _useUnisolatedLeptons ? &unIsolatedElectrons : &tightElectrons;
+    muonsToUsePtr = _useUnisolatedLeptons ? &tightMuons : &unIsolatedMuons;
   }
-  else if (whichtrig == 1){
-    electronsToUsePtr = !useUnisolatedLeptons ? &unIsolatedElectrons : &isolatedElectrons;
-    muonsToUsePtr = !useUnisolatedLeptons ? &isolatedMuons : &unIsolatedMuons;
+  else if (_trigID == 1){
+    electronsToUsePtr = !_useUnisolatedLeptons ? &unIsolatedElectrons : &tightElectrons;
+    muonsToUsePtr = !_useUnisolatedLeptons ? &tightMuons : &unIsolatedMuons;
   }
 } //SetUseUnisolatedLeptons
 
@@ -404,7 +404,6 @@ void EventContainer::SetUseUnisolatedLeptons(const Bool_t& useUnisolatedLeptons,
  ******************************************************************************/
 Int_t EventContainer::ReadEvent()
 {
-
   // Set the event weight if there is any
   if(DoFastSim()) {
     // Will have to be updated when we have a fast sim tree
@@ -594,6 +593,7 @@ Int_t EventContainer::ReadEvent()
     bestjetdr = 999;
     jeteoverlap = kFALSE;
     //cout <<"EVENT"<<endl;
+
     Double_t ejoverlap = GetConfig() -> GetValue("ObjectID.Jet.ElectronDeltaRMin", 0.0);
     for(Int_t io = 0;io < _eventTree -> Jet_pt->size(); io++) {
       newJet.Clear();
@@ -602,7 +602,6 @@ Int_t EventContainer::ReadEvent()
       ejordr = 999;
       bestjetdr = 999;
       //      missingEt = -888; 
-      
       useObj = newJet.Fill(1.0,1.0, *muonsToUsePtr, *electronsToUsePtr, _eventTree, io);
       //      useObj = newJet.Fill(1.0,1.0, _eventTree, io);
       
