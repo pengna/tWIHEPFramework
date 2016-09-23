@@ -89,6 +89,8 @@ int main(int argc, char **argv)
   Bool_t doPileup = kFALSE;
   Bool_t dobWeight = kFALSE;
   Bool_t useInvertedIsolation = kFALSE;
+  Bool_t useLeptonSFs = kFALSE;
+  Bool_t usebTagReweight = kFALSE;
   TString leptonTypeToSelect = "Tight"; //This variable is altered to unisolated when running QCD estimation.
   string evtListFileName="";
   int whichtrig = -1;
@@ -101,6 +103,14 @@ int main(int argc, char **argv)
 	int b = ListName.find("SingleTop.");
 	//	evtListFileName="WtDiElectron_"+ListName.substr(b)+".lst.root";
 	//cout << "evtListFileName : " << evtListFileName << endl;
+    }
+    if (!strcmp(argv[i], "-lepSFs")){
+      useLeptonSFs = kTRUE;
+      cout << "Driver: Using lepton ID/iso SFs" << endl;
+    }
+    if (!strcmp(argv[i], "-bTagReshape")){
+      usebTagReweight = kTRUE;
+      cout << "Driver: Enable b-tag discriminant reshaping" << endl;
     }
     if (!strcmp(argv[i], "-fast")) {
       doFast = kTRUE;
@@ -183,7 +193,7 @@ int main(int argc, char **argv)
   /////////////////////////////////////////////////////////////////////////////////
   // ******** Cuts and Histograms applied to all studies ********
 
-  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight));
+  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight, useLeptonSFs, usebTagReweight));
 
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"All"));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Tight"));  // make the muon plots, hopefully.
@@ -191,20 +201,25 @@ int main(int argc, char **argv)
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"UnIsolated"));  // make the muon plots, hopefully.
   mystudy.AddCut(new CutPrimaryVertex(particlesObj));
   mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
+
+  mystudy.AddCut(new HistogrammingMET(particlesObj));
   //mystudy.AddCut(new CutElectronTighterPt(particlesObj, "Tight")); 
   mystudy.AddCut(new CutMuonN(particlesObj, leptonTypeToSelect));     //require that lepton to be isolated, central, high pt
 
-  mystudy.AddCut(new HistogrammingMET(particlesObj));
-  mystudy.AddCut(new HistogrammingMtW(particlesObj,useInvertedIsolation));
-
-  mystudy.AddCut(new HistogrammingMuon(particlesObj,leptonTypeToSelect));  // make the muon plots, hopefully.
   mystudy.AddCut(new CutMuonN(particlesObj, "Veto"));     //require that lepton to be isolated, central, high pt
-  
+ 
+
   mystudy.AddCut(new HistogrammingElectron(particlesObj,"Tight"));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingElectron(particlesObj,"Veto"));  // make the muon plots, hopefully.
 
 
   mystudy.AddCut(new CutElectronN(particlesObj, "Veto")); //require that lepton to be isolated, central, high pt
+
+  mystudy.AddCut(new HistogrammingMET(particlesObj));
+  mystudy.AddCut(new HistogrammingMtW(particlesObj,useInvertedIsolation));
+
+  mystudy.AddCut(new HistogrammingMuon(particlesObj,leptonTypeToSelect));  // make the muon plots, hopefully.
+
   //mystudy.AddCut(new CutMuonTighterPt(particlesObj, "Tight")); //require that new Pt cut for leading and subleading muon  
   //if (isemu){
   //  mystudy.AddCut(new CutEMuOverlap(particlesObj));
