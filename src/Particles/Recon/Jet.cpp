@@ -372,7 +372,7 @@ Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selecte
     if (mu.DeltaR(*this) < closestLepton) closestLepton = mu.DeltaR(*this);
   }
   if (closestLepton < _closestLeptonCut) passesCleaning = kFALSE;
-
+  
   /////////////////////////////////////////////////////////////////////////
   // B-tag related cuts
   /////////////////////////////////////////////////////////////////////////

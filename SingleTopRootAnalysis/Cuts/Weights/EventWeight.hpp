@@ -31,7 +31,9 @@
 
 #include "SingleTopRootAnalysis/Base/Dictionary/HistoCut.hpp"
 #include "SingleTopRootAnalysis/Base/Dictionary/EventContainer.hpp"
-
+#include "SingleTopRootAnalysis/Base/Dictionary/BTagEntry.hpp"
+#include "SingleTopRootAnalysis/Base/Dictionary/BTagCalibration.hpp"
+#include "SingleTopRootAnalysis/Base/Dictionary/BTagCalibrationReader.hpp"
 //#include "externaltools/pileup/PileupReweighting/TPileupReweighting.h"
 
 
@@ -41,7 +43,7 @@ class EventWeight : public HistoCut
 public:
 
   // Parameterized Constructor
-  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false);
+  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE);
   
   // Default Destructor
   ~EventWeight();
@@ -76,14 +78,33 @@ private:
   Bool_t _usePileUpWgt;  // set to true if this MC is MC@NLO and we need to use the corresponding weight
   Bool_t _usebWeight;  // set to true if using b-tag weights
   Bool_t _useNoWeight;  //No weight except MCatNLO weight
+  Bool_t _useLeptonSFs; // Use lepton SFs. Needs to be configured in the overall config file
+  Bool_t _usebTagReshape; // Do CSV discriminant reshaping
   // Histograms
   myTH1F* _hTreeWeight;   // Histogram of input tree weights
   myTH1F* _hGlobalWeight; // Histogram of global weights
   myTH1F* _hMCatNLOWeight; // Histogram of MCatNLO weight
   myTH1F* _hPileUpWeight; // Histogram of PileUpWgt weight
   myTH1F* _hbWeight; // Histogram of b weight
+  myTH1F* _hLeptonSFWeight; //Histogram of the lepton SF claculated for the event
+  myTH1F* _hbTagReshape; //Histogram of the btag reshaping
   myTH1F* _hOutputWeight; // Histogram of output weights
   Double_t _totalMCatNLOEvents;
+  BTagCalibration _bTagCalib;
+  BTagCalibrationReader _bTagCalibReader;
+
+  //Histograms that are used for applying scale factors to leptons
+  //For now we are only using muons as we veto on electrons anyway
+  TH2F* _muonIsoSF;
+  TH2F* _muonIDSF;
+
+  //Pileup reweighting hisotgrams
+  TH1F* _dataPV;
+  TH1F* _mcPV;
+
+  Double_t getLeptonWeight(EventContainer * EventContainerObj);
+  void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName);
+  Double_t getBTagReshape(EventContainer * EventContainerObj);
 
  //Root::TPileupReweighting* PileupReweighting;
 

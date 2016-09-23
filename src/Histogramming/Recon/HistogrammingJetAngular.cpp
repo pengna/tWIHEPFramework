@@ -229,6 +229,11 @@ Bool_t HistogrammingJetAngular::Apply()
   }
     
   met.SetPtEtaPhiE(evc->missingEt,0,evc->missingPhi,evc->missingEt);
+  /*
+  std::cout << "Lead " <<leadingJet.Pt() << " " << lepton.DeltaR(leadingJet) << std::endl;
+  std::cout << "Second " << subleadingJet.Pt() << " " << lepton.DeltaR(subleadingJet) << std::endl;
+  std::cout << "bjet "  <<bJet.Pt() << " " << lepton.DeltaR(bJet) << std::endl;
+  */
   
   _hUntaggedJetDelR   	-> Fill(leadingJet.DeltaR(subleadingJet));
   _hJet1bJetDelR	-> Fill(leadingJet.DeltaR(bJet));

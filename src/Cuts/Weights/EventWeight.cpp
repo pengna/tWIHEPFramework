@@ -43,7 +43,9 @@ using namespace std;
  * Input:  Particle class                                                     *
  * Output: None                                                               *
  ******************************************************************************/
-EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight)
+EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight, Bool_t useLeptonSFs, Bool_t usebTagReshape):
+  _useLeptonSFs(useLeptonSFs),
+  _usebTagReshape(usebTagReshape)
 {
   //pileup is NOT applied by default.  Instead it is applied by the user, and stored in the tree for later application
 
@@ -89,7 +91,22 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
   } else {
     SetTotalMCatNLOEvents(TotalMCatNLOEvents);
   }
-  if(pileup) setPileUpWgt(true);
+  if(pileup){
+    setPileUpWgt(true);
+    TFile* dataPVFile = TFile::Open(conf -> GetValue("Include.dataPVFile","null"),"READ");
+    _dataPV = (TH1F*)dataPVFile->Get("pileup");
+    _dataPV->SetDirectory(0);
+    _dataPV->Scale(1./_dataPV->Integral());
+    dataPVFile->Close();
+    delete dataPVFile;
+    
+    TFile* mcPVFile = TFile::Open(conf -> GetValue("Include.mcPVFile","null"),"READ");
+    _mcPV = (TH1F*)mcPVFile->Get("pileup");
+    _mcPV->SetDirectory(0);
+    _dataPV->Scale(1./_dataPV->Integral());
+    mcPVFile->Close();
+    delete mcPVFile;
+  }
   else setPileUpWgt(false);
 
   if (bWeight) setbWeight(true);
@@ -169,6 +186,16 @@ void EventWeight::BookHistogram()
   _hbWeight -> SetXAxisTitle("b Weight");
   _hbWeight -> SetYAxisTitle("Events");
 
+  // Histogram of lepton weight
+  _hLeptonSFWeight =  DeclareTH1F("leptonSFWeight","Event Weight for lepton SFs",100,0.,2.);
+  _hLeptonSFWeight -> SetXAxisTitle("Lep SF");
+  _hLeptonSFWeight -> SetYAxisTitle("Events");
+
+  // Histogram of bTag shape weight
+  _hbTagReshape =  DeclareTH1F("bTagReshape","bTag reshaping",100,-5.0,5.);
+  _hbTagReshape -> SetXAxisTitle("bTag Reshape");
+  _hbTagReshape -> SetYAxisTitle("Events");
+
   // Histogram of Output Weights
   _hOutputWeight =  DeclareTH1F("OutputWeight","Output Event Weight",100,-10.,10.);
   _hOutputWeight -> SetXAxisTitle("Output Weight");
@@ -219,6 +246,17 @@ void EventWeight::BookHistogram()
     cout << "<EventWeight::BookHistogram>          |     Global Weight: " << std::setw(12) << EventContainerObj -> GetGlobalEventWeight()<< "|" << endl;
     //	 << sName << " ("<<sNumber<<") is " << EventContainerObj -> GetGlobalEventWeight() << endl;
   } //if
+
+  //Set up the lepton efficiency SF histograms
+  if (_useLeptonSFs) setLeptonHistograms(conf->GetValue("Include.MuonIDSFsFile","null"),conf->GetValue("LeptonID.MuonIDSFHistName","null"),conf->GetValue("Include.MuonISOSFsFile","null"),conf->GetValue("LeptonID.MuonIsoSFHistName","null"));
+
+  if (_usebTagReshape){
+    _bTagCalib = BTagCalibration(conf->GetValue("BTaggerAlgo","CSVv2"),conf->GetValue("Include.BTagCSVFile","null"));
+    _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central"); // This is where to put in the systematic names when I get around to that!
+    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
+    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
+    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"iterativefit");
+  }
 
 } //BookHistogram()
 
@@ -290,7 +328,9 @@ Bool_t EventWeight::Apply()
 
  //only apply pileup weight if specified
  if(isPileUpWgt()) {
-   pileupEventWeight = tree->PUWeight;
+   if (_mcPV->GetBinContent(tree->trueInteractions) > 0){
+     pileupEventWeight = _dataPV->GetBinContent(tree->trueInteractions) / _mcPV->GetBinContent(tree->trueInteractions);
+   }
    wgt *= pileupEventWeight;
  }
 
@@ -299,6 +339,21 @@ Bool_t EventWeight::Apply()
  if (isbWeight()){
    bEventWeight = tree->bWeight;
    wgt *= bEventWeight;
+ }
+
+ 
+ float lepSFWeight(1.0);
+
+ if(_useLeptonSFs){
+   lepSFWeight = getLeptonWeight(EventContainerObj);
+   wgt *= lepSFWeight;
+ }
+
+ float bTagReshape(1.0);
+
+ if (_usebTagReshape){
+   bTagReshape = getBTagReshape(EventContainerObj);
+   wgt *= bTagReshape;
  }
 
  // if(isPileUpWgt()) {
@@ -319,18 +374,99 @@ Bool_t EventWeight::Apply()
   EventContainerObj -> SetOutputEventWeight(wgt);
   EventContainerObj -> SetEventPileupWeight(pileupEventWeight);
   EventContainerObj -> SetEventbWeight(bEventWeight);
+  EventContainerObj -> SetEventLepSFWeight(lepSFWeight);
+  EventContainerObj -> SetEventbTagReshape(bTagReshape);
   //  cout<<"weight "<<EventContainerObj -> GetOutputEventWeight()<<endl;;
   // Fill Histograms
 
-  _hTreeWeight   -> FillWithoutWeight(EventContainerObj -> GetTreeEventWeight());
-  _hGlobalWeight -> FillWithoutWeight(EventContainerObj -> GetGlobalEventWeight());
-  _hOutputWeight -> FillWithoutWeight(EventContainerObj -> GetEventWeight());
-  _hPileUpWeight -> FillWithoutWeight(EventContainerObj -> GetEventPileupWeight());
-  _hbWeight	 -> FillWithoutWeight(EventContainerObj -> GetEventbWeight());
+  _hTreeWeight     -> FillWithoutWeight(EventContainerObj -> GetTreeEventWeight());
+  _hGlobalWeight   -> FillWithoutWeight(EventContainerObj -> GetGlobalEventWeight());
+  _hOutputWeight   -> FillWithoutWeight(EventContainerObj -> GetEventWeight());
+  _hPileUpWeight   -> FillWithoutWeight(EventContainerObj -> GetEventPileupWeight());
+  _hbWeight	   -> FillWithoutWeight(EventContainerObj -> GetEventbWeight());
+  _hLeptonSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventLepSFWeight());
+  _hbTagReshape    -> FillWithoutWeight(EventContainerObj -> GetEventbTagReshape());
 
   return kTRUE;
   
 } //Apply
+
+//Used to set up the efficiency histograms for the first time
+/****************************************************************************** 
+ * Bool_t EventWeight::setLeptonHistograms()                                  * 
+ *                                                                            * 
+ * Sets up the histograms that will be used for lepton SF reweighting         * 
+ *                                                                            * 
+ * Input:  Names of files and histograms that are relevant to the calculation * 
+ * Output: none                                                               * 
+ ******************************************************************************/
+void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName){
+
+  if (muonIsoFileName == "null" || muonIDFileName == "null"){
+    std::cout << "You want lepton SFs included in the weight but you haven't specified files for this! Fix your config!" << std::endl;
+  }
+  
+  TFile* muonIDFile = TFile::Open(muonIDFileName,"READ");
+  _muonIDSF = (TH2F*)muonIDFile->Get(muonIDHistName+"_pt_spliteta_bin1/pt_abseta_ratio");
+  _muonIDSF->SetDirectory(0);
+  muonIDFile->Close();
+
+  TFile* muonIsoFile = TFile::Open(muonIsoFileName,"READ");
+  _muonIsoSF = (TH2F*)muonIsoFile->Get(muonIsoHistName+"_pt_spliteta_bin1/pt_abseta_ratio")->Clone();
+  _muonIsoSF->SetDirectory(0);
+  muonIsoFile->Close();
+  delete muonIsoFile,muonIDFile;
+
+}
+
+/****************************************************************************** 
+ * Bool_t EventWeight::getLeptonWeight()                                      * 
+ *                                                                            * 
+ * Get the relevant pt and eta dependent SFs for the leptons in the event     *
+ * and put them into one weight that is returned                              * 
+ *                                                                            * 
+ * Input:  None                                                               * 
+ * Output: Double_t weight to be applied to the event weight                  * 
+ ******************************************************************************/
+Double_t EventWeight::getLeptonWeight(EventContainer* EventContainerObj){
+
+  Double_t leptonWeight = 1.0;
+
+  for (auto const & muon : *EventContainerObj->muonsToUsePtr){
+    Int_t xAxisBin = _muonIsoSF->GetXaxis()->FindBin(muon.Pt());
+    if (muon.Pt() > 200.) xAxisBin = _muonIsoSF->GetXaxis()->FindBin(199.);
+    Int_t yAxisBin = _muonIsoSF->GetYaxis()->FindBin(std::fabs(muon.Eta()));
+    if (std::fabs(muon.Eta()) > 2.4) yAxisBin = _muonIsoSF->GetYaxis()->FindBin(2.39);
+    Float_t isoSF = _muonIsoSF->GetBinContent(xAxisBin,yAxisBin);
+    Float_t idSF = _muonIDSF->GetBinContent(xAxisBin,yAxisBin);
+    leptonWeight *= isoSF * idSF;
+  }
+
+  return leptonWeight;
+}
+
+/******************************************************************************  
+ * Double_t EventWeight::getBTagReshape()                                     *  
+ *                                                                            *  
+ * Get the reshaped CSV discriminant from the reshaping class                 *
+ *                                                                            *  
+ * Input:  EventContainer of the event                                        *  
+ * Output: Double_t weight to be applied to the event weight                  *  
+ ******************************************************************************/ 
+Double_t EventWeight::getBTagReshape(EventContainer * EventContainerObj){
+
+  Double_t bTagWeight = 1.0;
+  
+  for (auto const & jet : EventContainerObj->taggedJets){
+    bTagWeight *= _bTagCalibReader.eval_auto_bounds("central",BTagEntry::FLAV_B, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+  }
+
+  for (auto const & jet : EventContainerObj->unTaggedJets){
+    bTagWeight *= _bTagCalibReader.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+  }
+
+  return bTagWeight;
+}
 
 Double_t EventWeight::PileupAdjust(int eventNumber, int runnumber)
 {

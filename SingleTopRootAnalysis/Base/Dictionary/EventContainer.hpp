@@ -319,7 +319,16 @@ class EventContainer
   inline void SetEventbWeight(const Double_t& bweight) {_EventbWeight = bweight;}; //tagging prob per event
   inline Double_t GetEventbWeight() const {return _EventbWeight;}; 
   inline Double_t EventbWeight() const {return GetEventbWeight();}; 
+  
+  //lepton SF weight per event
+  inline void SetEventLepSFWeight(const Double_t& lepSFweight) {_EventLepSFWeight = lepSFweight;};
+  inline Double_t GetEventLepSFWeight() const {return _EventLepSFWeight;};
+  inline Double_t EventLepSFWeight() const {return GetEventLepSFWeight();};
 
+  //lepton SF weight per event
+  inline void SetEventbTagReshape(const Double_t& lepSFweight) {_EventbTagReshape = lepSFweight;};
+  inline Double_t GetEventbTagReshape() const {return _EventbTagReshape;};
+  inline Double_t EventbTagReshape() const {return GetEventbTagReshape();};
 
  //Tagging probabiliy weight per event
   inline void SetEventTagWeight(const Double_t& taggingweight) {_EventTagWeight = taggingweight;}; //tagging prob per event
@@ -357,6 +366,10 @@ class EventContainer
   inline Bool_t GetBadJetEvent() const { return _badJetEvent; };
   inline void SetBadJetEvent(Bool_t bb) { _badJetEvent=bb; };
 
+  inline void SetnPvt(const int& nPvt) { nPvtx = nPvt; };
+  inline Int_t GetnPvt() const { return nPvtx; };
+  inline Int_t nPvt() const {return nPvtx;};
+
    // Get the configuration 
   TEnv * GetConfig() {return &_config; };
 
@@ -376,6 +389,8 @@ class EventContainer
   Float_t _EventTagWeight_Lqdown;//tagging weight per event applying the Lq SF down shift
   Float_t _EventPileupWeight;
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
+  Float_t _EventLepSFWeight;
+  Float_t _EventbTagReshape;
 
   //MultijetJESUncertaintyProvider myJES;
   // CalibrationDataVariables CalibVar;
@@ -596,6 +611,7 @@ private:
   Bool_t _doSkim;       // should we skim?
   Bool_t _doConfig;     // should we include the Bkgd tree at all?
   Bool_t _useUnisolatedLeptons;   // should we use unisolated leptons? (for QCD estimation)
+  Int_t _trigID;
 
   // Info for source that we are reading (i.e. tb, tq, tW, tt_lepjets, tt_dilep, etc.
   TString _sourceName;    // Source Name

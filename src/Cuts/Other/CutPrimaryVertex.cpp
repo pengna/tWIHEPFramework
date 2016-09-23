@@ -91,14 +91,19 @@ void CutPrimaryVertex::BookHistogram(){
   // ***********************************************  
 
   // Histogram before cut
-  _hPrimaryVertexBefore =  DeclareTH1F(histNameBefore.Data(), histTitleBefore.Data(), 20, 0.0, 20.);
+  _hPrimaryVertexBefore =  DeclareTH1F(histNameBefore.Data(), histTitleBefore.Data(), 100, 0.0, 100.);
   _hPrimaryVertexBefore -> SetXAxisTitle("Primary Vertex");
   _hPrimaryVertexBefore -> SetYAxisTitle("Events");
 
   // Histogram after cut
-  _hPrimaryVertexAfter =  DeclareTH1F(histNameAfter.Data(), histTitleAfter.Data(), 20, 0.0, 20.);
+  _hPrimaryVertexAfter =  DeclareTH1F(histNameAfter.Data(), histTitleAfter.Data(), 100, 0.0, 100.);
   _hPrimaryVertexAfter -> SetXAxisTitle("Primary Vertex");
   _hPrimaryVertexAfter -> SetYAxisTitle("Events");
+
+  //Additional histogram containing the number of true interactions
+  _hNTrueInteractions = DeclareTH1F("nTrueInteractions","Number of true interactions",100,0.0,100.);
+  _hNTrueInteractions -> SetXAxisTitle("N True Interactions");
+  _hNTrueInteractions -> SetYAxisTitle("Events");
 
   // ***********************************************
   // Add these cuts to the cut flow table
@@ -164,6 +169,7 @@ Bool_t CutPrimaryVertex::Apply()
   }
   //cout << endl;
 
+  GetEventContainer()->SetnPvt(tmpCounter);
 
   // Fill the histograms before the cuts
   _hPrimaryVertexBefore->Fill(tmpCounter);
@@ -180,6 +186,8 @@ Bool_t CutPrimaryVertex::Apply()
 
   cutFlowNameStream << "PV";
   cutFlowName = cutFlowNameStream.str().c_str();
+
+  _hNTrueInteractions->Fill(EventContainerObj->trueInteractions);
 
   if (hasPV) {
     _hPrimaryVertexAfter->Fill(tmpCounter);
