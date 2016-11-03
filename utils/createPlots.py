@@ -14,6 +14,9 @@ dataFolder = ""
 useQCD = False
 qcdFolder = ""
 
+masterMCScale = 12554./27217.
+#masterMCScale = 1.
+
 if len(sys.argv) > 3: 
     doData = True
     dataFolder = sys.argv[3]
@@ -67,13 +70,14 @@ text2.SetTextSize(0.0610687)
 
 #samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
+samples = ["tW_top","tW_antitop","tChan_top","tChan_antitop","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 #samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 #samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200"]
 #samples = ["tW_top","tW_antitop","tChan","zz","wz","ww","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 hists = ["tW","singleTop","VV","ttbar","wPlusJets","zPlusJets","qcd"]
 #hists = ["tW","singleTop","VV","ttbar","qcd"]
 
-histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan":"singleTop","zz":"VV","zPlusJetsLowMass":"zPlusJets","zPlusJetsHighMass":"zPlusJets","wz":"VV","ww":"VV","wPlusJets":"wPlusJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd","wPlusJetsMCatNLO":"wPlusJets"}
+histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan":"singleTop","zz":"VV","zPlusJetsLowMass":"zPlusJets","zPlusJetsHighMass":"zPlusJets","wz":"VV","ww":"VV","wPlusJets":"wPlusJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd","wPlusJetsMCatNLO":"wPlusJets","tChan_top":"tChan","tChan_antitop":"tChan"}
 colourPerSample = {"tW_top":kGreen+2,"tW_antitop":kGreen+2,"tChan":kYellow,"zPlusJetsLowMass":kBlue,"zPlusJetsHighMass":kBlue,"wz":kPink,"ww":kPink,"zz":kPink,"wPlusJets":kTeal,"ttbar":kRed,"qcd700_1000":kGray,"qcd500_700":kGray,"qcd300_500":kGray,"qcd200_300":kGray,"qcd2000_inf":kGray,"qcd1500_2000":kGray,"qcd100_200":kGray,"qcd1000_1500":kGray,"sChan":kOrange,"VV":kPink,"qcd":kGray,"tW":kGreen+2,"zPlusJets":kBlue,"singleTop":kYellow}
 
 reducedHists = ["tW","ttbar","zPlusJets"]
@@ -105,10 +109,17 @@ for obj in inFiles["tW_top"].GetListOfKeys():
                 plotPaths.append(tempThing.GetName() + "/"+ temp2.GetName())
                 
 
-print "plotPath:",plotPaths
+#print plotPaths
+
+ignorePlots = ["01","02","03","04","10"]
 
 for plotName in plotPaths:
-
+    doPlot = True
+    for ignore in ignorePlots:
+        if ignore in plotName:
+            doPlot = False
+            break
+    if not doPlot: continue
     saveName = plotName
     if not plotName.find("/") == -1:
         saveName = ""
@@ -132,25 +143,30 @@ for plotName in plotPaths:
 
     for sample in samples:
         if histoGramPerSample[sample] in histMap.keys():
-            print sample, histoGramPerSample[sample]
             histMap[histoGramPerSample[sample]].Add(inFiles[sample].Get(plotName))
             
         else:
             histMap[histoGramPerSample[sample]] = inFiles[sample].Get(plotName)
+            histMap[histoGramPerSample[sample]].SetName(histMap[histoGramPerSample[sample]].GetName()+histoGramPerSample[sample])
 
     
     if useQCD:
         qcdNormalisation = histMap['qcd'].Integral()
         if inFiles['qcdData'].Get(plotName):
             histMap['qcd'] = inFiles['qcdData'].Get(plotName)
-        elif inFiles['qcdData'].Get(plotName.split("Tight")[0]+"UnIsolated"+plotName.split("Tight")[1]):
+        elif "Tight" in plotName and inFiles['qcdData'].Get(plotName.split("Tight")[0]+"UnIsolated"+plotName.split("Tight")[1]):
             print "Using alternate named data-driven QCD estimation plot"
             histMap['qcd'] = inFiles['qcdData'].Get(plotName.split("Tight")[0]+"UnIsolated"+plotName.split("Tight")[1])
+        elif inFiles['qcdData'].Get(str(int(plotName.split("_")[0])+1).zfill(2)+plotName.split(plotName.split("_")[0])[-1]):
+            histMap['qcd'] = inFiles['qcdData'].Get(str(int(plotName.split("_")[0])+1).zfill(2)+plotName.split(plotName.split("_")[0])[-1])
+        elif "Tight" in plotName and inFiles['qcdData'].Get(str(int(plotName.split("_")[0])+1).zfill(2)+plotName.split(plotName.split("_")[0])[-1].split("Tight")[0]+"UnIsolated"+plotName.split(plotName.split("_")[0])[-1].split("Tight")[1]):
+            histMap['qcd'] = inFiles['qcdData'].Get(str(int(plotName.split("_")[0])+1).zfill(2)+plotName.split(plotName.split("_")[0])[-1].split("Tight")[0]+"UnIsolated"+plotName.split(plotName.split("_")[0])[-1].split("Tight")[1])
         else:
             print "Couldn't find "+plotName+" in the data enriched QCD sample so skipping this histogram."
             continue
         if histMap['qcd'].Integral() > 0.:
             histMap['qcd'].Scale(qcdNormalisation/histMap['qcd'].Integral())
+        histMap['qcd'].SetName(histMap['qcd'].GetName() + "qcd")
         #If I need to do any scaling I will do it here I suppose.
 #        print "Doing scaling:", histMap['qcd'].Integral(),
 #        histMap['qcd'].Scale(0.5)
@@ -175,11 +191,20 @@ for plotName in plotPaths:
     canvy.cd()
 #    SetOwnership(mcstack,False)
 
+    dataHist = 0
+
     if doData:
-        dataHist = inFiles['data'].Get(plotName)
+        if inFiles['data'].Get(plotName):
+            dataHist = inFiles['data'].Get(plotName)
+        elif inFiles['data'].Get(str(int(plotName.split("_")[0])+1).zfill(2)+plotName.split(plotName.split("_")[0])[-1]):
+            dataHist = inFiles['data'].Get(str(int(plotName.split("_")[0])+1).zfill(2)+plotName.split(plotName.split("_")[0])[-1])            
+        else:
+            print plotName, str(int(plotName.split("_")[0])+1).zfill(2)+plotName.split(plotName.split("_")[0])[-1]
+        dataHist.SetName(dataHist.GetName()+"data")
         dataHist.SetMarkerStyle(20)
         dataHist.SetMarkerSize(1.2)
         dataHist.SetMarkerColor(kBlack)
+        if "MET" in plotName: dataHist.Rebin(4)
         leggy.AddEntry(dataHist,"Data","p")
 
     for histName in hists:
@@ -187,6 +212,9 @@ for plotName in plotPaths:
         histMap[histName].SetFillColor(colourPerSample[histName])
         histMap[histName].SetLineColor(kBlack)
         histMap[histName].SetLineWidth(1)
+        #This is the master rescaling - we do this to account for incorrect lumi calculations or whatever. Change the master variable at the top of the code
+        histMap[histName].Scale(masterMCScale)
+        if "MET" in plotName: histMap[histName].Rebin(4)
 
 #    hists.reverse()
 
@@ -272,11 +300,13 @@ for plotName in plotPaths:
 
 
     canvy.SaveAs(outDir+saveName+".png")
+    canvy.SaveAs(outDir+saveName+".root")
 
 #    mcstack.SetMinimum(1)
     canvy.SetLogy()
 
     canvy.SaveAs(outDir+saveName+"_log.png")
+    canvy.SaveAs(outDir+saveName+"_log.root")
 
     del ratioCanvy
     del sumHistoData
@@ -307,6 +337,7 @@ for plotName in plotPaths:
     leggy.Draw()
 
     compCanvy.SaveAs(outDir+saveName+"comp.png")
+    compCanvy.SaveAs(outDir+saveName+"comp.root")
 
     reducedCanvy =  TCanvas(plotName+"reducedComp",plotName+"reducedComp",1000,800)
     reducedCanvy.cd()
@@ -323,6 +354,7 @@ for plotName in plotPaths:
     reducedLeggy.Draw()
 
     reducedCanvy.SaveAs(outDir+saveName+"reducedComp.png")
+    reducedCanvy.SaveAs(outDir+saveName+"reducedComp.root")
     
 stages = ["lepSel","jetSel","bTag","fullSel"]
 
@@ -330,6 +362,12 @@ latexFile = open(outDir+"combinedLatexFile.tex","w")
 latexFile.write("\\documentclass{beamer}\n\\usetheme{Warsaw}\n\n\\usepackage{graphicx}\n\\useoutertheme{infolines}\n\\setbeamertemplate{headline}{}\n\n\\begin{document}\n\n")
 
 for plot in plotPaths:
+    doPlot = True
+    for ignore in ignorePlots:
+        if ignore in plot:
+            doPlot = False
+            break
+    if not doPlot: continue
     if not  plot.find(" ") == -1: continue
     saveName = plot
     writtenName = ""

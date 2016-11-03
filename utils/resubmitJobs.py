@@ -21,7 +21,13 @@ samples=[
 "zPlusJetsLowMass",
 "zPlusJetsHighMass",
 "wPlusJetsMCatNLO",
-"singleMuon"
+"singleMuon",
+"SingMuB",
+"SingMuC",
+"SingMuD",
+"SingMuE",
+"SingMuF",
+"SingMuG"
 ]
 
 nJobs = {
@@ -45,7 +51,13 @@ nJobs = {
 "zPlusJetsLowMass":76,
 "zPlusJetsHighMass":69,
 "wPlusJetsMCatNLO":60,
-"singleMuon":108
+"singleMuon":108,
+"SingMuB":174,
+"SingMuC":58,
+"SingMuD":98,
+"SingMuE":83,
+"SingMuF":61,
+"SingMuG":132
 }
 
 dirToCheck = sys.argv[1]
@@ -60,6 +72,7 @@ for sample in samples:
     for i in range(nJobs[sample]):
         if not os.path.exists(prefix + "/logs/"+sample+str(i)+".error"): continue
         statinfo = os.stat(prefix + "/logs/"+sample+str(i)+".error")
-        if statinfo.st_size < 1000 and statinfo.st_size > 10:
+#        if statinfo.st_size < 1000 and statinfo.st_size > 10:
+        if statinfo.st_size < 10000:
             print prefix + "/logs/"+sample+str(i)+".error"
             missedFile.write("condor_submit "+prefix + "/scripts/"+sample+str(i)+".submit -group cms -name job@schedd01.ac.cn\n")

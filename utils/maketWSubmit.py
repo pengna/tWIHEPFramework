@@ -14,7 +14,7 @@ configFile = "config/overall/SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config"
 invPostfix = ""
 mcPostfix = " -MCatNLO -mc -bTagReshape -lepSFs -PileUpWgt"
 makeSkims = False
-samplesMC=[
+samplesMC76=[
 "qcd1000_1500",
 "qcd100_200",
 "qcd1500_2000",
@@ -36,8 +36,38 @@ samplesMC=[
 "zPlusJetsHighMass",
 "wPlusJetsMCatNLO"
 ]
-samplesData=[
+samplesMC=[
+"qcd1000_1500",
+"qcd100_200",
+"qcd1500_2000",
+"qcd2000_inf",
+"qcd200_300",
+"qcd300_500",
+"qcd500_700",
+"qcd700_1000",
+"sChan",
+"tChan_top",
+"tChan_antitop",
+"ttbar",
+"tW_top",
+"tW_antitop",
+"ww",
+"wz",
+"zz",
+"zPlusJetsLowMass",
+"zPlusJetsHighMass",
+"wPlusJetsMCatNLO"
+]
+samplesData2015=[
 "singleMuon"
+]
+samplesData=[
+"SingMuB",
+"SingMuC",
+"SingMuD",
+#"SingMuE",
+#"SingMuF",
+#"SingMuG",
 ]
 sample = samplesMC
 if "inv" in sys.argv:
@@ -49,6 +79,9 @@ if "wJetsReg" in sys.argv:
 if "ttbarReg" in sys.argv:
 	configFile = "config/overall/ttbar3j2t.config"
 	analysis += "3j2t"
+if "wJets2" in sys.argv:
+	configFile = "config/overall/wJets2j1t.config"
+	analysis += "2j1t"
 if "wJetsReg" in sys.argv and "ttbarReg" in sys.argv:
 	print "Please only use one of ttbar and wJets -Reg! Exiting..."
 	sys.exit()
@@ -63,7 +96,7 @@ if "skims" in sys.argv:
 workpath    = os.getcwd()+"/"+analysis +"/"
 frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
 jobDir      = workpath+"/"+"Jobs"
-fileListDirectory = "fullSmallerJobs/"
+fileListDirectory = "small80X/"
 smallerJobs = True
 AnalyzerDir = workpath+"/"+"Analyzer"
 task        = analysis+"_"+taskname
@@ -71,6 +104,34 @@ rootplizer  = "Rootplizer_"+task+".cc"
 headplizer  = "Rootplizer_"+task+".h"
 #Directory of input files
 nJobs = {
+"qcd1000_1500":12,
+"qcd100_200":54,
+"qcd1500_2000":9,
+"qcd2000_inf":5,
+"qcd200_300":14,
+"qcd300_500":41,
+"qcd500_700":44,
+"qcd700_1000":36,
+"sChan":3,
+"tChan_top":33,
+"tChan_antitop":152,
+"ttbar":34,
+"tW_top":3,
+"tW_antitop":3,
+"ww":3,
+"wz":3,
+"zz":3,
+"zPlusJetsLowMass":74,
+"zPlusJetsHighMass":72,
+"wPlusJetsMCatNLO":24,
+"SingMuB":174,
+"SingMuC":58,
+"SingMuD":98,
+"SingMuE":83,
+"SingMuF":61,
+"SingMuG":132
+}
+nJobs76X = {
 "qcd1000_1500":13,
 "qcd100_200":193,
 "qcd1500_2000":10,
@@ -202,6 +263,10 @@ for k in sample:
 
 #print >> MergeFile, "cd",outputDirectory
 #print >> MergeFile, "hadd Merged_rootplas.root",MergeSourceFile
+
+if mcPostfix == "":
+	print >> MergeFile, "mkdir -p "+analysis+"/singleMuon/hists/"
+	print >> MergeFile, "hadd -f "+analysis+"/singleMuon/hists/mergedsingleMuon.root " + analysis+"/SingMu*/hists/merged*"
 
 print >> allJobFile, "cd -"
 print "Finished",analysis
