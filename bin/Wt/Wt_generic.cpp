@@ -200,7 +200,7 @@ int main(int argc, char **argv)
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Veto"));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"UnIsolated"));  // make the muon plots, hopefully.
   mystudy.AddCut(new CutPrimaryVertex(particlesObj));
-  mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
+  if (!doMC) mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
 
   mystudy.AddCut(new HistogrammingMET(particlesObj));
   //mystudy.AddCut(new CutElectronTighterPt(particlesObj, "Tight")); 

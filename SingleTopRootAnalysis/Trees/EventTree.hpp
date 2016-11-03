@@ -91,6 +91,8 @@ public :
    Int_t           HLT_Ele23_WPLoose_Gsf;
    Int_t           HLT_Ele23_CaloIdL_TrackIdL_IsoVL;
    Int_t           HLT_IsoTkMu20;
+   Int_t           HLT_IsoTkMu22;
+   Int_t           HLT_IsoMu22;
    Int_t           HLT_DiMu9_Ele9_CaloIdL_TrackIdL;
    Int_t           HLT_Mu8_DiEle12_CaloIdL_TrackIdL;
    Int_t           HLT_TripleMu_12_10_5;
@@ -794,6 +796,8 @@ public :
    TBranch        *b_HLT_Ele23_WPLoose_Gsf;   //!
    TBranch        *b_HLT_Ele23_CaloIdL_TrackIdL_IsoVL;   //!
    TBranch        *b_HLT_IsoTkMu20;   //!
+   TBranch        *b_HLT_IsoTkMu22;   //!
+   TBranch        *b_HLT_IsoMu22;   //!
    TBranch        *b_HLT_DiMu9_Ele9_CaloIdL_TrackIdL;   //!
    TBranch        *b_HLT_Mu8_DiEle12_CaloIdL_TrackIdL;   //!
    TBranch        *b_HLT_TripleMu_12_10_5;   //!
@@ -2157,6 +2161,8 @@ void EventTree::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_Ele23_WPLoose_Gsf", &HLT_Ele23_WPLoose_Gsf, &b_HLT_Ele23_WPLoose_Gsf);
    fChain->SetBranchAddress("HLT_Ele23_CaloIdL_TrackIdL_IsoVL", &HLT_Ele23_CaloIdL_TrackIdL_IsoVL, &b_HLT_Ele23_CaloIdL_TrackIdL_IsoVL);
    fChain->SetBranchAddress("HLT_IsoTkMu20", &HLT_IsoTkMu20, &b_HLT_IsoTkMu20);
+   fChain->SetBranchAddress("HLT_IsoTkMu22", &HLT_IsoTkMu22, &b_HLT_IsoTkMu22);
+   fChain->SetBranchAddress("HLT_IsoMu22", &HLT_IsoMu22, &b_HLT_IsoMu22);
    fChain->SetBranchAddress("HLT_DiMu9_Ele9_CaloIdL_TrackIdL", &HLT_DiMu9_Ele9_CaloIdL_TrackIdL, &b_HLT_DiMu9_Ele9_CaloIdL_TrackIdL);
    fChain->SetBranchAddress("HLT_Mu8_DiEle12_CaloIdL_TrackIdL", &HLT_Mu8_DiEle12_CaloIdL_TrackIdL, &b_HLT_Mu8_DiEle12_CaloIdL_TrackIdL);
    fChain->SetBranchAddress("HLT_TripleMu_12_10_5", &HLT_TripleMu_12_10_5, &b_HLT_TripleMu_12_10_5);

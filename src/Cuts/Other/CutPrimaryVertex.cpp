@@ -105,6 +105,10 @@ void CutPrimaryVertex::BookHistogram(){
   _hNTrueInteractions -> SetXAxisTitle("N True Interactions");
   _hNTrueInteractions -> SetYAxisTitle("Events");
 
+  _hNTrueIntsUnweighted = DeclareTH1F("nTrueIntsUnweighted","Number of true interactions unweighted",100,0.0,100.);
+  _hNTrueIntsUnweighted -> SetXAxisTitle("N True Interactions");
+  _hNTrueIntsUnweighted -> SetYAxisTitle("Events");
+
   // ***********************************************
   // Add these cuts to the cut flow table
   // ***********************************************
@@ -188,6 +192,7 @@ Bool_t CutPrimaryVertex::Apply()
   cutFlowName = cutFlowNameStream.str().c_str();
 
   _hNTrueInteractions->Fill(EventContainerObj->trueInteractions);
+  _hNTrueIntsUnweighted->FillWithoutWeight(EventContainerObj->trueInteractions);
 
   if (hasPV) {
     _hPrimaryVertexAfter->Fill(tmpCounter);
