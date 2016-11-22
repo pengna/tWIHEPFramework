@@ -69,6 +69,7 @@ ClassImp(AnalysisMain)
  * Output: None
  ******************************************************************************/
 AnalysisMain::AnalysisMain(): CutListProcessor("cutter"),            // New Instance of CutListProcessor class
+                              AdditionalVarsProcessor(),
 			      _histogramFile(NULL),                  // Output file points to NULL
 			      _eventLimit(0),                        // Initialize max number of events processed
 			      _histogramFileName("histograms.root"), // Initialize output file name_skimFileName("NONE"),                 // Initialize skim output file name
@@ -979,6 +980,10 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
   Bool_t writeThisEvent    = kFALSE;
   Bool_t firstEventWritten = kFALSE;
 
+  //  if (_skimEventTree != NULL){
+  // AdditionalVarsProcessor::BookBranches(_skimEventTree);
+  //}
+
   // Loop over events in chain until (1) Out of events or (2) Have reached limit specified on command line
   //cout << "<AnalysisMain::Loop> " <<  "Beginning loop over events, _numEvent is "<<_eventLimit << ", eventInChain is "<<eventInChain<<endl;
   cout << "<AnalysisMain::Loop> " << endl;
@@ -994,6 +999,7 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
       if (!firstEventWritten) {
 	firstEventWritten = kTRUE;
 	if( NULL != _skimEventTree) {
+	  AdditionalVarsProcessor::BookBranches(_skimEventTree);
 	  _EventWeightb = -999;
 	  _newBranchb = _skimEventTree->Branch("EventWeight", &_EventWeightb, "EventWeight/F");
 	  _HFORb = -999;
@@ -1006,7 +1012,7 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
 	  _newBranchEventTagWeightBdown  = _skimEventTree->Branch("EventTagWeightBdown",  &_EventTagWeightBdownb,  "EventTagWeightBdown/F");
 	  _newBranchEventTagWeightLqup   = _skimEventTree->Branch("EventTagWeightLqup",   &_EventTagWeightLqupb,   "EventTagWeightLqup/F");
 	  _newBranchEventTagWeightLqdown = _skimEventTree->Branch("EventTagWeightLqdown", &_EventTagWeightLqdownb, "EventTagWeightLqdown/F");
-	  
+
 	  _EventTagWeightb= 1;
 	  _EventTagWeightBupb= 1;
 	  _EventTagWeightBdownb= 1;
@@ -1026,6 +1032,9 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
 	_EventTagWeightBdownb  = EventContainer::GetEventTagWeight_Bdown();
 	_EventTagWeightLqupb   = EventContainer::GetEventTagWeight_Lqup();
 	_EventTagWeightLqdownb = EventContainer::GetEventTagWeight_Lqdown();
+	AdditionalVarsProcessor::ResetBranches();
+	AdditionalVarsProcessor::FillBranches(this);
+	//AdditionalVarsProcessor::OutputBranches();
 	_skimEventTree          -> Fill();
       }
     } //if

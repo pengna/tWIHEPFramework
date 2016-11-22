@@ -39,8 +39,9 @@
 
 #include "SingleTopRootAnalysis/Base/Dictionary/EventContainer.hpp"
 #include "SingleTopRootAnalysis/Base/CutFlow/CutListProcessor.hpp"
+#include "SingleTopRootAnalysis/Base/Dictionary/AdditionalVarsProcessor.hpp"
 
-class AnalysisMain: public EventContainer, public CutListProcessor
+class AnalysisMain: public EventContainer, public CutListProcessor, public AdditionalVarsProcessor
 {
  public:
   // Default Constructor

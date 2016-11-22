@@ -49,6 +49,9 @@
 //#include "SingleTopRootAnalysis/Cuts/Other/CutHFOR.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutBadPileupEvent.hpp"
 
+//Include the additional variables that we would want in the skim tree
+#include "SingleTopRootAnalysis/Vars/TestVar.hpp"
+
 using std::cout;
 using std::endl;
 
@@ -241,6 +244,10 @@ int main(int argc, char **argv)
   //if (isee || ismumu){
   //  mystudy.AddCut(new CutZveto(particlesObj, "Tight"));
   //}
+
+  //Add in any variables to the skim tree that you want here
+  mystudy.AddVars(new TestVar());
+
   TFile *_skimBDTFile;
   TString NNname = mystudy.GetHistogramFileName() + "skimBDT.root" ;
   _skimBDTFile = new TFile(NNname,"RECREATE"); 
