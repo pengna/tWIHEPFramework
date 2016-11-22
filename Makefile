@@ -36,7 +36,7 @@ endif
 # Flags that root demands:
 ####################################################################################
 
-ROOTCFLAGS=$(shell root-config --cflags) 
+ROOTCFLAGS=$(shell root-config --cflags)
 ROOTLIBS=$(shell root-config --libs) -lTreePlayer -lMLP
 #LIBS = externaltools/bunchcrossing/TrigBunchCrossingTool/standalone/libTrigBunchCrossingTool.so -lrt
 # For gcc version 4 and greater use -iquote instead of -I.
@@ -113,6 +113,7 @@ DIR_BASE_DICTIONARY = $(DIR_SRC)/Base/Dictionary
 DIR_PARTICLES       = $(DIR_SRC)/Particles/
 DIR_TREES           = $(DIR_SRC)/Trees/
 DIR_CUTS            = $(DIR_SRC)/Cuts/
+DIR_VARS            = $(DIR_SRC)/Vars/
 DIR_HIST            = $(DIR_SRC)/Histogramming/
 
 ####################################################################################
@@ -137,6 +138,7 @@ SRC = $(subst $(DIR_BASE)      ,, $(shell find $(DIR_BASE)      -name \*$(SUF_SR
       $(subst $(DIR_PARTICLES) ,, $(shell find $(DIR_PARTICLES) -name \*$(SUF_SRC) -type f ) ) \
       $(subst $(DIR_TREES)     ,, $(shell find $(DIR_TREES)     -name \*$(SUF_SRC) -type f ) ) \
       $(subst $(DIR_CUTS)      ,, $(shell find $(DIR_CUTS)      -name \*$(SUF_SRC) -type f ) ) \
+      $(subst $(DIR_VARS)      ,, $(shell find $(DIR_VARS)      -name \*$(SUF_SRC) -type f ) ) \
       $(subst $(DIR_HIST)      ,, $(shell find $(DIR_HIST)      -name \*$(SUF_SRC) -type f ) ) 
 
 OBJ_TMP = $(subst $(SUF_SRC),$(SUF_OBJ),$(SRC))
@@ -160,6 +162,7 @@ BINS_Example= bin/example/test_analysis.x bin/example/test_analysis2.x
 BINS_Matching= bin/Matching/MatchQuality.x
 BINS_ParticleStudies= bin/ParticleStudies/electron_study.x bin/ParticleStudies/jet_study.x bin/ParticleStudies/MCParticle_study.x bin/ParticleStudies/muon_study.x
 BINS_Wt= bin/Wt/Wt_generic.x
+BINS_Vertex= bin/Wt/Wt_nVertOnly.x
 #BINS_Wt= bin/Wt/Wt.x bin/Wt/Wt_mumu.x bin/Wt/Wteu.x bin/Wt/Wt_Tree.x bin/Wt/Wt_generic.x
 BINS_Skimming= bin/Skimming/Skimming.x 
 BINS_St= bin/St/St_subtractQCD.x
@@ -230,6 +233,8 @@ all: lib St Wt Skimming FER2 Matching ParticleStudies MCStudies EventComparison 
 St: lib $(BINS_St)
 
 Wt: lib $(BINS_Wt)
+
+nVert: lib $(BINS_Vertex)
 
 Skimming: lib $(BINS_Skimming)
 
