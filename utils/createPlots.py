@@ -14,6 +14,12 @@ dataFolder = ""
 useQCD = False
 qcdFolder = ""
 
+perMCSFs = {}
+perMCSFs['qcd'] = 0.5265
+perMCSFs['wPlusJets'] = 2.1348
+
+nBinsForPlots = 40.
+
 masterMCScale = 12554./27217.
 #masterMCScale = 1.
 
@@ -204,7 +210,10 @@ for plotName in plotPaths:
         dataHist.SetMarkerStyle(20)
         dataHist.SetMarkerSize(1.2)
         dataHist.SetMarkerColor(kBlack)
-        if "MET" in plotName: dataHist.Rebin(4)
+        if dataHist.GetXaxis().GetNbins() > int(nBinsForPlots):
+            rebin = int(dataHist.GetXaxis().GetNbins() / nBinsForPlots)
+            dataHist.Rebin(rebin)
+#        if "MET" in plotName: dataHist.Rebin(4)
         leggy.AddEntry(dataHist,"Data","p")
 
     for histName in hists:
@@ -214,7 +223,14 @@ for plotName in plotPaths:
         histMap[histName].SetLineWidth(1)
         #This is the master rescaling - we do this to account for incorrect lumi calculations or whatever. Change the master variable at the top of the code
         histMap[histName].Scale(masterMCScale)
-        if "MET" in plotName: histMap[histName].Rebin(4)
+        #Now do per MC scaling if there's a SF in there somewhere
+        if histName in perMCSFs.keys():
+            histMap[histName].Scale(perMCSFs[histName])
+        # Do rebinning here. Most of these plots have too many bins.
+        if histMap[histName].GetXaxis().GetNbins() > int(nBinsForPlots):
+            rebin = int(histMap[histName].GetXaxis().GetNbins() / nBinsForPlots)
+            histMap[histName].Rebin(rebin)
+#        if "MET" in plotName: histMap[histName].Rebin(4)
 
 #    hists.reverse()
 

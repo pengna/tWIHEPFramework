@@ -90,7 +90,7 @@ if "data" in sys.argv:
 	analysis += "Data"
 	sample = samplesData
 if "skims" in sys.argv:
-	makeSkims = False 
+	makeSkims = True 
 #executable = "Wt_generic.x"
 #for the queue
 workpath    = os.getcwd()+"/"+analysis +"/"

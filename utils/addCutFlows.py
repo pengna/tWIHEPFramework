@@ -12,7 +12,8 @@ samplesMC=[
 "qcd500_700",
 "qcd700_1000",
 "sChan",
-"tChan",
+"tChan_top",
+"tChan_antitop",
 "ttbar",
 "tW_top",
 "tW_antitop",
@@ -23,15 +24,14 @@ samplesMC=[
 "zPlusJetsLowMass",
 "zPlusJetsHighMass",
 "wPlusJetsMCatNLO",
-"singleMuon"
 ]
 
-histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan":"singleTop","zz":"VV","zPlusJetsLowMass":"zPlusJets","zPlusJetsHighMass":"zPlusJets","wz":"VV","ww":"VV","wPlusJets":"wPlusJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd","wPlusJetsMCatNLO":"wPlusJets","singleMuon":"Data"}
+histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan":"singleTop","zz":"VV","zPlusJetsLowMass":"zPlusJets","zPlusJetsHighMass":"zPlusJets","wz":"VV","ww":"VV","wPlusJets":"wPlusJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd","wPlusJetsMCatNLO":"wPlusJets","singleMuon":"Data","tChan_top":"tChan","tChan_antitop":"tChan"}
 
 #samplesMC = ["tW_top","tW_antitop","ttbar","singleMuon"]
 #samplesMC = ["tW_top"]
 
-sampleData = ['singleMuon']
+sampleData = ['SingMuB','SingMuC','SingMuD']
 
 inDirMC = sys.argv[1]
 inDirData = ""
@@ -107,5 +107,6 @@ for cut in cutOrder:
     for sample in cutYield.keys():
         if sample == "Data" or sample == "total" or sample == "totalMinusQCD" or sample == "sOverb": continue
         print " \t&",cutYield[sample][cut],
-    print " \t&",cutYield["total"][cut]," \t&",cutYield['totalMinusQCD'][cut]," \t&",cutYield["Data"][cut]," \t&",cutYield['sOverb'][cut],
+    if inDirData == "": print " \t&",cutYield["total"][cut]," \t&",cutYield['totalMinusQCD'][cut]," \t&"," \t&",cutYield['sOverb'][cut],
+    else: print " \t&",cutYield["total"][cut]," \t&",cutYield['totalMinusQCD'][cut]," \t&",cutYield["Data"][cut]," \t&",cutYield['sOverb'][cut], 
     print "\t\\\\"
