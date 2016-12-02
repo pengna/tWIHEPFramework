@@ -6,7 +6,7 @@
 #########################################
 
 # The luminosity of the sample to be processed. For some reason before it was already in all of the weights, which is not ideal.
-Weight.Lumi: 2300.
+Weight.Lumi: 27217.
 
 # 100000 - tW_top_5fs inclusive
 Weight.Source.100000: 35.85
@@ -88,4 +88,91 @@ Events.Source.100018: 721306
 Weight.Source.100019: 20508.9
 Events.Source.100019: 24156124
 
+# 300000 - tW_top_5fs inclusive
+Weight.Source.300000: 35.85
+Events.Source.300000: 998400
+
+# 30001 - tW_antitop
+Weight.Source.300001: 35.6
+Events.Source.300001: 985000
+
+# 300002 - tChan
+Weight.Source.300002: 70.69
+Events.Source.300002: 19938230
+
+# 300003 - ttbar
+Weight.Source.300003: 831.76
+Events.Source.300003: 14803800
+
+# 300004 - zPlusJetsHighMass
+Weight.Source.300004: 6025.2
+Events.Source.300004: 28730591
+
+# 300005 - zPlusJetsLowMass
+Weight.Source.300005: 18610.
+Events.Source.300005: 30915886
+
+# 300006 - wPlusJets
+Weight.Source.300006: 20508.9
+Events.Source.300006: 47161328
+
+#300007 - WW
+Weight.Source.300007: 118.7
+Events.Source.300007: 993214
+
+#300008 - WZ
+Weight.Source.300008: 66.1
+Events.Source.300008: 1000000
+
+#300009 - ZZ
+Weight.Source.300009: 31.8
+Events.Source.300009: 989312
+
+#300010 - sChan
+Weight.Source.300010: 3.36
+Events.Source.300010: 1000000
+
+#300011 - qcd100_200
+Weight.Source.300011: 27990000.
+Events.Source.300011: 82073090
+
+#300012 - qcd200_300
+Weight.Source.300012: 1712000.
+Events.Source.300012: 18523829
+
+#300013 - qcd300_500
+Weight.Source.300013: 347700.
+Events.Source.300013: 16830696
+
+#300014 - qcd500_700
+Weight.Source.300014: 32100.
+Events.Source.300014: 19199088
+
+#300015 - qcd700_1000
+Weight.Source.300015: 6831.
+Events.Source.300015: 15621634
+
+#300016 - qcd1000_1500
+Weight.Source.300016: 1207.
+Events.Source.300016: 4980387
+
+#300017 - qcd1500_2000
+Weight.Source.300017: 119.9
+Events.Source.300017: 3846616
+
+#300018 - qcd2000_inf
+Weight.Source.300018: 25.24
+Events.Source.300018: 1960245
+
+#300019 - wPlusJetsMCatNLO
+Weight.Source.300019: 20508.9
+Events.Source.300019: 9908534
+
+#300020 - tChan_antitop
+Weight.Source.300020: 80.95
+Events.Source.300020: 19825855
+
+#300021- tChan_top
+Weight.Source.300021: 136.02
+Events.Source.300021: 32808300
 
