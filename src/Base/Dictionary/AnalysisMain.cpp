@@ -85,28 +85,14 @@ AnalysisMain::AnalysisMain(): CutListProcessor("cutter"),            // New Inst
 			      _hevents(NULL),                         // events histo points to NULL
 			      _totalEvents(0),                        //events double is 0
                               _totalMCatNLOEvents(0),                  //events double is 0
-			      _newBranchb(NULL),
-			      _newBranchNBPb(NULL),
-			      _EventWeightb(-999),
 			      _EventNBeforePreselb(-999),
 			      _newBranchHFORb(NULL),
-			      _newBranchHFORb2(NULL),
+                              _newBranchNBPb(NULL),
 			      _HFORb(-999),
-			      _EventWeightb2(-999),
 			      
-			      _EventTagWeightb(-999),
-			      _EventTagWeightBupb(-999),
-			      _EventTagWeightBdownb(-999),
-			      _EventTagWeightLqupb(-999),
-			      _EventTagWeightLqdownb(-999),
-
 			      chainConfig(NULL),
 			      
-			      _EventTagWeightb2(-999),
-			      _EventTagWeightBupb2(-999),
-			      _EventTagWeightBdownb2(-999),
-			      _EventTagWeightLqupb2(-999),
-			      _EventTagWeightLqdownb2(-999),
+			      
 			      _SkimMax(1)
 {
 
@@ -1000,38 +986,16 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
 	firstEventWritten = kTRUE;
 	if( NULL != _skimEventTree) {
 	  AdditionalVarsProcessor::BookBranches(_skimEventTree);
-	  _EventWeightb = -999;
-	  _newBranchb = _skimEventTree->Branch("EventWeight", &_EventWeightb, "EventWeight/F");
 	  _HFORb = -999;
 	  _newBranchHFORb = _skimEventTree->Branch("hfor_type", &_HFORb, "hfor_type/I");
 	  _EventNBeforePreselb = -999;
 	  _newBranchNBPb                 = _skimEventTree->Branch("EventNBeforePresel",   &_EventNBeforePreselb,   "EventNBeforePresel/F");
-	  _newBranchEventPileupWeight    = _skimEventTree->Branch("EventPileupWeight",    &_EventPileupWeightb,    "EventPileupWeight/F");
-	  _newBranchEventTagWeight       = _skimEventTree->Branch("EventTagWeight",       &_EventTagWeightb,       "EventTagWeight/F");
-	  _newBranchEventTagWeightBup    = _skimEventTree->Branch("EventTagWeightBup",    &_EventTagWeightBupb,    "EventTagWeightBup/F");
-	  _newBranchEventTagWeightBdown  = _skimEventTree->Branch("EventTagWeightBdown",  &_EventTagWeightBdownb,  "EventTagWeightBdown/F");
-	  _newBranchEventTagWeightLqup   = _skimEventTree->Branch("EventTagWeightLqup",   &_EventTagWeightLqupb,   "EventTagWeightLqup/F");
-	  _newBranchEventTagWeightLqdown = _skimEventTree->Branch("EventTagWeightLqdown", &_EventTagWeightLqdownb, "EventTagWeightLqdown/F");
-
-	  _EventTagWeightb= 1;
-	  _EventTagWeightBupb= 1;
-	  _EventTagWeightBdownb= 1;
-	  _EventTagWeightLqupb= 1;
-	  _EventTagWeightLqdownb= 1;
-	  _EventPileupWeightb= 1;
 
 	}
       } //if
     
       if(NULL != _skimEventTree) {
 	_EventNBeforePreselb   = _totalMCatNLOEvents;
-	_EventWeightb          = EventContainer::GetOutputEventWeight();
-	_EventPileupWeightb    = EventContainer::GetEventPileupWeight();
-	_EventTagWeightb       = EventContainer::GetEventTagWeight();
-	_EventTagWeightBupb    = EventContainer::GetEventTagWeight_Bup();
-	_EventTagWeightBdownb  = EventContainer::GetEventTagWeight_Bdown();
-	_EventTagWeightLqupb   = EventContainer::GetEventTagWeight_Lqup();
-	_EventTagWeightLqdownb = EventContainer::GetEventTagWeight_Lqdown();
 	AdditionalVarsProcessor::ResetBranches();
 	AdditionalVarsProcessor::FillBranches(this);
 	//AdditionalVarsProcessor::OutputBranches();
