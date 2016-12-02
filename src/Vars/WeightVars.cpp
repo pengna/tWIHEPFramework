@@ -29,11 +29,15 @@ WeightVars::WeightVars(){
 }
 
 void WeightVars::FillBranches(EventContainer * evtObj){
-  
+
   //Fill the nominal event weight variables
   _floatVars["EventWeight"] = evtObj->GetOutputEventWeight();
   _floatVars["bWeight"] = evtObj->GetEventbTagReshape();
   _floatVars["puWeight"] = evtObj->GetEventPileupWeight();
   _floatVars["lepSF"] = evtObj->GetEventLepSFWeight();
+
+  //Get the systematic variations
+  _floatVars["lepSF_SysUp"] = evtObj->GetEventLepSFWeightUp();
+  _floatVars["lepSF_SysDown"] = evtObj->GetEventLepSFWeightDown();
 
 }

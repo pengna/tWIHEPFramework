@@ -102,7 +102,7 @@ private:
   TH1F* _dataPV;
   TH1F* _mcPV;
 
-  Double_t getLeptonWeight(EventContainer * EventContainerObj);
+  std::tuple<Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
   void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName);
   Double_t getBTagReshape(EventContainer * EventContainerObj);
 

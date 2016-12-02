@@ -325,6 +325,16 @@ class EventContainer
   inline Double_t GetEventLepSFWeight() const {return _EventLepSFWeight;};
   inline Double_t EventLepSFWeight() const {return GetEventLepSFWeight();};
 
+  //lepton SF weight up variation per event
+  inline void SetEventLepSFWeightUp(const Double_t& lepSFweight) {_EventLepSFWeightUp = lepSFweight;};
+  inline Double_t GetEventLepSFWeightUp() const {return _EventLepSFWeightUp;};
+  inline Double_t EventLepSFWeightUp() const {return GetEventLepSFWeightUp();};
+
+  //lepton SF weight down variation per event
+  inline void SetEventLepSFWeightDown(const Double_t& lepSFweight) {_EventLepSFWeightDown = lepSFweight;};
+  inline Double_t GetEventLepSFWeightDown() const {return _EventLepSFWeightDown;};
+  inline Double_t EventLepSFWeightDown() const {return GetEventLepSFWeightDown();};
+
   //lepton SF weight per event
   inline void SetEventbTagReshape(const Double_t& lepSFweight) {_EventbTagReshape = lepSFweight;};
   inline Double_t GetEventbTagReshape() const {return _EventbTagReshape;};
@@ -391,6 +401,10 @@ class EventContainer
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventLepSFWeight;
   Float_t _EventbTagReshape;
+
+  //Add in the systematic variations to the SFs
+  Float_t _EventLepSFWeightUp;
+  Float_t _EventLepSFWeightDown;
 
   //MultijetJESUncertaintyProvider myJES;
   // CalibrationDataVariables CalibVar;

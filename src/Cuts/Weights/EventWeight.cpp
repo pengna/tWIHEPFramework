@@ -31,6 +31,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <tuple>
 
 using namespace std;
 
@@ -342,10 +343,10 @@ Bool_t EventWeight::Apply()
  }
 
  
- float lepSFWeight(1.0);
+ float lepSFWeight(1.0), lepSFWeightUp(1.0), lepSFWeightDown(1.0);
 
  if(_useLeptonSFs){
-   lepSFWeight = getLeptonWeight(EventContainerObj);
+   std::tie(lepSFWeight,lepSFWeightUp,lepSFWeightDown) = getLeptonWeight(EventContainerObj);
    wgt *= lepSFWeight;
  }
 
@@ -376,6 +377,13 @@ Bool_t EventWeight::Apply()
   EventContainerObj -> SetEventbWeight(bEventWeight);
   EventContainerObj -> SetEventLepSFWeight(lepSFWeight);
   EventContainerObj -> SetEventbTagReshape(bTagReshape);
+
+  EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
+  EventContainerObj -> SetEventLepSFWeightDown(lepSFWeightDown);
+
+  //Also save the systematic variations in these SFs
+  //  EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
+  //EventContainerObj -> SetEventLepSFWeightDown(lepSFWeightDown);
   //  cout<<"weight "<<EventContainerObj -> GetOutputEventWeight()<<endl;;
   // Fill Histograms
 
@@ -428,9 +436,9 @@ void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHist
  * Input:  None                                                               * 
  * Output: Double_t weight to be applied to the event weight                  * 
  ******************************************************************************/
-Double_t EventWeight::getLeptonWeight(EventContainer* EventContainerObj){
+std::tuple<Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContainer* EventContainerObj){
 
-  Double_t leptonWeight = 1.0;
+  Double_t leptonWeight = 1.0, leptonWeightUp = 1.0, leptonWeightDown = 1.0;
 
   for (auto const & muon : *EventContainerObj->muonsToUsePtr){
     Int_t xAxisBin = _muonIsoSF->GetXaxis()->FindBin(muon.Pt());
@@ -438,11 +446,15 @@ Double_t EventWeight::getLeptonWeight(EventContainer* EventContainerObj){
     Int_t yAxisBin = _muonIsoSF->GetYaxis()->FindBin(std::fabs(muon.Eta()));
     if (std::fabs(muon.Eta()) > 2.4) yAxisBin = _muonIsoSF->GetYaxis()->FindBin(2.39);
     Float_t isoSF = _muonIsoSF->GetBinContent(xAxisBin,yAxisBin);
+    Float_t isoUnc = _muonIsoSF->GetBinError(xAxisBin,yAxisBin);
     Float_t idSF = _muonIDSF->GetBinContent(xAxisBin,yAxisBin);
+    Float_t idUnc = _muonIDSF->GetBinError(xAxisBin,yAxisBin);
     leptonWeight *= isoSF * idSF;
+    leptonWeightUp *= (isoSF + isoUnc) * (idSF + idUnc);
+    leptonWeightDown *= (isoSF - isoUnc) * (idSF - idUnc);
   }
 
-  return leptonWeight;
+  return std::make_tuple(leptonWeight,leptonWeightUp,leptonWeightDown);
 }
 
 /******************************************************************************  

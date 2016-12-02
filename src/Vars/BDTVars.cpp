@@ -521,9 +521,9 @@ void BDTVars::FillBranches(EventContainer * evtObj){
   _intVars["M_nBJet4000"]   = BJet4000.size();
 
   _intVars["M_nJet2030e24"]   = Jet2030e24.size();
-  _intVars["M_nJet2030e24"]   = Jet2040e24.size();
-  _intVars["M_nJet2030e24"]   = Jet3040e24.size();
-  _intVars["M_nJet2030e24"]   = Jet4000e24.size();
+  _intVars["M_nJet2040e24"]   = Jet2040e24.size();
+  _intVars["M_nJet3040e24"]   = Jet3040e24.size();
+  _intVars["M_nJet4000e24"]   = Jet4000e24.size();
 
   if(_intVars["M_nJet2040"]>=1){
     _floatVars["M_Pt_Jet1_2040"]     = (Jet2040.at(0)).Pt();
@@ -594,28 +594,29 @@ void BDTVars::FillBranches(EventContainer * evtObj){
     _floatVars["M_Phi_BJet1_4000"]     = (BJet4000.at(0)).Phi();
   }
 
-
   if(_intVars["M_nJet2040e24"]>=1){
     _floatVars["M_Pt_Jet1_2040e24"]     = (Jet2040e24.at(0)).Pt();
     _floatVars["M_Eta_Jet1_2040e24"]     = (Jet2040e24.at(0)).Eta();
     _floatVars["M_Phi_Jet1_2040e24"]     = (Jet2040e24.at(0)).Phi();
   }
+
   if(_intVars["M_nJet2030e24"]>=1){
     _floatVars["M_Pt_Jet1_2030e24"]     = (Jet2030e24.at(0)).Pt();
     _floatVars["M_Eta_Jet1_2030e24"]     = (Jet2030e24.at(0)).Eta();
     _floatVars["M_Phi_Jet1_2030e24"]     = (Jet2030e24.at(0)).Phi();
   }
+
   if(_intVars["M_nJet3040e24"]>=1){
     _floatVars["M_Pt_Jet1_3040e24"]     = (Jet3040e24.at(0)).Pt();
     _floatVars["M_Eta_Jet1_3040e24"]     = (Jet3040e24.at(0)).Eta();
     _floatVars["M_Phi_Jet1_3040e24"]     = (Jet3040e24.at(0)).Phi();
   }
+
   if(_intVars["M_nJet4000e24"]>=1){
     _floatVars["M_Pt_Jet1_4000e24"]     = (Jet4000e24.at(0)).Pt();
     _floatVars["M_Eta_Jet1_4000e24"]     = (Jet4000e24.at(0)).Eta();
     _floatVars["M_Phi_Jet1_4000e24"]     = (Jet4000e24.at(0)).Phi();
   }
-
 
   if(Jet.size()>=1){
     _floatVars["M_Mass_AllJets"]   = (totalJets).M();
@@ -698,8 +699,7 @@ void BDTVars::FillBranches(EventContainer * evtObj){
     _floatVars["M_DeltaPhiWlvJet1"] =  fabs(Jet.at(0).DeltaPhi(Wlv));
     _floatVars["M_DeltaRWlvJet1"] =  fabs(Jet.at(0).DeltaR(Wlv));
     
-
-    if(Jet.size()>=2)
+     if(Jet.size()>=2)
       {
 
 	_floatVars["M_Mass_Jet1Jet2"]       = (Jet.at(0)+Jet.at(1)).M();
