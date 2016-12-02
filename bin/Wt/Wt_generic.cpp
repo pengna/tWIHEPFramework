@@ -51,6 +51,8 @@
 
 //Include the additional variables that we would want in the skim tree
 #include "SingleTopRootAnalysis/Vars/TestVar.hpp"
+#include "SingleTopRootAnalysis/Vars/BDTVars.hpp"
+#include "SingleTopRootAnalysis/Vars/WeightVars.hpp"
 
 using std::cout;
 using std::endl;
@@ -246,7 +248,9 @@ int main(int argc, char **argv)
   //}
 
   //Add in any variables to the skim tree that you want here
-  mystudy.AddVars(new TestVar());
+  //  mystudy.AddVars(new TestVar());
+  mystudy.AddVars(new BDTVars());
+  mystudy.AddVars(new WeightVars());
 
   TFile *_skimBDTFile;
   TString NNname = mystudy.GetHistogramFileName() + "skimBDT.root" ;
