@@ -485,6 +485,7 @@ class EventContainer
   Double_t missingEx;
   Double_t missingPhi;
   Double_t missingEy;
+  TLorentzVector missingEtVec;
   // and the sum of scalar ET
   Double_t sumEt;
 

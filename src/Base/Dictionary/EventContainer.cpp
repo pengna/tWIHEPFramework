@@ -515,8 +515,8 @@ Int_t EventContainer::ReadEvent()
     missingEx = _eventTree->Met_type1PF_px;
     missingPhi = _eventTree->Met_type1PF_phi;
     missingEy = _eventTree->Met_type1PF_py;
+    missingEtVec.SetPtEtaPhiE(missingEt,0.,missingPhi,missingEt);
 
-    
     ///////////////////////////////////////////
     // Electrons-->refilled and sorted later in method!!
     ///////////////////////////////////////////
@@ -602,18 +602,18 @@ Int_t EventContainer::ReadEvent()
       ejordr = 999;
       bestjetdr = 999;
       //      missingEt = -888; 
-      useObj = newJet.Fill(1.0,1.0, *muonsToUsePtr, *electronsToUsePtr, _eventTree, io);
+      useObj = newJet.Fill(1.0,1.0, *muonsToUsePtr, *electronsToUsePtr, _eventTree, io, &missingEtVec);
       //      useObj = newJet.Fill(1.0,1.0, _eventTree, io);
       
       missingEt = TMath::Sqrt(pow(missingEx,2) + pow(missingEy,2));//so MET gets JES adjustment toogEx=top_met.MET_ExMiss();
-     /////////////////////////////////////
+      /////////////////////////////////////
       
-     //   alljets.push_back(newJet);
-     if(useObj) {
-       jets.push_back(newJet);
+      alljets.push_back(newJet);
+      if(useObj) {
+	jets.push_back(newJet);
  
-       if(newJet.IsTagged()) taggedJets.push_back(newJet);
-       else unTaggedJets.push_back(newJet);
+	if(newJet.IsTagged()) taggedJets.push_back(newJet);
+	else unTaggedJets.push_back(newJet);
    
         //NOTE: PdgId of +/-1 is used for light quark jets when charge information is available and 
 	//uncharged particles that are not labeled as b, c, or tau are given an ID of 0
@@ -622,14 +622,14 @@ Int_t EventContainer::ReadEvent()
 	//NOTE: This PDGId() method returns the flavor of the MC particle associated
 	//with the jet (wrt position).  It is NOT nessesarily the jet's flavor, but
 	//a reasonable assumption BASED ON MC AND RECO INFORMATION
-
+	
 	//if(newJet.GetAbsPdgId() == 5)    bLabeledJets.push_back(newJet);
 	//if(newJet.GetAbsPdgId() == 4)    cLabeledJets.push_back(newJet);
 	//if(newJet.GetAbsPdgId() == 15)   tauLabeledJets.push_back(newJet);
 	//if((newJet.GetAbsPdgId() == 1) || (newJet.GetAbsPdgId() == 0) )  lightQuarkLabeledJets.push_back(newJet);
-     } // if useObj
+      } // if useObj
     } //jets
-
+    
 /*
     missingEx = _eventTree -> MissingEt_etx / 1000.0;
     missingEy = _eventTree -> MissingEt_ety / 1000.0;
@@ -678,7 +678,7 @@ Int_t EventContainer::ReadEvent()
     top_met.ApplyPileupUncertainty(pileupShift());
       
     missingPhi = top_met.MET_MetPhi();
-    missingEx=top_met.MET_ExMiss()/1000;
+    missingE1x=top_met.MET_ExMiss()/1000;
     missingEy=top_met.MET_EyMiss()/1000;      
     sumEt=top_met.MET_SumEt()/1000;
  

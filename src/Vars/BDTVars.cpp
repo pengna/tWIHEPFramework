@@ -429,8 +429,10 @@ void BDTVars::FillBranches(EventContainer * evtObj){
   //First thing we do is split up the jets into the vectors defined by pt
   TLorentzVector tempjet(0,0,0,0);
   EventTree* eventTree = evtObj->GetEventTree();
-  for (int i = 0; i < eventTree-> Jet_pt->size(); i++){
-    tempjet.SetPtEtaPhiE(eventTree-> Jet_pt->at(i),eventTree->Jet_eta->at(i),eventTree->Jet_phi->at(i),eventTree->Jet_energy->at(i));
+  for (auto jet : evtObj->alljets){
+    tempjet.SetPtEtaPhiE(jet.Pt(),jet.Eta(),jet.Phi(),jet.E());
+    //  for (int i = 0; i < eventTree-> Jet_pt->size(); i++){
+    //tempjet.SetPtEtaPhiE(eventTree-> Jet_pt->at(i),eventTree->Jet_eta->at(i),eventTree->Jet_phi->at(i),eventTree->Jet_energy->at(i));
     if (tempjet.Pt() > 20 && tempjet.Pt() < 30) Jet2030.push_back(tempjet);
     if (tempjet.Pt() > 20 && tempjet.Pt() < 40) Jet2040.push_back(tempjet);
     if (tempjet.Pt() > 30 && tempjet.Pt() < 40) Jet3040.push_back(tempjet);

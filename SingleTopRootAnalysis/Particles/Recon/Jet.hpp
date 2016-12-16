@@ -71,7 +71,7 @@ class Jet: public Particle
   void SetCuts(TEnv* config);
 
   // Fill the jet from an EventTree 
-  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE);
+  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met);
   //  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE);
   // Also fill from FastSim tree:
   Bool_t FillFastSim( std::vector<MCJet>& MCBJets, std::vector<MCJet>& MCCJets, std::vector<MCTau>& MCTaus,  std::vector<Electron>& electrons, FastSimTree *tr,Int_t iE,TEnv *config,const TString& tagName="default", Double_t btagCut = 999, Double_t mistagCut = 999, Double_t eshift = 0 );
@@ -168,7 +168,15 @@ class Jet: public Particle
   Double_t _bMinPtCut;
   Double_t _bTagCut;
   Double_t _closestLeptonCut;
-  
+
+  // Are we running systematic variations?
+  Bool_t _jesUp;
+  Bool_t _jesDown;
+  Bool_t _jerUp;
+  Bool_t _jerDown;
+
+  // Apply the jet correction systematics
+  void SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met);
  
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system
