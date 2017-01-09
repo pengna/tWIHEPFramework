@@ -170,10 +170,10 @@ class Jet: public Particle
   Double_t _closestLeptonCut;
 
   // Are we running systematic variations?
-  Bool_t _jesUp;
-  Bool_t _jesDown;
-  Bool_t _jerUp;
-  Bool_t _jerDown;
+  Int_t _jesUp;
+  Int_t _jesDown;
+  Int_t _jerUp;
+  Int_t _jerDown;
 
   // Apply the jet correction systematics
   void SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met);

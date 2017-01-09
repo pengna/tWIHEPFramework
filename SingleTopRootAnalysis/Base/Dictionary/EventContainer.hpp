@@ -606,6 +606,10 @@ private:
   Double_t _softjetShift;
   Double_t _pileupShift;
   Int_t _larShift;
+
+  //met uncertainty shift, +1,-1 or 0 as above.
+  Int_t _metShift;
+
   // which b-tag algorithm to use?
   TString _bTagAlgo;
  // which b-tag weight cut to use?

@@ -255,10 +255,10 @@ void Jet::SetCuts(TEnv * config)
   _bMinPtCut = 		config -> GetValue("ObjectID.BJet.MinPt",0.);
   _bTagCut = 		config -> GetValue("ObjectID.BJet.BTagCut",0.0);
   _closestLeptonCut = 	config -> GetValue("ObjectID.Jet.LepCleanR",0.0);
-  _jesUp = 		config -> GetValue("Systs.doJESUp",true);
-  _jesDown = 		config -> GetValue("Systs.doJESDown",true);
-  _jerUp = 		config -> GetValue("Systs.doJERUp",true);
-  _jerDown = 		config -> GetValue("Systs.doJERDown",true);
+  _jesUp = 		config -> GetValue("Systs.doJESUp",0);
+  _jesDown = 		config -> GetValue("Systs.doJESDown",0);
+  _jerUp = 		config -> GetValue("Systs.doJERUp",0);
+  _jerDown = 		config -> GetValue("Systs.doJERDown",0);
 }
 
 /******************************************************************************         
@@ -522,6 +522,8 @@ Bool_t Jet::FillFastSim( std::vector<MCJet>& MCBJets, std::vector<MCJet>& MCCJet
  ******************************************************************************/
 void Jet::SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met){
 
+
+  //  std::cout << "syst correct" << std::endl;
   float ptSF = 1.0;
   if (_jesUp){
     ptSF = evtr->Jet_JesSFup->operator[](iE)/evtr->Jet_JesSF->operator[](iE);
@@ -530,10 +532,10 @@ void Jet::SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met){
     ptSF = evtr->Jet_JesSFdown->operator[](iE)/evtr->Jet_JesSF->operator[](iE);
   }
   if (_jerUp){
-    ptSF = evtr->Jet_JerSFup->operator[](iE)/evtr->Jet_JesSF->operator[](iE);
+    ptSF = evtr->Jet_JerSFup->operator[](iE)/evtr->Jet_JerSF->operator[](iE);
   }
   if (_jerDown){
-    ptSF = evtr->Jet_JerSFdown->operator[](iE)/evtr->Jet_JesSF->operator[](iE);
+    ptSF = evtr->Jet_JerSFdown->operator[](iE)/evtr->Jet_JerSF->operator[](iE);
   }
   //Remove jet from MET
   met->SetPx(met->Px() + Px());

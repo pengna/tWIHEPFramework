@@ -215,7 +215,7 @@ EventContainer::EventContainer():
   _debugLevel(0),   _doFastSim(false),_doSkim(false),
   _sourceName("NONE"),
   _globalEventWeight(1.), _treeEventWeight(1.), _outputEventWeight(1.),_EventPileupWeight(-1),
-  _config("Configuration"), _JESconfig("JESConfiguration"),_jesError(0.), _jesShift(0), _bTagAlgo("default"), _bTagCut(999), _misTagCut(999), jeteoverlap(kFALSE),closeindex(999),ejordr(999), bestjetdr(999), _isFirstEvent(true), isSimulation(kTRUE), _badJetEvent(kFALSE),  _celloutShift(0),_softjetShift(0),_pileupShift(0),_larShift(0), _JESconfigread(false),_jesUShift(0),_jesPtShift(0),_jesEtaShift(0),_useUnisolatedLeptons(kFALSE),_trigID(0)
+  _config("Configuration"), _JESconfig("JESConfiguration"),_jesError(0.), _jesShift(0), _bTagAlgo("default"), _bTagCut(999), _misTagCut(999), jeteoverlap(kFALSE),closeindex(999),ejordr(999), bestjetdr(999), _isFirstEvent(true), isSimulation(kTRUE), _badJetEvent(kFALSE),  _celloutShift(0),_softjetShift(0),_pileupShift(0),_larShift(0),_metShift(0), _JESconfigread(false),_jesUShift(0),_jesPtShift(0),_jesEtaShift(0),_useUnisolatedLeptons(kFALSE),_trigID(0)
 {
  
 } //EventContainer()
@@ -330,6 +330,9 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
 //  CalibVar.jetAuthor = "AntiKt4Topo";
 //  uncertainty = Total;
 //
+  
+  // Check for any systematic uncertainties we may be calculating
+  _metShift = _config.GetValue("Systs.metShift",0);
 
   return;
 } //Initialize()
@@ -509,13 +512,24 @@ Int_t EventContainer::ReadEvent()
     //Pvtxall_n = _eventTree->Vertex_n;
 
     ///////////////////////////////////////////
-    // Fill MET info
+    // Fill MET info 
     ///////////////////////////////////////////
+    // Should I update this to use PUPPI information?!?
     missingEt = _eventTree->Met_type1PF_pt;
     missingEx = _eventTree->Met_type1PF_px;
     missingPhi = _eventTree->Met_type1PF_phi;
     missingEy = _eventTree->Met_type1PF_py;
+
+    // Systematic variations on met to be re-calculated here.
+    if (_metShift != 0){
+      float oldEt = missingEt;
+      missingEt = (_metShift == 1) ? _eventTree->Met_type1PF_shiftedPtUp : _eventTree->Met_type1PF_shiftedPtDown;
+      missingEx *= missingEt/oldEt;
+      missingEy *= missingEt/oldEt;
+    }
+
     missingEtVec.SetPtEtaPhiE(missingEt,0.,missingPhi,missingEt);
+
 
     ///////////////////////////////////////////
     // Electrons-->refilled and sorted later in method!!
