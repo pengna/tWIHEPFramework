@@ -59,9 +59,11 @@ public:
   // methods for weighting for MC generatd with MCatNLO
   void setMCatNLO(Bool_t val=true) { _useMCatNLO=val; };
   void setPileUpWgt(Bool_t val=true) { _usePileUpWgt=val; };
+  void setPileUpSyst(Bool_t val=false) { _doPileupSysts=val; };
   void setbWeight(Bool_t val=true) { _usebWeight=val; };
   Bool_t isMCatNLO() const { return _useMCatNLO; };
   Bool_t isPileUpWgt() const { return _usePileUpWgt; };
+  Bool_t isPileupSysts() const { return _doPileupSysts; };
   Bool_t isbWeight() const { return _usebWeight; };
 
     // methods for weighting for MC generatd with NoWeight
@@ -76,6 +78,7 @@ private:
   //  vector<double> vecPileUpWgt;  // vector to store vertex Pile up reweighting weights
   Bool_t _useMCatNLO;  // set to true if this MC is MC@NLO and we need to use the corresponding weight
   Bool_t _usePileUpWgt;  // set to true if this MC is MC@NLO and we need to use the corresponding weight
+  Bool_t _doPileupSysts; // set to true if including the systematic uncertainties associated with pileup reweighting in the output file 
   Bool_t _usebWeight;  // set to true if using b-tag weights
   Bool_t _useNoWeight;  //No weight except MCatNLO weight
   Bool_t _useLeptonSFs; // Use lepton SFs. Needs to be configured in the overall config file
@@ -101,6 +104,9 @@ private:
   //Pileup reweighting hisotgrams
   TH1F* _dataPV;
   TH1F* _mcPV;
+  //Pileup reweighting systematic histograms
+  TH1F* _minBiasUpPV;
+  TH1F* _minBiasDownPV;
 
   std::vector<std::string> _bTagSystNames;
   std::map<std::string,float> _bTagSystValues;

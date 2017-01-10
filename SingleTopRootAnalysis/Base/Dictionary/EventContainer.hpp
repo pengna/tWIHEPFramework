@@ -310,10 +310,20 @@ class EventContainer
   inline Double_t GetTreeEventWeight()   const { return _treeEventWeight;   };
   inline Double_t GetGlobalEventWeight() const { return _globalEventWeight; };
 
- //pileup weight per event
+  //pileup weight per event
   inline void SetEventPileupWeight(const Double_t& pileupweight) {_EventPileupWeight = pileupweight;}; //tagging prob per event
   inline Double_t GetEventPileupWeight() const {return _EventPileupWeight;}; 
   inline Double_t EventPileupWeight() const {return GetEventPileupWeight();}; 
+
+  //pileup weight per event with min bias x-sec pushed up
+  inline void SetEventPileupMinBiasUpWeight(const Double_t& pileupweight) {_EventPileupMinBiasUpWeight = pileupweight;}; 
+  inline Double_t GetEventPileupMinBiasUpWeight() const {return _EventPileupMinBiasUpWeight;}; 
+  inline Double_t EventPileupMinBiasUpWeight() const {return GetEventPileupMinBiasUpWeight();}; 
+
+  //pileup weight per event with min bias x-sec pushed down
+  inline void SetEventPileupMinBiasDownWeight(const Double_t& pileupweight) {_EventPileupMinBiasDownWeight = pileupweight;}; 
+  inline Double_t GetEventPileupMinBiasDownWeight() const {return _EventPileupMinBiasDownWeight;}; 
+  inline Double_t EventPileupMinBiasDownWeight() const {return GetEventPileupMinBiasDownWeight();}; 
 
  //b weight per event
   inline void SetEventbWeight(const Double_t& bweight) {_EventbWeight = bweight;}; //tagging prob per event
@@ -398,6 +408,8 @@ class EventContainer
   Float_t _EventTagWeight_Lqup;//tagging weight per event applying the Lq SF up shift
   Float_t _EventTagWeight_Lqdown;//tagging weight per event applying the Lq SF down shift
   Float_t _EventPileupWeight;
+  Float_t _EventPileupMinBiasUpWeight;
+  Float_t _EventPileupMinBiasDownWeight;
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventLepSFWeight;
   std::map<std::string,Float_t> _EventbTagReshape;

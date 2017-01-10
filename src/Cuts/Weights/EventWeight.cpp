@@ -92,6 +92,7 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
   } else {
     SetTotalMCatNLOEvents(TotalMCatNLOEvents);
   }
+  setPileUpSyst(false);
   if(pileup){
     setPileUpWgt(true);
     TFile* dataPVFile = TFile::Open(conf -> GetValue("Include.dataPVFile","null"),"READ");
@@ -104,9 +105,32 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
     TFile* mcPVFile = TFile::Open(conf -> GetValue("Include.mcPVFile","null"),"READ");
     _mcPV = (TH1F*)mcPVFile->Get("pileup");
     _mcPV->SetDirectory(0);
-    _dataPV->Scale(1./_dataPV->Integral());
+    _mcPV->Scale(1./_mcPV->Integral());
     mcPVFile->Close();
     delete mcPVFile;
+
+    //Load in the pileup distributions with the min bias x-section altered for systematic studies
+    string minBiasFileName = conf -> GetValue("Include.minBiasUp","null");
+    if (minBiasFileName != "null"){
+      TFile* minBiasUpFile = TFile::Open(minBiasFileName.c_str(),"READ");
+      setPileUpSyst(true);
+      _minBiasUpPV = (TH1F*)minBiasUpFile->Get("pileup");
+      _minBiasUpPV->SetDirectory(0);
+      _minBiasUpPV->Scale(1./_minBiasUpPV->Integral());
+      minBiasUpFile->Close();
+      delete minBiasUpFile;
+    }
+
+    string minBiasDownFileName = conf -> GetValue("Include.minBiasDown","null");
+    if (minBiasDownFileName != "null"){    
+      TFile* minBiasDownFile = TFile::Open(minBiasDownFileName.c_str(),"READ");
+      _minBiasDownPV = (TH1F*)minBiasDownFile->Get("pileup");
+      _minBiasDownPV->SetDirectory(0);
+      _minBiasDownPV->Scale(1./_minBiasDownPV->Integral());
+      minBiasDownFile->Close();
+      delete minBiasDownFile;
+    }
+
   }
   else setPileUpWgt(false);
 
@@ -308,6 +332,8 @@ Bool_t EventWeight::Apply()
 
   // multiply by PileUpWgt weight if desired.
  float pileupEventWeight(-1.0);
+ float pileupMinBiasUpWeight(-1.0);
+ float pileupMinBiasDownWeight(-1.0);
  float mu = 1; //(float)EventContainerObj -> GetEventTree() -> lbn;
  //eventInfo->event_ID()->lumi_block();
  
@@ -338,6 +364,10 @@ Bool_t EventWeight::Apply()
  if(isPileUpWgt()) {
    if (_mcPV->GetBinContent(tree->trueInteractions) > 0){
      pileupEventWeight = _dataPV->GetBinContent(tree->trueInteractions) / _mcPV->GetBinContent(tree->trueInteractions);
+     if (isPileupSysts()){
+       pileupMinBiasUpWeight = _minBiasUpPV->GetBinContent(tree->trueInteractions) / _mcPV->GetBinContent(tree->trueInteractions);
+       pileupMinBiasDownWeight = _minBiasDownPV->GetBinContent(tree->trueInteractions) / _mcPV->GetBinContent(tree->trueInteractions);
+     }
    }
    wgt *= pileupEventWeight;
  }
@@ -381,6 +411,9 @@ Bool_t EventWeight::Apply()
  // cout << wgt << endl;
   EventContainerObj -> SetOutputEventWeight(wgt);
   EventContainerObj -> SetEventPileupWeight(pileupEventWeight);
+  //Save systematic pileup weights
+  EventContainerObj -> SetEventPileupMinBiasUpWeight(pileupMinBiasUpWeight);
+  EventContainerObj -> SetEventPileupMinBiasDownWeight(pileupMinBiasDownWeight);
   EventContainerObj -> SetEventbWeight(bEventWeight);
   EventContainerObj -> SetEventLepSFWeight(lepSFWeight);
   for (auto const bSystName: _bTagSystNames) EventContainerObj -> SetEventbTagReshape(bTagReshape[bSystName],bSystName);

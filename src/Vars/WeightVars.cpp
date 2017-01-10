@@ -41,6 +41,10 @@ void WeightVars::FillBranches(EventContainer * evtObj){
   _floatVars["lepSF_SysUp"] = evtObj->GetEventLepSFWeightUp();
   _floatVars["lepSF_SysDown"] = evtObj->GetEventLepSFWeightDown();
 
+  //Pileup variations
+  _floatVars["puWeight_SysUp"] = evtObj->GetEventPileupMinBiasUpWeight();
+  _floatVars["puWeight_SysDown"] = evtObj->GetEventPileupMinBiasDownWeight();
+
   for (auto const bSystName: _bTagSystNames) _floatVars["bWeight_"+bSystName] = evtObj->GetEventbTagReshape(bSystName);
 
 }
