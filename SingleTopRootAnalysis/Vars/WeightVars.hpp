@@ -20,6 +20,9 @@ public:
   
   //void BookBranches(TTree * skimTree);
   void FillBranches(EventContainer * evtObj);
+
+private:
+  std::vector<std::string> _bTagSystNames;
   
 };
 

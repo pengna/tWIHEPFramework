@@ -132,6 +132,10 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
   //int isGood = PileupReweighting->initialize(rootfileData, "avgintperbx", rootfileMC, histMC);
   //if ( isGood == 0 ) cout<< "EventContainer:: Initialization of TPileupReweighting successful"<<endl;
   //else  cout<<"EventContainer:: Initialization of TPileupReweighting NOT successful!"<<endl;
+
+  //Default list of b tagging systematics. This could possibly become customisable, but it probably doesn't need to be.
+  _bTagSystNames = {"central","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2","up_jes"};
+  
   
 } // EventWeight
 
@@ -192,11 +196,14 @@ void EventWeight::BookHistogram()
   _hLeptonSFWeight -> SetXAxisTitle("Lep SF");
   _hLeptonSFWeight -> SetYAxisTitle("Events");
 
-  // Histogram of bTag shape weight
-  _hbTagReshape =  DeclareTH1F("bTagReshape","bTag reshaping",100,-5.0,5.);
-  _hbTagReshape -> SetXAxisTitle("bTag Reshape");
-  _hbTagReshape -> SetYAxisTitle("Events");
-
+  //Create one histogtam per b-tag systematic (and central value)
+  for (auto const bTagSystName: _bTagSystNames){
+    // Histogram of bTag shape weight
+    _hbTagReshape[bTagSystName] =  DeclareTH1F("bTagReshape_"+bTagSystName,"bTag reshaping "+bTagSystName,100,-5.0,5.);
+    _hbTagReshape[bTagSystName] -> SetXAxisTitle("bTag Reshape " + bTagSystName);
+    _hbTagReshape[bTagSystName] -> SetYAxisTitle("Events");
+  }
+    
   // Histogram of Output Weights
   _hOutputWeight =  DeclareTH1F("OutputWeight","Output Event Weight",100,-10.,10.);
   _hOutputWeight -> SetXAxisTitle("Output Weight");
@@ -253,7 +260,7 @@ void EventWeight::BookHistogram()
 
   if (_usebTagReshape){
     _bTagCalib = BTagCalibration(conf->GetValue("BTaggerAlgo","CSVv2"),conf->GetValue("Include.BTagCSVFile","null"));
-    _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central"); // This is where to put in the systematic names when I get around to that!
+    _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central",_bTagSystNames);
     _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
     _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
     _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"iterativefit");
@@ -350,11 +357,11 @@ Bool_t EventWeight::Apply()
    wgt *= lepSFWeight;
  }
 
- float bTagReshape(1.0);
+ std::map<std::string,float> bTagReshape;
 
  if (_usebTagReshape){
-   bTagReshape = getBTagReshape(EventContainerObj);
-   wgt *= bTagReshape;
+   for (auto const bSystName: _bTagSystNames) bTagReshape[bSystName] = getBTagReshape(EventContainerObj,bSystName);
+   wgt *= bTagReshape["central"];
  }
 
  // if(isPileUpWgt()) {
@@ -376,7 +383,7 @@ Bool_t EventWeight::Apply()
   EventContainerObj -> SetEventPileupWeight(pileupEventWeight);
   EventContainerObj -> SetEventbWeight(bEventWeight);
   EventContainerObj -> SetEventLepSFWeight(lepSFWeight);
-  EventContainerObj -> SetEventbTagReshape(bTagReshape);
+  for (auto const bSystName: _bTagSystNames) EventContainerObj -> SetEventbTagReshape(bTagReshape[bSystName],bSystName);
 
   EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
   EventContainerObj -> SetEventLepSFWeightDown(lepSFWeightDown);
@@ -393,7 +400,7 @@ Bool_t EventWeight::Apply()
   _hPileUpWeight   -> FillWithoutWeight(EventContainerObj -> GetEventPileupWeight());
   _hbWeight	   -> FillWithoutWeight(EventContainerObj -> GetEventbWeight());
   _hLeptonSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventLepSFWeight());
-  _hbTagReshape    -> FillWithoutWeight(EventContainerObj -> GetEventbTagReshape());
+  for (auto const bSystName: _bTagSystNames) _hbTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventbTagReshape(bSystName));
 
   return kTRUE;
   
@@ -465,18 +472,20 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContain
  * Input:  EventContainer of the event                                        *  
  * Output: Double_t weight to be applied to the event weight                  *  
  ******************************************************************************/ 
-Double_t EventWeight::getBTagReshape(EventContainer * EventContainerObj){
+Double_t EventWeight::getBTagReshape(EventContainer * EventContainerObj, std::string syst){
 
   Double_t bTagWeight = 1.0;
-  
   for (auto const & jet : EventContainerObj->taggedJets){
-    bTagWeight *= _bTagCalibReader.eval_auto_bounds("central",BTagEntry::FLAV_B, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+    float jetSF = _bTagCalibReader.eval_auto_bounds(syst, BTagEntry::FLAV_B, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+    if (jetSF == 0) jetSF = _bTagCalibReader.eval_auto_bounds("central", BTagEntry::FLAV_B, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+    bTagWeight *= jetSF;
   }
 
   for (auto const & jet : EventContainerObj->unTaggedJets){
-    bTagWeight *= _bTagCalibReader.eval_auto_bounds("central",BTagEntry::FLAV_UDSG, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+    float jetSF = _bTagCalibReader.eval_auto_bounds(syst, BTagEntry::FLAV_UDSG, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+    if (jetSF == 0) jetSF = _bTagCalibReader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+    bTagWeight *= jetSF;
   }
-
   return bTagWeight;
 }
 

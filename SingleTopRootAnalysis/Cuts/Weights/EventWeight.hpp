@@ -87,14 +87,14 @@ private:
   myTH1F* _hPileUpWeight; // Histogram of PileUpWgt weight
   myTH1F* _hbWeight; // Histogram of b weight
   myTH1F* _hLeptonSFWeight; //Histogram of the lepton SF claculated for the event
-  myTH1F* _hbTagReshape; //Histogram of the btag reshaping
+  std::map<std::string,myTH1F*> _hbTagReshape; //Map of histograms containing the information for b tag reshaping and its associated systematics
   myTH1F* _hOutputWeight; // Histogram of output weights
   Double_t _totalMCatNLOEvents;
   BTagCalibration _bTagCalib;
   BTagCalibrationReader _bTagCalibReader;
 
   //Histograms that are used for applying scale factors to leptons
-  //For now we are only using muons as we veto on electrons anyway
+  //For now we are only using muons as we veto on electroons anyway
   TH2F* _muonIsoSF;
   TH2F* _muonIDSF;
 
@@ -102,9 +102,12 @@ private:
   TH1F* _dataPV;
   TH1F* _mcPV;
 
+  std::vector<std::string> _bTagSystNames;
+  std::map<std::string,float> _bTagSystValues;
+
   std::tuple<Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
   void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName);
-  Double_t getBTagReshape(EventContainer * EventContainerObj);
+  Double_t getBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
 
  //Root::TPileupReweighting* PileupReweighting;
 

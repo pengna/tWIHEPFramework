@@ -17,10 +17,11 @@ WeightVars::WeightVars(){
   _floatVars["bWeight"] = 0.;
   _floatVars["puWeight"] = 0.;
   _floatVars["lepSF"] = 0.;
-  
+
+  _bTagSystNames = {"central","up_jes","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2"};
+
   //Systematic variations
-  _floatVars["bWeight_SysUp"] = 0.;
-  _floatVars["bWeight_SysDown"] = 0.;
+  for (auto const bSystName: _bTagSystNames) _floatVars["bWeight_"+bSystName] = 0.;
   _floatVars["puWeight_SysUp"] = 0.;
   _floatVars["puWeight_SysDown"] = 0.;
   _floatVars["lepSF_SysUp"] = 0.;
@@ -39,5 +40,7 @@ void WeightVars::FillBranches(EventContainer * evtObj){
   //Get the systematic variations
   _floatVars["lepSF_SysUp"] = evtObj->GetEventLepSFWeightUp();
   _floatVars["lepSF_SysDown"] = evtObj->GetEventLepSFWeightDown();
+
+  for (auto const bSystName: _bTagSystNames) _floatVars["bWeight_"+bSystName] = evtObj->GetEventbTagReshape(bSystName);
 
 }

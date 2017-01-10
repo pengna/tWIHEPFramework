@@ -335,10 +335,10 @@ class EventContainer
   inline Double_t GetEventLepSFWeightDown() const {return _EventLepSFWeightDown;};
   inline Double_t EventLepSFWeightDown() const {return GetEventLepSFWeightDown();};
 
-  //lepton SF weight per event
-  inline void SetEventbTagReshape(const Double_t& lepSFweight) {_EventbTagReshape = lepSFweight;};
-  inline Double_t GetEventbTagReshape() const {return _EventbTagReshape;};
-  inline Double_t EventbTagReshape() const {return GetEventbTagReshape();};
+  //set and get btag weights for central and systematics
+  inline void SetEventbTagReshape(const Double_t& lepSFweight, std::string systName = "central" ) {_EventbTagReshape[systName] = lepSFweight;};
+  inline Double_t GetEventbTagReshape(std::string systName = "central") {return _EventbTagReshape[systName];};
+  inline Double_t EventbTagReshape() {return GetEventbTagReshape();};
 
  //Tagging probabiliy weight per event
   inline void SetEventTagWeight(const Double_t& taggingweight) {_EventTagWeight = taggingweight;}; //tagging prob per event
@@ -400,7 +400,7 @@ class EventContainer
   Float_t _EventPileupWeight;
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventLepSFWeight;
-  Float_t _EventbTagReshape;
+  std::map<std::string,Float_t> _EventbTagReshape;
 
   //Add in the systematic variations to the SFs
   Float_t _EventLepSFWeightUp;
