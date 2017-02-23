@@ -20,7 +20,8 @@ perMCSFs['wPlusJets'] = 2.1348
 
 nBinsForPlots = 40.
 
-masterMCScale = 12554./27217.
+masterMCScale = 12554./27217. #runs B-D scale
+masterMCScale = 1.
 #masterMCScale = 1.
 
 if len(sys.argv) > 3: 
