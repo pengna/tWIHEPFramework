@@ -66,7 +66,9 @@ ClassImp(Muon)
   _validHitsInner	(0.0),
   _matchedStat		(0.0),
   _TLayers		(0.0),
-  _relIsoR04		(0.0)
+  _relIsoR04		(0.0),
+  _ndof			(0.0),
+  _charge		(0.0)
 {
 
 } //Muon
@@ -111,7 +113,9 @@ Muon::Muon(const Muon& other): Particle(other),
   _validHitsInner(other.GetvalidHitsInner()),
   _matchedStat(other.GetmatchedStat()),
   _TLayers(other.GetTLayers()),
-  _relIsoR04(other.GetrelIsoR04())
+  _relIsoR04(other.GetrelIsoR04()),
+			       _ndof(other.Getndof()),
+			       _charge(other.GetCharge())			       
 			       
 {
 } //Muon()
@@ -143,7 +147,9 @@ Muon::Muon(const Particle& other): Particle(other),
   _validHitsInner	(0.0),
   _matchedStat		(0.0),
   _TLayers		(0.0),
-  _relIsoR04            (0.0)
+				   _relIsoR04            (0.0),
+				   _ndof (0.0),
+				   _charge(0.0)
 {
 } //Muon
 
@@ -207,6 +213,8 @@ Muon& Muon::operator=(const Particle& other)
   SetmatchedStat	(0.0);
   SetTLayers		(0.0);
   SetrelIsoR04		(0.0);
+  Setndof		(0.0);
+  SetCharge		(0.0);
   return *this;
 } //= Particle
 
@@ -240,6 +248,8 @@ Muon& Muon::operator=(const Muon& other)
   SetmatchedStat(other.GetmatchedStat());
   SetTLayers(other.GetTLayers());
   SetrelIsoR04(other.GetrelIsoR04());
+  Setndof(other.Getndof());
+  SetCharge(other.GetCharge());
   return *this;
 } //= const muon
 
@@ -273,6 +283,8 @@ Muon& Muon::operator=(Muon& other)
   SetmatchedStat(other.GetmatchedStat());
   SetTLayers(other.GetTLayers());
   SetrelIsoR04(other.GetrelIsoR04());
+  Setndof(other.Getndof());
+  SetCharge(other.GetCharge());
   return *this;
 } //= non-const muon
 
@@ -340,6 +352,7 @@ Bool_t Muon::Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation)
   SetTLayers		(evtr -> Muon_TLayers   	-> operator[](iE));
   SetrelIsoR04		(evtr -> Muon_relIsoDeltaBetaR04-> operator[](iE));
   Setndof		(evtr -> Muon_ndof		-> operator[](iE));
+  SetCharge		(evtr -> Muon_charge		-> operator[](iE));
  
   // **************************************************************
   // Isolation Cuts

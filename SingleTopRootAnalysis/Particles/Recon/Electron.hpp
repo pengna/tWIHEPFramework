@@ -133,6 +133,10 @@ class Electron: public Particle
   inline Double_t GetisoPU() const {return _isoPU;};
   inline Double_t isoPU() const {return _isoPU;};
 
+  inline void SetCharge(Double_t charge){_charge = charge;};
+  inline Double_t GetCharge() const {return _charge;};
+  inline Double_t charge() const {return _charge;};
+
  private:
 
   Int_t _passVetoId;
@@ -150,6 +154,7 @@ class Electron: public Particle
   Double_t _isoNeutralHadrons;
   Double_t _isoPhotons;
   Double_t _isoPU;
+  Double_t _charge;
 
   ///////////////////////////////////////////
   // Maps containing the cut values to be placed on the different type of selected leptons

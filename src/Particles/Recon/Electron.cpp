@@ -41,7 +41,7 @@ ClassImp(Electron)
  * Input:  None                                                               *
  * Output: None                                                               *
  ******************************************************************************/
-  Electron::Electron() : Particle::Particle(),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0)
+Electron::Electron() : Particle::Particle(),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0), _charge(0.0)
 {
 } //Electron()
 
@@ -80,7 +80,8 @@ _patElectron_dz(other.GetpatElectron_dz()),
 _isoChargedHadrons(other.GetisoChargedHadrons()), 
 _isoNeutralHadrons(other.GetisoNeutralHadrons()), 
 _isoPhotons(other.GetisoPhotons()), 
-_isoPU(other.GetisoPU())
+					   _isoPU(other.GetisoPU()),
+					   _charge(other.GetCharge())
 {
 } //Electron()
 
@@ -92,7 +93,7 @@ _isoPU(other.GetisoPU())
  * Input:  Particle                                                           *
  * Output: None                                                               *
  ******************************************************************************/
-  Electron::Electron(const Particle& other) : Particle(other),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0)
+Electron::Electron(const Particle& other) : Particle(other),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0), _charge(0.0)
 { 
 } //Electron()
 
@@ -154,6 +155,7 @@ Electron& Electron::operator=(const Particle& other)
   SetisoNeutralHadrons(0.0);
   SetisoPhotons(0.0);
   SetisoPU(0.0);
+  SetCharge(0.0);
 
   return *this;
 } // = Particle
@@ -183,6 +185,7 @@ Electron& Electron::operator=(const Electron& other)
   SetisoNeutralHadrons(other.GetisoNeutralHadrons());
   SetisoPhotons(other.GetisoPhotons());
   SetisoPU(other.GetisoPU());
+  SetCharge(other.GetCharge());
   return *this;
 } //= const Electron
 
@@ -211,6 +214,7 @@ Electron& Electron::operator=(Electron& other)
   SetisoNeutralHadrons(other.GetisoNeutralHadrons());
   SetisoPhotons(other.GetisoPhotons());
   SetisoPU(other.GetisoPU());
+  SetCharge(other.GetCharge());
   return *this;
 } //= non-const Electron
 
@@ -273,6 +277,7 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   SetisoNeutralHadrons  ( evtr -> patElectron_isoNeutralHadrons   -> operator[](iE) );
   SetisoPhotons         ( evtr -> patElectron_isoPhotons          -> operator[](iE) );
   SetisoPU              ( evtr -> patElectron_isoPU               -> operator[](iE) );
+  SetCharge		( evtr -> patElectron_charge		  -> operator[](iE) );
 
   // **************************************************************
   // **************************************************************
