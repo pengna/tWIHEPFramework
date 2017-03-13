@@ -56,6 +56,16 @@ private:
   myTH2F* _hNPvtx_nElectron;  // Histogram of NPvtx vs Electron number
   myTH2F* _hNPvtx_nMuon;  // Histogram of NPvtx vs Muon number
 
+  myTH1F* _hNTrueInteractions; //Number of true interactions in the event
+  myTH2F* _hNTrueInteractions_nElectron; // Number of true interactions vs n electrons
+  myTH2F* _hNTrueInteractions_nMuon; // Number of true interactions vs n muons
+  myTH2F* _hNTrueInteractions_nJet; // Number of true interactions vs n jets
+
+  myTH1F* _hNPUVertices; //Number of pileup vertices
+  myTH2F* _hNPUVertices_nElectron; // Number of pileup interactions vs n electrons
+  myTH2F* _hNPUVertices_nMuon; // Number of pileup interactions vs n muons
+  myTH2F* _hNPUVertices_nJet; // Number of pileup interactions vs n jets
+  
 };
 
 
