@@ -163,6 +163,7 @@ BINS_Matching= bin/Matching/MatchQuality.x
 BINS_ParticleStudies= bin/ParticleStudies/electron_study.x bin/ParticleStudies/jet_study.x bin/ParticleStudies/MCParticle_study.x bin/ParticleStudies/muon_study.x
 BINS_Wt= bin/Wt/Wt_generic.x
 BINS_Vertex= bin/Wt/Wt_nVertOnly.x
+BINS_Synch= bin/Wt/Wt_synch.x
 #BINS_Wt= bin/Wt/Wt.x bin/Wt/Wt_mumu.x bin/Wt/Wteu.x bin/Wt/Wt_Tree.x bin/Wt/Wt_generic.x
 BINS_Skimming= bin/Skimming/Skimming.x 
 BINS_St= bin/St/St_subtractQCD.x
@@ -233,6 +234,8 @@ all: lib St Wt Skimming FER2 Matching ParticleStudies MCStudies EventComparison 
 St: lib $(BINS_St)
 
 Wt: lib $(BINS_Wt)
+
+Synch: lib $(BINS_Synch)
 
 nVert: lib $(BINS_Vertex)
 
@@ -386,16 +389,18 @@ cleanBTag:
 	rm -f $(BINS_BTag)
 cleanWt:
 	rm -f $(BINS_Wt)
+cleanSynch:
+	rm -f $(BINS_Synch)
 cleanSkimming:
 	rm -f $(BINS_Skimming)
 cleanSt:
 	rm -f $(BINS_St)
 
-cleanExe: cleanSt cleanWt cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
+cleanExe: cleanSt cleanWt cleanSynch cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
 
 cleanall: clean
 
-clean:  cleanSt cleanWt cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
+clean:  cleanSt cleanWt cleanSynch cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
 	rm -rf ti_files
 	rm -rf $(DIR_OBJ)/*
 	rm -rf $(DIR_TMP)/*
