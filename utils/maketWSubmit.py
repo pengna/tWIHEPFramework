@@ -94,7 +94,7 @@ if "skims" in sys.argv:
 #executable = "Wt_generic.x"
 #for the queue
 workpath    = os.getcwd()+"/"+analysis +"/"
-frameworkDir = "/acfs/cms/user/duncanleg/tW13TeV/framework/"
+frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
 jobDir      = workpath+"/"+"Jobs"
 fileListDirectory = "moriond17/"
 smallerJobs = True

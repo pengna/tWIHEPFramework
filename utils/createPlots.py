@@ -15,8 +15,8 @@ useQCD = False
 qcdFolder = ""
 
 perMCSFs = {}
-perMCSFs['qcd'] = 0.5265
-perMCSFs['wPlusJets'] = 2.1348
+#perMCSFs['qcd'] = 0.5265
+#perMCSFs['wPlusJets'] = 2.1348
 
 nBinsForPlots = 40.
 
