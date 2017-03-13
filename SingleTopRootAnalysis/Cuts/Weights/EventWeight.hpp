@@ -35,6 +35,7 @@
 #include "SingleTopRootAnalysis/Base/Dictionary/BTagCalibration.hpp"
 #include "SingleTopRootAnalysis/Base/Dictionary/BTagCalibrationReader.hpp"
 //#include "externaltools/pileup/PileupReweighting/TPileupReweighting.h"
+#include <TGraphAsymmErrors.h>
 
 
 class EventWeight : public HistoCut
@@ -100,6 +101,8 @@ private:
   //For now we are only using muons as we veto on electroons anyway
   TH2F* _muonIsoSF;
   TH2F* _muonIDSF;
+  TH2F* _muonTrigSF;
+  TGraphAsymmErrors* _muonTkSF;
 
   //Pileup reweighting hisotgrams
   TH1F* _dataPV;
@@ -112,7 +115,7 @@ private:
   std::map<std::string,float> _bTagSystValues;
 
   std::tuple<Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
-  void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName);
+  void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName);
   Double_t getBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
 
  //Root::TPileupReweighting* PileupReweighting;

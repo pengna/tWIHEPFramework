@@ -526,11 +526,11 @@ Int_t EventContainer::ReadEvent()
     missingPhi_xy = _eventTree->Met_type1PFxy_phi;
     missingEy_xy = _eventTree->Met_type1PFxy_py;
 
-    /*    missingEt_xy = 1.;
-    missingEx_xy = 1.;
-    missingPhi_xy = 1.;
-    missingEy_xy = 1.;*/
-
+    //Fill pvtx information
+    nPvtx = _eventTree->nBestVtx;
+    trueInteractions = _eventTree->trueInteractions;
+    npuVertices = _eventTree->npuVertices;
+    
     // Systematic variations on met to be re-calculated here.
     if (_metShift != 0){
       float oldEt = missingEt;

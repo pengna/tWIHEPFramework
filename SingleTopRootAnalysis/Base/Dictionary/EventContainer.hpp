@@ -501,7 +501,16 @@ class EventContainer
   // and the sum of scalar ET
   Double_t sumEt;
 
+  Double_t missingEt_xy;
+  Double_t missingEx_xy;
+  Double_t missingEy_xy;
+  Double_t missingPhi_xy;
+  TLorentzVector missingEtVec_xy;
+
+  //Various variables for plotting primary vertex information
   Int_t nPvtx;
+  Int_t trueInteractions;
+  Int_t npuVertices;
 
   Double_t particleHT;
   Double_t particleMTotal;
