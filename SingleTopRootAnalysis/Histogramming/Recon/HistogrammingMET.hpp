@@ -55,6 +55,13 @@ private:
   myTH1F* _hMEX;  // Histogram of MEX
   myTH1F* _hMEY;  // Histogram of MEY
   myTH1F* _hMETPhi;  // Histogram of MET phi
+
+  //Corrected met distributions
+  myTH1F* _hMET_xy; // Histogram of xy corrected MET
+  myTH1F* _hMEX_xy; // Histogram of xy corrected MEX
+  myTH1F* _hMEY_xy; // Histogram of xy corrected MEY
+  myTH1F* _hMETPhi_xy; // Histogram of xy corrected MET phi
+
   myTH1F* _hSumEt;  // Histogram of SumEt
 
 };

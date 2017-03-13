@@ -145,13 +145,13 @@ Bool_t CutTriggerSelection::Apply()
 
   Int_t triggerBit = 0.;
 
-  Int_t electronTrigger = EventContainerObj->HLT_Ele23_WPLoose_Gsf;
-  Int_t muonTrigger = EventContainerObj->HLT_IsoMu22 || EventContainerObj->HLT_IsoTkMu22;
+  Int_t electronTrigger = EventContainerObj->HLT_Ele27_WPTight_Gsf;
+  Int_t muonTrigger = EventContainerObj->HLT_IsoMu24 || EventContainerObj->HLT_IsoTkMu24;
   
-  if (_whichtrigger == 0) triggerBit = EventContainerObj->HLT_Ele23_WPLoose_Gsf;
+  if (_whichtrigger == 0) triggerBit = EventContainerObj->HLT_Ele27_WPTight_Gsf;
   if (_whichtrigger == 1) {//I should really make these customisable, but I'm not gonna do that now.
     //triggerBit = EventContainerObj->HLT_IsoMu18;
-    triggerBit = EventContainerObj->HLT_IsoMu22 || EventContainerObj->HLT_IsoTkMu22;
+    triggerBit = EventContainerObj->HLT_IsoMu24 || EventContainerObj->HLT_IsoTkMu24;
   }
   
   if (_whichtrigger == 0) passesTrigger = electronTrigger != 0. and muonTrigger == 0;

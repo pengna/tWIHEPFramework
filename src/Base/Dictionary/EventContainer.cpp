@@ -521,15 +521,31 @@ Int_t EventContainer::ReadEvent()
     missingPhi = _eventTree->Met_type1PF_phi;
     missingEy = _eventTree->Met_type1PF_py;
 
+    missingEt_xy = _eventTree->Met_type1PFxy_pt;
+    missingEx_xy = _eventTree->Met_type1PFxy_px;
+    missingPhi_xy = _eventTree->Met_type1PFxy_phi;
+    missingEy_xy = _eventTree->Met_type1PFxy_py;
+
+    /*    missingEt_xy = 1.;
+    missingEx_xy = 1.;
+    missingPhi_xy = 1.;
+    missingEy_xy = 1.;*/
+
     // Systematic variations on met to be re-calculated here.
     if (_metShift != 0){
       float oldEt = missingEt;
       missingEt = (_metShift == 1) ? _eventTree->Met_type1PF_shiftedPtUp : _eventTree->Met_type1PF_shiftedPtDown;
       missingEx *= missingEt/oldEt;
       missingEy *= missingEt/oldEt;
+
+      float oldEt_xy = missingEt_xy;
+      missingEt_xy = (_metShift == 1) ? _eventTree->Met_type1PF_shiftedPtUp : _eventTree->Met_type1PF_shiftedPtDown;
+      missingEx_xy *= missingEt_xy/oldEt_xy;
+      missingEy_xy *= missingEt_xy/oldEt_xy;
     }
 
     missingEtVec.SetPtEtaPhiE(missingEt,0.,missingPhi,missingEt);
+    missingEtVec_xy.SetPtEtaPhiE(missingEt_xy,0.,missingPhi_xy,missingEt_xy);
 
 
     ///////////////////////////////////////////

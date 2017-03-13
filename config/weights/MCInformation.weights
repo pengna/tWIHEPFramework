@@ -176,3 +176,91 @@ Events.Source.300020: 19825855
 Weight.Source.300021: 136.02
 Events.Source.300021: 32808300
 
+# 500000 - tW_top_5fs inclusive
+Weight.Source.500000: 35.85
+Events.Source.500000: 992024
+
+# 50001 - tW_antitop
+Weight.Source.500001: 35.85
+Events.Source.500001: 998276
+
+# 500002 - tChan
+Weight.Source.500002: 70.69
+Events.Source.500002: 19938230
+
+# 500003 - ttbar
+Weight.Source.500003: 831.76
+Events.Source.500003: 9885256
+
+# 500004 - zPlusJetsHighMass
+Weight.Source.500004: 6025.2
+Events.Source.500004: 49144274
+
+# 500005 - zPlusJetsLowMass
+Weight.Source.500005: 18610.
+Events.Source.500005: 30920596
+
+# 500006 - wPlusJets
+Weight.Source.500006: 20508.9
+Events.Source.500006: 24120319
+
+#500007 - WW
+Weight.Source.500007: 118.7
+Events.Source.500007: 994012
+
+#500008 - WZ
+Weight.Source.500008: 66.1
+Events.Source.500008: 1000000
+
+#500009 - ZZ
+Weight.Source.500009: 31.8
+Events.Source.500009: 990064
+
+#500010 - sChan
+Weight.Source.500010: 3.36
+Events.Source.500010: 1000000
+
+#500011 - qcd100_200
+Weight.Source.500011: 27990000.
+Events.Source.500011: 80684349
+
+#500012 - qcd200_300
+Weight.Source.500012: 1712000.
+Events.Source.500012: 18722416
+
+#500013 - qcd300_500
+Weight.Source.500013: 347700.
+Events.Source.500013: 17035891
+
+#500014 - qcd500_700
+Weight.Source.500014: 32100.
+Events.Source.500014: 18929951
+
+#500015 - qcd700_1000
+Weight.Source.500015: 6831.
+Events.Source.500015: 15629253
+
+#500016 - qcd1000_1500
+Weight.Source.500016: 1207.
+Events.Source.500016: 4767100
+
+#500017 - qcd1500_2000
+Weight.Source.500017: 119.9
+Events.Source.500017: 3970819
+
+#500018 - qcd2000_inf
+Weight.Source.500018: 25.24
+Events.Source.500018: 1991645
+
+#500019 - wPlusJetsMCatNLO
+Weight.Source.500019: 20508.9
+Events.Source.500019: 24120319
+
+#500020 - tChan_antitop
+Weight.Source.500020: 80.95
+Events.Source.500020: 38811017
+
+#500021- tChan_top
+Weight.Source.500021: 136.02
+Events.Source.500021: 67240808
+

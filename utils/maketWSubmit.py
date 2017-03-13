@@ -65,9 +65,9 @@ samplesData=[
 "SingMuB",
 "SingMuC",
 "SingMuD",
-#"SingMuE",
-#"SingMuF",
-#"SingMuG",
+"SingMuE",
+"SingMuF",
+"SingMuG",
 ]
 sample = samplesMC
 if "inv" in sys.argv:
@@ -94,9 +94,9 @@ if "skims" in sys.argv:
 #executable = "Wt_generic.x"
 #for the queue
 workpath    = os.getcwd()+"/"+analysis +"/"
-frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
+frameworkDir = "/acfs/cms/user/duncanleg/tW13TeV/framework/"
 jobDir      = workpath+"/"+"Jobs"
-fileListDirectory = "small80X/"
+fileListDirectory = "moriond17/"
 smallerJobs = True
 AnalyzerDir = workpath+"/"+"Analyzer"
 task        = analysis+"_"+taskname
@@ -104,6 +104,34 @@ rootplizer  = "Rootplizer_"+task+".cc"
 headplizer  = "Rootplizer_"+task+".h"
 #Directory of input files
 nJobs = {
+"qcd1000_1500":9,
+"qcd100_200":74,
+"qcd1500_2000":8,
+"qcd2000_inf":4,
+"qcd200_300":18,
+"qcd300_500":20,
+"qcd500_700":21,
+"qcd700_1000":19,
+"sChan":3,
+"tChan_top":73,
+"tChan_antitop":41,
+"ttbar":14,
+"tW_top":2,
+"tW_antitop":2,
+"ww":2,
+"wz":3,
+"zz":2,
+"zPlusJetsLowMass":24,
+"zPlusJetsHighMass":48,
+"wPlusJetsMCatNLO":30,
+"SingMuB":176,
+"SingMuC":58,
+"SingMuD":98,
+"SingMuE":83,
+"SingMuF":61,
+"SingMuG":143
+}
+nJobsSum16 = {
 "qcd1000_1500":12,
 "qcd100_200":54,
 "qcd1500_2000":9,
@@ -131,6 +159,7 @@ nJobs = {
 "SingMuF":61,
 "SingMuG":132
 }
+
 nJobs76X = {
 "qcd1000_1500":13,
 "qcd100_200":193,

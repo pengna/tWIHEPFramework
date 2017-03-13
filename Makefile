@@ -27,9 +27,9 @@ OSYS=$(shell uname -s)
 
 # For MacOS (Darwin) include -bind_at_local
 ifeq ($(OSYS),Darwin)
-  SPECIALFLAGS= $(OPT) -bind_at_load
+  SPECIALFLAGS= $(OPT) -bind_at_load #-fsanitize=address
 else
-  SPECIALFLAGS= $(OPT)
+  SPECIALFLAGS= $(OPT) #-fsanitize=address
 endif
 
 ####################################################################################
@@ -97,7 +97,7 @@ endif
 ifeq ($(VERSION-4),true)
         CFLAGS = $(SPECIALFLAGS) -iquote- -iquote. -iquote${DIR_INC} -iquote${DIR_SRC}
 else
-        CFLAGS = $(SPECIALFLAGS)  -I. -I${DIR_INC} -I${DIR_SRC}
+        CFLAGS = $(SPECIALFLAGS) -I. -I${DIR_INC} -I${DIR_SRC}
 endif
 
 LFLAGS = $(SPECIALFLAGS)
@@ -268,6 +268,7 @@ $(DIR_OBJ)/%dict.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_OBJ)/Particles/Recon $(DIR_OBJ)/Particles/Truth $(DIR_OBJ)/Particles/TruthAll
 	@mkdir -p $(DIR_OBJ)/Cuts/Electron $(DIR_OBJ)/Cuts/IsolatedMuon $(DIR_OBJ)/Cuts/Jet $(DIR_OBJ)/Cuts/Lepton $(DIR_OBJ)/Cuts/Muon $(DIR_OBJ)/Cuts/Other $(DIR_OBJ)/Cuts/TaggedJet 
 	@mkdir -p $(DIR_OBJ)/Histogramming/Matching  $(DIR_OBJ)/Histogramming/Recon  $(DIR_OBJ)/Histogramming/Topological  $(DIR_OBJ)/Histogramming/Truth  $(DIR_OBJ)/Histogramming/TruthAll $(DIR_OBJ)/Histogramming/Other
+	@mkdir -p $(DIR_OBJ)/Vars
 
 	@mkdir -p $(DIR_TMP)
 	@mkdir -p $(DIR_TMP)/Base/CutFlow $(DIR_TMP)/Base/Dictionary $(DIR_TMP)/Base/Histograms
@@ -275,6 +276,7 @@ $(DIR_OBJ)/%dict.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_TMP)/Particles/Recon $(DIR_TMP)/Particles/Truth $(DIR_TMP)/Particles/TruthAll
 	@mkdir -p $(DIR_TMP)/Cuts/Electron $(DIR_TMP)/Cuts/IsolatedMuon $(DIR_TMP)/Cuts/Jet $(DIR_TMP)/Cuts/Lepton $(DIR_TMP)/Cuts/Muon $(DIR_TMP)/Cuts/Other $(DIR_TMP)/Cuts/TaggedJet $(DIR_TMP)/Cuts/Tau $(DIR_TMP)/Cuts/Weights
 	@mkdir -p $(DIR_TMP)/Histogramming/Matching  $(DIR_TMP)/Histogramming/Recon  $(DIR_TMP)/Histogramming/Topological  $(DIR_TMP)/Histogramming/Truth  $(DIR_TMP)/Histogramming/TruthAll $(DIR_TMP)/Histogramming/Other
+	@mkdir -p $(DIR_TMP)/Vars
 
 	@mkdir -p $(DIR_DEP)
 	@mkdir -p $(DIR_DEP)/Base/CutFlow $(DIR_DEP)/Base/Dictionary $(DIR_DEP)/Base/Histograms
@@ -282,6 +284,7 @@ $(DIR_OBJ)/%dict.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_DEP)/Particles/Recon $(DIR_DEP)/Particles/Truth $(DIR_DEP)/Particles/TruthAll
 	@mkdir -p $(DIR_DEP)/Cuts/Electron $(DIR_DEP)/Cuts/IsolatedMuon $(DIR_DEP)/Cuts/Jet $(DIR_DEP)/Cuts/Lepton $(DIR_DEP)/Cuts/Muon $(DIR_DEP)/Cuts/Other $(DIR_DEP)/Cuts/TaggedJet $(DIR_DEP)/Cuts/Tau $(DIR_DEP)/Cuts/Weights
 	@mkdir -p $(DIR_DEP)/Histogramming/Matching  $(DIR_DEP)/Histogramming/Recon  $(DIR_DEP)/Histogramming/Topological  $(DIR_DEP)/Histogramming/Truth  $(DIR_DEP)/Histogramming/TruthAll $(DIR_DEP)/Histogramming/Other
+	@mkdir -p $(DIR_DEP)/Vars
 
 # Create dependency files                                                                                                                                                                       
 	$(CPP) $(RCXX)  -MM  $(@:$(DIR_OBJ)/%dict$(SUF_OBJ)=$(DIR_SRC)/%$(SUF_SRC)) >  $(DIR_DEP)/$(@:$(DIR_OBJ)/%$(SUF_OBJ)=%$(SUF_DEP))
