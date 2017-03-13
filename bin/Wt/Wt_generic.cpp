@@ -27,6 +27,8 @@
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingMET.hpp"
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingMtW.hpp"
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingJetAngular.hpp"
+#include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingJet.hpp"
+#include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingNPvtx.hpp"
 // Include cuts classes
 //#include "SingleTopRootAnalysis/Cuts/Other/CutTriangularSumDeltaPhiLepMET.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutEMuOverlap.hpp"
@@ -78,6 +80,7 @@ int main(int argc, char **argv)
   /////////////////////////////////////////////////////////////////////////////////
   // Instantiate the analysis class
   AnalysisMain mystudy;
+
   TChain *chainReco       = new TChain("TNT/BOOM");
   TChain *chainTruth      = new TChain("TruthTree");
   TChain *chainTrigger    = new TChain("TriggerTree");
@@ -205,7 +208,7 @@ int main(int argc, char **argv)
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Veto"));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"UnIsolated"));  // make the muon plots, hopefully.
   mystudy.AddCut(new CutPrimaryVertex(particlesObj));
-  if (!doMC) mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
+  mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
 
   mystudy.AddCut(new HistogrammingMET(particlesObj));
   //mystudy.AddCut(new CutElectronTighterPt(particlesObj, "Tight")); 
@@ -237,6 +240,8 @@ int main(int argc, char **argv)
   mystudy.AddCut(new HistogrammingMET(particlesObj));
   mystudy.AddCut(new HistogrammingMtW(particlesObj,useInvertedIsolation));
   mystudy.AddCut(new HistogrammingJetAngular(particlesObj,useInvertedIsolation));
+  mystudy.AddCut(new HistogrammingJet(particlesObj));
+  mystudy.AddCut(new HistogrammingNPvtx(particlesObj));
   //mystudy.AddCut(new CutTriangularSumDeltaPhiLepMET(particlesObj));  
   //if (isemu){
   //  mystudy.AddCut(new CutHTJET1(particlesObj));
