@@ -231,7 +231,7 @@ Bool_t CutLeptonCharge::Apply()
   cutFlowNameAllStream << leptonType.Data() << "Dilepton.Charge.All";
   cutFlowNameAll = cutFlowNameAllStream.str().c_str();
   
-  if ( _LeptonSameSign && LeptonPairCharge < 0.){
+  if ( _LeptonSameSign == (LeptonPairCharge < 0.)){
     LeptonChargePass = kFALSE;
     GetCutFlowTable()->FailCut(cutFlowNameAll.Data());
   }

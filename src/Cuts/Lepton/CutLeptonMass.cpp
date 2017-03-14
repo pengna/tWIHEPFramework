@@ -84,20 +84,20 @@ void CutLeptonMass::BookHistogram(){
 
   // Histogram Before Cut
   std::ostringstream histNameBeforeStream;
-  histNameBeforeStream << leptonType << "DileptonMassBefore";
+  histNameBeforeStream << leptonType << "DileptonMassBefore" << massCutPostfix;
   TString histNameBefore = histNameBeforeStream.str().c_str();
 
   std::ostringstream histTitleBeforeStream;
-  histTitleBeforeStream << leptonType << "Dilepton Mass Before Cut";
+  histTitleBeforeStream << leptonType << "Dilepton Mass Before Cut " << massCutPostfix;
   TString histTitleBefore = histTitleBeforeStream.str().c_str();
 
   // Histogram After Cut
   std::ostringstream histNameAfterStream;
-  histNameAfterStream << leptonType << "DileptonMassAfter";
+  histNameAfterStream << leptonType << "DileptonMassAfter" << massCutPostfix;
   TString histNameAfter = histNameAfterStream.str().c_str();
 
   std::ostringstream histTitleAfterStream;
-  histTitleAfterStream << leptonType << "Dilepton Mass After Cut";
+  histTitleAfterStream << leptonType << "Dilepton Mass After Cut " << massCutPostfix;
   TString histTitleAfter = histTitleAfterStream.str().c_str();
 
   // ***********************************************
@@ -154,32 +154,32 @@ void CutLeptonMass::BookHistogram(){
   TString maxReject = _LeptonMassReject?" >= ":" <= ";
 
   // Min cut
-  cutFlowTitleStream << leptonType.Data() << " Dilepton : " << "Mass" << minReject << _LeptonMassMin;
+  cutFlowTitleStream << leptonType.Data() << " Dilepton" << massCutPostfix << " : Mass" << minReject << _LeptonMassMin;
   cutFlowTitle = cutFlowTitleStream.str().c_str();
 
-  cutFlowNameStream << leptonType.Data() << "Dilepton.Number.Min";
+  cutFlowNameStream << leptonType.Data() << "Dilepton.Mass.Min" << massCutPostfix;
   cutFlowName = cutFlowNameStream.str().c_str();
 
   GetCutFlowTable()->AddCutToFlow(cutFlowName.Data(), cutFlowTitle.Data());
 
   // Max cut
   cutFlowTitleStream.str("");
-  cutFlowTitleStream << leptonType.Data() << " Dilepton : " << "Mass" << maxReject << _LeptonMassMax;
+  cutFlowTitleStream << leptonType.Data() << " Dilepton" << massCutPostfix << " : Mass" << maxReject << _LeptonMassMax;
   cutFlowTitle = cutFlowTitleStream.str().c_str();
   
   cutFlowNameStream.str("");
-  cutFlowNameStream << leptonType.Data() << "Dilepton.Mass.Max";
+  cutFlowNameStream << leptonType.Data() << "Dilepton.Mass.Max" << massCutPostfix;
   cutFlowName = cutFlowNameStream.str().c_str();
 
   GetCutFlowTable()->AddCutToFlow(cutFlowName.Data(), cutFlowTitle.Data());
 
   // Min + Max cut
   cutFlowTitleStream.str("");
-  cutFlowTitleStream << leptonType.Data() << " Dilepton : " << "Mass" << minReject << _LeptonMassMin << " and " << "Mass" << maxReject << _LeptonMassMax;
+  cutFlowTitleStream << leptonType.Data() << " Dilepton" << massCutPostfix << " : Mass" << minReject << _LeptonMassMin << " and " << "Mass" << maxReject << _LeptonMassMax;
   cutFlowTitle = cutFlowTitleStream.str().c_str();
 
   cutFlowNameStream.str("");
-  cutFlowNameStream << leptonType.Data() << "Dilepton.Mass.All";
+  cutFlowNameStream << leptonType.Data() << "Dilepton.Mass.All" << massCutPostfix;
   cutFlowName = cutFlowNameStream.str().c_str();
 
   GetCutFlowTable()->AddCutToFlow(cutFlowName, cutFlowTitle);
@@ -208,7 +208,7 @@ Bool_t CutLeptonMass::Apply()
   // Initialize number of leptons
   Int_t MuonNumber      = 0;       
   Int_t ElectronNumber  = 0;       
-  Int_t LeptonMass    = 0;       
+  Float_t LeptonMass    = 0;       
 
   // Flags 
   Bool_t LeptonMassMinPass = kTRUE;   // Event passes min pT lepton cuts
@@ -250,11 +250,20 @@ Bool_t CutLeptonMass::Apply()
 	      << "muonType must be All, Tight, Veto, Isolated, or UnIsolated, PtEtaCut" << std::endl;
     exit(8);
   } //else                                                                                                          
+  
+  TLorentzVector testVec;
 
   //Now work out the dilepton mass
-  if (muonVector.size() > 1) LeptonMass = (muonVector[0] + muonVector[1]).M();
-  else if (electronVector.size() > 1) LeptonMass = (electronVector[0] + electronVector[1]).M();
-  else LeptonMass = (muonVector[0] + electronVector[0]).M();
+  if (muonVector.size() > 1){
+    testVec = (muonVector[0]);
+    testVec.Pt();
+    testVec+= muonVector[1];
+  }
+  else if (electronVector.size() > 1) testVec = (electronVector[0] + electronVector[1]);
+  else testVec = (muonVector[0] + electronVector[0]);
+
+  LeptonMass = testVec.M();
+
 
   // Fill the histograms before the cuts
   _hLeptonMassBefore    -> Fill(LeptonMass);
@@ -272,13 +281,13 @@ Bool_t CutLeptonMass::Apply()
   TString cutFlowNameMax;
   TString cutFlowNameAll;
   
-  cutFlowNameMinStream << leptonType.Data() << "Dilepton.Mass.Min";
+  cutFlowNameMinStream << leptonType.Data() << "Dilepton.Mass.Min" << massCutPostfix;
   cutFlowNameMin = cutFlowNameMinStream.str().c_str();
   
-  cutFlowNameMaxStream << leptonType.Data() << "Dilepton.Mass.Max";
+  cutFlowNameMaxStream << leptonType.Data() << "Dilepton.Mass.Max" << massCutPostfix;
   cutFlowNameMax = cutFlowNameMaxStream.str().c_str();
   
-  cutFlowNameAllStream << leptonType.Data() << "Dilepton.Mass.All";
+  cutFlowNameAllStream << leptonType.Data() << "Dilepton.Mass.All" << massCutPostfix;
   cutFlowNameAll = cutFlowNameAllStream.str().c_str();
   
   // Cut on Min Number of Leptons
@@ -302,7 +311,7 @@ Bool_t CutLeptonMass::Apply()
   } //else
   
   // Cut on Min and Max Number of Leptons
-  if(LeptonMassMinPass && LeptonMassMaxPass){
+  if((LeptonMassMinPass != LeptonMassMaxPass) == _LeptonMassReject){
     _hLeptonMassAfter -> Fill(LeptonMass);
     GetCutFlowTable() -> PassCut(cutFlowNameAll.Data());
   } //if
@@ -312,7 +321,7 @@ Bool_t CutLeptonMass::Apply()
   // Return result of Min and Max Cut
   // ***********************************************
   
-  return(LeptonMassMinPass && LeptonMassMaxPass);
+  return((LeptonMassMinPass != LeptonMassMaxPass) == _LeptonMassReject);
  
 } //Apply
 
