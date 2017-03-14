@@ -54,7 +54,7 @@ class CutLeptonPt1 : public HistoCut
 public:
 
   // Parameterized Constructor
-  CutLeptonPt1(EventContainer *EventContainerObj);
+  CutLeptonPt1(EventContainer *EventContainerObj, TString leptonType);
   
   // Destructor
   ~CutLeptonPt1();
@@ -72,14 +72,23 @@ public:
 private:
 
   // Histograms
-  myTH1F* _hElectronPt1Before;      // Histogram Electron 1 p_T before the cut
-  myTH1F* _hElectronPt1After;       // Histogram Electron 1 p_T of jets after the cut
+  //  myTH1F* _hElectronPt1Before;      // Histogram Electron 1 p_T before the cut
+  //myTH1F* _hElectronPt1After;       // Histogram Electron 1 p_T of jets after the cut
 
-  myTH1F* _hMuonPt1Before;          // Histogram Muon 1 p_T before the cut
-  myTH1F* _hMuonPt1After;           // Histogram Muon 1 p_T of jets after the cut
+  //myTH1F* _hMuonPt1Before;          // Histogram Muon 1 p_T before the cut
+  //  myTH1F* _hMuonPt1After;           // Histogram Muon 1 p_T of jets after the cut
+
+  // The type of lepton we are using
+  TString _leptonType;
+
+  myTH1F* _hLeadingLeptonPtBefore;  // Histogram of leading pt before cut
+  myTH1F* _hLeadingLeptonPtAfter;   // Histogram of leading pt after cut
 
   // Cut parameters
-  Int_t _ElectronNumberMin;         // Minimum Electron Number
+  Double_t _LeadingMuonPtCut;
+  Double_t _LeadingElectronPtCut;
+
+  /*Int_t _ElectronNumberMin;         // Minimum Electron Number
   Int_t _ElectronNumberMax;         // Maximum Electron Number
 
   Int_t _MuonNumberMin;             // Minimum Muon Number
@@ -90,6 +99,7 @@ private:
 
   Double_t _MuonPt1Min;             // Minimum Muon 1 p_T
   Double_t _MuonPt1Max;             // Maximum Muon 1 p_T
+  */
 
 };
 
