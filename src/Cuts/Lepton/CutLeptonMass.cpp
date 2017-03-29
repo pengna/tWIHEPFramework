@@ -250,20 +250,50 @@ Bool_t CutLeptonMass::Apply()
 	      << "muonType must be All, Tight, Veto, Isolated, or UnIsolated, PtEtaCut" << std::endl;
     exit(8);
   } //else                                                                                                          
-  
-  TLorentzVector testVec;
+  Particle leadingLep;
+  Particle subLeadingLep;
+  leadingLep.SetPtEtaPhiE(0.,0.,0.,0.);
+  subLeadingLep.SetPtEtaPhiE(0.,0.,0.,0.);
+  Bool_t leadingIsMuon;
+  Bool_t subLeadingIsMuon;
 
-  //Now work out the dilepton mass
-  if (muonVector.size() > 1){
-    testVec = (muonVector[0]);
-    testVec.Pt();
-    testVec+= muonVector[1];
+  // Grab the leading and sub leading leptons
+  for (auto mu : muonVector){
+    if (mu.Pt() > leadingLep.Pt()){
+      if (leadingLep.Pt() > subLeadingLep.Pt()){
+	subLeadingLep = leadingLep;
+	subLeadingIsMuon = leadingIsMuon;
+      }
+      leadingLep = mu;
+      leadingIsMuon = kTRUE;
+    }
+    else if (mu.Pt() > subLeadingLep.Pt()){
+      subLeadingLep = mu;
+      subLeadingIsMuon = kTRUE;
+    }
   }
-  else if (electronVector.size() > 1) testVec = (electronVector[0] + electronVector[1]);
-  else testVec = (muonVector[0] + electronVector[0]);
-
-  LeptonMass = testVec.M();
-
+  for (auto ele : electronVector){
+    if (ele.Pt() > leadingLep.Pt()){
+      if (leadingLep.Pt() > subLeadingLep.Pt()){
+	subLeadingLep = leadingLep;
+	subLeadingIsMuon = leadingIsMuon;
+      }
+      leadingLep = ele;
+      leadingIsMuon = kFALSE;
+    }
+    else if (ele.Pt() > subLeadingLep.Pt()){
+      subLeadingLep = ele;
+      subLeadingIsMuon = kFALSE;
+    }
+  }
+  //If the configuration doesn't match that required by the channel, return false
+  if (EventContainerObj->GetChannelName() == "mumu" && !(leadingIsMuon && subLeadingIsMuon)) return false;
+  if (EventContainerObj->GetChannelName() == "ee" && (leadingIsMuon || subLeadingIsMuon)) return false;
+  if (EventContainerObj->GetChannelName() == "emu" && (leadingIsMuon == subLeadingIsMuon)) {
+    std::cout << leadingLep.Pt() << " " << subLeadingLep.Pt() << " " << leadingIsMuon << " " << subLeadingIsMuon << std::endl;
+    return false;
+  }
+  LeptonMass = (leadingLep+subLeadingLep).M();
 
   // Fill the histograms before the cuts
   _hLeptonMassBefore    -> Fill(LeptonMass);
@@ -315,7 +345,10 @@ Bool_t CutLeptonMass::Apply()
     _hLeptonMassAfter -> Fill(LeptonMass);
     GetCutFlowTable() -> PassCut(cutFlowNameAll.Data());
   } //if
-  else GetCutFlowTable() -> FailCut(cutFlowNameAll.Data());
+  else { 
+    GetCutFlowTable() -> FailCut(cutFlowNameAll.Data());
+    //    std::cout << leadingLep.Pt() << " " << subLeadingLep.Pt() << " " << LeptonMass << std::endl;
+  }
 
   // ***********************************************
   // Return result of Min and Max Cut

@@ -132,6 +132,10 @@ class Jet: public Particle
   inline Bool_t IsTagged() const {return _tagged;};
   inline Bool_t tagged() const {return _tagged;};
 
+  inline void SetClosestLep(Double_t closestLep){_closestLep = closestLep;};
+  inline Double_t GetClosestLep() const {return _closestLep;};
+  inline Double_t closestLep() const {return _closestLep;};
+
   // Overloaded Operators
   // +=
   Jet& operator+=(const Jet& other);
@@ -160,6 +164,7 @@ class Jet: public Particle
   Double_t _photonEnergy;   
   Double_t _uncorrPt; 
   Bool_t _tagged;
+  Double_t _closestLep;
 
   // Cuts applied to the jet objects
   Double_t _maxEtaCut;

@@ -151,7 +151,8 @@ Bool_t CutMissingEt::Apply()
 
   Bool_t passesMETCut = kFALSE;
 
-  Float_t met = EventContainerObj->missingEt_xy;
+  //  Float_t met = EventContainerObj->missingEt_xy;
+  Float_t met = EventContainerObj->missingEt;
 
   _hMissingEtBefore->Fill(met);
 

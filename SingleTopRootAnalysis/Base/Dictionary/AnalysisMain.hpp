@@ -34,6 +34,7 @@
 #define AnalysisMain_h
 
 #include <string>
+#include <sstream>
 
 #include "TFile.h"
 
@@ -178,6 +179,8 @@ class AnalysisMain: public EventContainer, public CutListProcessor, public Addit
   TTree* _skimBkgdTree;             // bkgd tree in the skim file (for use with any trees hard coded into Analysis Main if statement)
   TTree* _skimConfigTreeMeta;  // ConfigMeta tree in skim file
   TTree* metaTree; 
+
+  std::vector<int> _eventsToRunOn; //A vector of interesting event numbers. Mostly used for synch.
 
   Double_t _totalEvents;
   Double_t _totalMCatNLOEvents;

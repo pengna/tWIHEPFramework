@@ -326,7 +326,7 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
 //  }
 //
 //  //taggername = "SV0";
-//  taggername = "JetFitterCOMBNN";
+//  taggername = "Jet1FitterCOMBNN";
 //  CalibROOT = new CalibrationDataInterfaceROOT(taggername, "config/btag/BTagCalibration.env", ""); 
 //  CalibVar.jetAuthor = "AntiKt4Topo";
 //  uncertainty = Total;
@@ -334,6 +334,7 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
   
   // Check for any systematic uncertainties we may be calculating
   _metShift = _config.GetValue("Systs.metShift",0);
+  _channelName = _config.GetValue("ChannelName","");
 
   return;
 } //Initialize()
@@ -382,6 +383,12 @@ void EventContainer::SetUseUnisolatedLeptons(const Bool_t& useUnisolatedLeptons,
     electronsToUsePtr = !_useUnisolatedLeptons ? &unIsolatedElectrons : &tightElectrons;
     muonsToUsePtr = !_useUnisolatedLeptons ? &tightMuons : &unIsolatedMuons;
   }
+
+  //For the synch excercise we want it to always be tight leptons, so I'm gonna add here the ability to just make it all tight.
+  if (GetChannelName() == "ee" || GetChannelName() == "emu" || GetChannelName() == "mumu"){
+    electronsToUsePtr = &tightElectrons;
+    muonsToUsePtr = &tightMuons;
+  }
 } //SetUseUnisolatedLeptons
 
 /******************************************************************************
@@ -425,8 +432,8 @@ Int_t EventContainer::ReadEvent()
     safejeteventdown= -999;
   }  else {
     _treeEventWeight = 1.0;
-    runNumber          = 1;//_eventTree -> 
-    eventNumber        = 1;//_eventTree -> 
+    runNumber          = _eventTree -> EVENT_run;
+    eventNumber        = _eventTree -> EVENT_event;
     actualIntPerXing   = 1;//_eventTree -> 
     averageIntPerXing  = 1;//_eventTree -> 
     bcid               = 1;//_eventTree -> 
@@ -525,6 +532,8 @@ Int_t EventContainer::ReadEvent()
     missingEx_xy = _eventTree->Met_type1PFxy_px;
     missingPhi_xy = _eventTree->Met_type1PFxy_phi;
     missingEy_xy = _eventTree->Met_type1PFxy_py;
+
+    passesMETFilters = _eventTree->Flag_METFilters;
 
     //Fill pvtx information
     nPvtx = _eventTree->nBestVtx;

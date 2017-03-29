@@ -161,6 +161,12 @@ Bool_t CutPrimaryVertex::Apply()
 
   Bool_t hasPV = kFALSE;
 
+  Bool_t passesMETFilterFlags = kTRUE;
+
+  if ( !EventContainerObj->Flag_goodVertices || !EventContainerObj->Flag_HBHENoiseFilter || !EventContainerObj->Flag_HBHENoiseIsoFilter || !EventContainerObj->Flag_EcalDeadCellTriggerPrimitiveFilter || !EventContainerObj->Flag_globalTightHalo2016Filter) passesMETFilterFlags = kFALSE;
+
+  //  if (!EventContainerObj->Flag_METFilters) passesMETFilterFlags = kFALSE;
+
   tmpCounter = 0;
 
   for (unsigned int  i = 0; i < EventContainerObj->pvertex_ndof->size() ; i++){
@@ -194,7 +200,7 @@ Bool_t CutPrimaryVertex::Apply()
   _hNTrueInteractions->Fill(EventContainerObj->trueInteractions);
   _hNTrueIntsUnweighted->FillWithoutWeight(EventContainerObj->trueInteractions);
 
-  if (hasPV) {
+  if (hasPV && passesMETFilterFlags) {
     _hPrimaryVertexAfter->Fill(tmpCounter);
     GetCutFlowTable()->PassCut(cutFlowName);
     return kTRUE;

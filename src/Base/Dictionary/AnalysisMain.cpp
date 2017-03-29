@@ -241,6 +241,7 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
     cout << "<AnalysisMain::ParseCmdLine> "<<"*  -MisTagCut #    - use this to specify cut on b-tagging weight (4.5, etc)*" << endl;
     cout << "<AnalysisMain::ParseCmdLine> "<<"*                    used for mis-tag rate uncertainty.               *" << endl;
     cout << "<AnalysisMain::ParseCmdLine> "<<"*                    Can also be passed through config file.               *" << endl;
+    cout << "<AnalysisMain::ParseCmdLine> "<<"*  -evtList #       A comma separated list of events to run on             *" << endl;
     cout << "<AnalysisMain::ParseCmdLine> "<<"*                                                                          *" << endl;
     cout << "<AnalysisMain::ParseCmdLine> "<<"****************************************************************************" << endl;
     return 1;
@@ -271,6 +272,28 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
       fileSingleIndex = i + 1;
       ++i;
       fileSingleFlag = kTRUE;
+    }//if single root file
+
+    else if( !strcmp(argv[i],"-evtList") ) { 
+      // Check if file name parameter is in command line
+      if (argc < i+1) {
+	cout << "<AnalysisMain::ParseCmdLine> " << "ERROR: Missing evt-list-file name in cmd line" << endl;
+	return 1;
+      }//if 
+      std::string listInStr = argv[i+1];
+      ++i;
+      std::stringstream ss(listInStr);
+      
+      int i;
+
+      while (ss.good()) {
+	std::string substr;
+	getline(ss,substr,',');
+	_eventsToRunOn.push_back(std::stoi(substr));
+      }
+      cout << "<AnalysisMain::ParseCmdLine> " << "Running over only events: ";
+      for (auto const evtID : _eventsToRunOn) cout << evtID << ",";
+      cout << endl;
     }//if single root file
 
     // FLAG: config file
@@ -978,6 +1001,22 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
   while( eventInChain != -1 && (!eventLimitFlag || eventInChain < _eventLimit) ) {  
     eventCounter++;
     if( 0 == (eventInChain%10000) ) cout << "<AnalysisMain::Loop> " << "Processing event " << eventInChain << endl;
+
+    //If we're only doing specific events, check them here.
+    if (_eventsToRunOn.size() > 0){
+      bool skipEvent = true;
+      for (auto const eventID : _eventsToRunOn){
+	if (eventID == this->eventNumber){
+	  skipEvent = false;
+	  break;
+	}
+      }
+      if (skipEvent) {
+	eventInChain = GetNextEvent(); 
+	continue;
+      }
+      std::cout << "Running on event: " << this->eventNumber << std::endl;
+    }
 
     // Fill the histograms
     writeThisEvent = CutListProcessor::Apply(this);

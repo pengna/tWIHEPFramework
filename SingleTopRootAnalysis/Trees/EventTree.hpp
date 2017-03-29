@@ -56,6 +56,7 @@ public :
    Double_t        EVENT_fixedGridRhoFastjetCentralNeutral;
    Int_t           Flag_HBHENoiseFilter;
    Int_t           Flag_HBHENoiseIsoFilter;
+   Int_t	   Flag_globalTightHalo2016Filter;
    Int_t           Flag_CSCTightHaloFilter;
    Int_t           Flag_CSCTightHaloTrkMuUnvetoFilter;
    Int_t           Flag_CSCTightHalo2015Filter;
@@ -768,6 +769,7 @@ public :
    TBranch        *b_EVENT_fixedGridRhoFastjetCentralNeutral;   //!
    TBranch        *b_Flag_HBHENoiseFilter;   //!
    TBranch        *b_Flag_HBHENoiseIsoFilter;   //!
+   TBranch 	  *b_Flag_globalTightHalo2016Filter; //!
    TBranch        *b_Flag_CSCTightHaloFilter;   //!
    TBranch        *b_Flag_CSCTightHaloTrkMuUnvetoFilter;   //!
    TBranch        *b_Flag_CSCTightHalo2015Filter;   //!
@@ -2140,6 +2142,7 @@ void EventTree::Init(TTree *tree)
    fChain->SetBranchAddress("EVENT_fixedGridRhoFastjetCentralNeutral", &EVENT_fixedGridRhoFastjetCentralNeutral, &b_EVENT_fixedGridRhoFastjetCentralNeutral);
    fChain->SetBranchAddress("Flag_HBHENoiseFilter", &Flag_HBHENoiseFilter, &b_Flag_HBHENoiseFilter);
    fChain->SetBranchAddress("Flag_HBHENoiseIsoFilter", &Flag_HBHENoiseIsoFilter, &b_Flag_HBHENoiseIsoFilter);
+   fChain->SetBranchAddress("Flag_globalTightHalo2016Filter", &Flag_globalTightHalo2016Filter, & b_Flag_globalTightHalo2016Filter);
    fChain->SetBranchAddress("Flag_CSCTightHaloFilter", &Flag_CSCTightHaloFilter, &b_Flag_CSCTightHaloFilter);
    fChain->SetBranchAddress("Flag_CSCTightHaloTrkMuUnvetoFilter", &Flag_CSCTightHaloTrkMuUnvetoFilter, &b_Flag_CSCTightHaloTrkMuUnvetoFilter);
    fChain->SetBranchAddress("Flag_CSCTightHalo2015Filter", &Flag_CSCTightHalo2015Filter, &b_Flag_CSCTightHalo2015Filter);

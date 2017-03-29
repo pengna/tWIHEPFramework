@@ -41,7 +41,7 @@ ClassImp(Electron)
  * Input:  None                                                               *
  * Output: None                                                               *
  ******************************************************************************/
-Electron::Electron() : Particle::Particle(),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0), _charge(0.0)
+Electron::Electron() : Particle::Particle(),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0), _charge(0.0), _scEta(0.0), _inCrack(0)
 {
 } //Electron()
 
@@ -81,7 +81,9 @@ _isoChargedHadrons(other.GetisoChargedHadrons()),
 _isoNeutralHadrons(other.GetisoNeutralHadrons()), 
 _isoPhotons(other.GetisoPhotons()), 
 					   _isoPU(other.GetisoPU()),
-					   _charge(other.GetCharge())
+					   _charge(other.GetCharge()),
+					   _scEta(other.scEta()),
+					   _inCrack(other.inCrack())
 {
 } //Electron()
 
@@ -93,7 +95,7 @@ _isoPhotons(other.GetisoPhotons()),
  * Input:  Particle                                                           *
  * Output: None                                                               *
  ******************************************************************************/
-Electron::Electron(const Particle& other) : Particle(other),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0), _charge(0.0)
+Electron::Electron(const Particle& other) : Particle(other),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0), _charge(0.0), _scEta(0.0), _inCrack(0)
 { 
 } //Electron()
 
@@ -156,6 +158,8 @@ Electron& Electron::operator=(const Particle& other)
   SetisoPhotons(0.0);
   SetisoPU(0.0);
   SetCharge(0.0);
+  SetSCeta(0.0);
+  SetInCrack(0);
 
   return *this;
 } // = Particle
@@ -186,6 +190,8 @@ Electron& Electron::operator=(const Electron& other)
   SetisoPhotons(other.GetisoPhotons());
   SetisoPU(other.GetisoPU());
   SetCharge(other.GetCharge());
+  SetSCeta(other.GetSCEta());
+  SetInCrack(other.GetInCrack());
   return *this;
 } //= const Electron
 
@@ -215,6 +221,8 @@ Electron& Electron::operator=(Electron& other)
   SetisoPhotons(other.GetisoPhotons());
   SetisoPU(other.GetisoPU());
   SetCharge(other.GetCharge());
+  SetSCeta(other.GetSCEta());
+  SetInCrack(other.GetInCrack());
   return *this;
 } //= non-const Electron
 
@@ -233,7 +241,6 @@ void Electron::SetCuts(TEnv* config, TString electronType)
   _minPtCuts[electronType] =   	 config -> GetValue("ObjectID.Electron." + electronType + ".MinPt", 0.);
   _minEtaGapCuts[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".MinEtaGap", 100.);
   _maxEtaGapCuts[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".MaxEtaGap", -100.);
-
 
 } // End SetCuts
 
@@ -278,7 +285,8 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   SetisoPhotons         ( evtr -> patElectron_isoPhotons          -> operator[](iE) );
   SetisoPU              ( evtr -> patElectron_isoPU               -> operator[](iE) );
   SetCharge		( evtr -> patElectron_charge		  -> operator[](iE) );
-
+  SetSCeta		( evtr -> patElectron_SCeta		  -> operator[](iE) );
+  SetInCrack		( evtr -> patElectron_inCrack		  -> operator[](iE) );
   // **************************************************************
   // **************************************************************
   // **************************************************************
@@ -329,10 +337,12 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   // If event passes or fails requirements
   Bool_t passMinPt  = kTRUE;
   Bool_t passMaxEta = kTRUE;
+  Bool_t passTight  = kTRUE;
   
   // Test requirements
   if(elPt <= _minPtCuts[electronType])               passMinPt  = kFALSE;
   if(TMath::Abs(elEta) >= _maxEtaCuts[electronType]) passMaxEta = kFALSE;
+  if(!passTightId())				     passTight  = kFALSE;
   
   // **************************************************************
   // Gap Electrons
@@ -341,14 +351,15 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   Bool_t passNoGapElectron  = kTRUE;
   
   // Test requirements and set variable
-  if( (TMath::Abs(elEta) >= _minEtaGapCuts[electronType]) && (TMath::Abs(elEta) <= _maxEtaGapCuts[electronType]) ) passNoGapElectron = kFALSE;
+  if( (TMath::Abs(scEta()) >= _minEtaGapCuts[electronType]) && (TMath::Abs(scEta()) <= _maxEtaGapCuts[electronType]) ) passNoGapElectron = kFALSE;
   //SetNoGapElectron(passNoGapElectron);
   
+
   // **************************************************************
   // Return value according to electron type passed to Fill
   // **************************************************************
   //if(     "Tight"      == electronType) return(GetIsRobusterTight() && passMinPt && passMaxEta && GetNoGapElectron() && Isolation());
-  if(     "Tight"      == electronType) return( passMinPt && passMaxEta);
+  if(     "Tight"      == electronType) return( passMinPt && passMaxEta && passTight && passNoGapElectron);
   //if(     "PtEtaCut"   == electronType) return(passMinPt && passMaxEta && IsRobusterTight());
   else if("Veto"       == electronType) return( passMinPt && passMaxEta);//no tight or isolation req.
   //else if("Isolated"   == electronType) return(GetIsolation()  && GetNoGapElectron()&& OverlapUse());

@@ -137,6 +137,14 @@ class Electron: public Particle
   inline Double_t GetCharge() const {return _charge;};
   inline Double_t charge() const {return _charge;};
 
+  inline void SetSCeta(Double_t scEta){_scEta = scEta;};
+  inline Double_t GetSCEta() const {return _scEta;};
+  inline Double_t scEta() const {return _scEta;};
+
+  inline void SetInCrack(Int_t inCrack){_inCrack =  inCrack;};
+  inline Int_t GetInCrack() const {return _inCrack;};
+  inline Int_t inCrack() const {return _inCrack;};
+
  private:
 
   Int_t _passVetoId;
@@ -155,6 +163,8 @@ class Electron: public Particle
   Double_t _isoPhotons;
   Double_t _isoPU;
   Double_t _charge;
+  Double_t _scEta;
+  Int_t _inCrack;
 
   ///////////////////////////////////////////
   // Maps containing the cut values to be placed on the different type of selected leptons

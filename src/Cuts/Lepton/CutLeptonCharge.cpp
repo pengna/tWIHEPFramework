@@ -212,9 +212,9 @@ Bool_t CutLeptonCharge::Apply()
   } //else                                                                                                          
 
   //Now work out the dilepton mass
-  if (muonVector.size() > 1) LeptonPairCharge = muonVector[0].charge()*muonVector[1].charge();
-  else if (electronVector.size() > 1) LeptonPairCharge = electronVector[0].charge() + electronVector[1].charge();
-  else LeptonPairCharge = muonVector[0].charge() + electronVector[0].charge();
+  if (EventContainerObj->GetChannelName() == "mumu") LeptonPairCharge = muonVector[0].charge()*muonVector[1].charge();
+  else if (EventContainerObj->GetChannelName() == "ee") LeptonPairCharge = electronVector[0].charge() * electronVector[1].charge();
+  else if (EventContainerObj->GetChannelName() == "emu") LeptonPairCharge = muonVector[0].charge() * electronVector[0].charge();
 
   // Fill the histograms before the cuts
   _hLeptonChargeBefore    -> Fill(LeptonPairCharge);

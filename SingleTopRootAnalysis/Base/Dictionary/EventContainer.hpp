@@ -389,6 +389,8 @@ class EventContainer
   inline void SetnPvt(const int& nPvt) { nPvtx = nPvt; };
   inline Int_t GetnPvt() const { return nPvtx; };
   inline Int_t nPvt() const {return nPvtx;};
+  
+  inline TString GetChannelName() const {return _channelName;};
 
    // Get the configuration 
   TEnv * GetConfig() {return &_config; };
@@ -507,6 +509,9 @@ class EventContainer
   Double_t missingPhi_xy;
   TLorentzVector missingEtVec_xy;
 
+  //Track whterh it passes the MET filters
+  Int_t passesMETFilters;
+
   //Various variables for plotting primary vertex information
   Int_t nPvtx;
   Int_t trueInteractions;
@@ -609,6 +614,9 @@ protected:
   TEnv _JESconfig;
   bool _JESconfigread;
 private:
+
+  //The name of the channel being used. this is currently used for synch, but might be used for trigger or something.
+  TString _channelName;
   
   // Target top mass used in the best jet algorithm
   Double_t _targetTopMass;
