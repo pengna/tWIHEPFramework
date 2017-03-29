@@ -2,11 +2,15 @@ SingleTop.105200*
 skims/
 hists/
 test/
+config/synch/
 README
 *sh
 dep/
 tmp/
+eventLists/
 errorLog
 moreCopies.txt
 *#*
 *root
+log
+*.tar.*
