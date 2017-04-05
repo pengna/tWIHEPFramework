@@ -6,7 +6,8 @@
 #########################################
 
 # The luminosity of the sample to be processed. For some reason before it was already in all of the weights, which is not ideal.
-Weight.Lumi: 27217.
+#Weight.Lumi: 27217.
+Weight.Lumi: 35900.
 
 # 100000 - tW_top_5fs inclusive
 Weight.Source.100000: 35.85
@@ -264,3 +265,10 @@ Events.Source.500020: 38811017
 Weight.Source.500021: 136.02
 Events.Source.500021: 67240808
 
+#500022 - tW_top synch
+Weight.Source.500022: 35.85
+Events.Source.500022: 77791
+
+#500023 = ttbar synch file
+Weight.Source.500023: 831.76
+Events.Source.500023: 47259

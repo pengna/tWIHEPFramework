@@ -84,6 +84,7 @@ public :
    Int_t           HLT_Ele27_eta2p1_WP75_Gsf;
    Int_t           HLT_Ele27_WP85_Gsf;
    Int_t           HLT_Ele27_eta2p1_WPLoose_Gsf;
+   Int_t           HLT_Ele32_eta2p1_WPTight_Gsf;
    Int_t	   HLT_Ele27_WPTight_Gsf;
    Int_t           HLT_Mu45_eta2p1;
    Int_t           HLT_Mu50;
@@ -797,6 +798,7 @@ public :
    TBranch        *b_HLT_Ele27_eta2p1_WP75_Gsf;   //!
    TBranch        *b_HLT_Ele27_WP85_Gsf;   //!
    TBranch        *b_HLT_Ele27_eta2p1_WPLoose_Gsf;   //!
+   TBranch        *b_HLT_Ele32_eta2p1_WPTight_Gsf;   //!
    TBranch        *b_HLT_Mu45_eta2p1;   //!
    TBranch        *b_HLT_Mu50;   //!
    TBranch        *b_HLT_IsoMu17_eta2p1;   //!
@@ -2170,6 +2172,7 @@ void EventTree::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_Ele27_eta2p1_WP75_Gsf", &HLT_Ele27_eta2p1_WP75_Gsf, &b_HLT_Ele27_eta2p1_WP75_Gsf);
    fChain->SetBranchAddress("HLT_Ele27_WP85_Gsf", &HLT_Ele27_WP85_Gsf, &b_HLT_Ele27_WP85_Gsf);
    fChain->SetBranchAddress("HLT_Ele27_eta2p1_WPLoose_Gsf", &HLT_Ele27_eta2p1_WPLoose_Gsf, &b_HLT_Ele27_eta2p1_WPLoose_Gsf);
+   fChain->SetBranchAddress("HLT_Ele32_eta2p1_WPTight_Gsf", &HLT_Ele32_eta2p1_WPTight_Gsf, &b_HLT_Ele32_eta2p1_WPTight_Gsf);
    fChain->SetBranchAddress("HLT_Ele27_WPTight_Gsf", &HLT_Ele27_WPTight_Gsf, &b_HLT_Ele27_WPTight_Gsf);
    fChain->SetBranchAddress("HLT_Mu45_eta2p1", &HLT_Mu45_eta2p1, &b_HLT_Mu45_eta2p1);
    fChain->SetBranchAddress("HLT_Mu50", &HLT_Mu50, &b_HLT_Mu50);

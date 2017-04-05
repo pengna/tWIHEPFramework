@@ -64,62 +64,62 @@ HistogrammingNPvtx::~HistogrammingNPvtx()
 void HistogrammingNPvtx::BookHistogram(){
   
   // Histogram of MET
-  _hNPvtx = DeclareTH1F("nPvtx","Number of primary vertex",20,0.,20.);
+  _hNPvtx = DeclareTH1F("nPvtx","Number of primary vertex",50,0.,50.);
   _hNPvtx->SetXAxisTitle("nPvtx");
   _hNPvtx->SetYAxisTitle("Events");
 
   // Histogram of MEX 
-  _hNPvtx_nJet = DeclareTH2F("nPvtx_nJet","Number of primary vertex vs number of Jets",20,0.,20., 20,0,20);
+  _hNPvtx_nJet = DeclareTH2F("nPvtx_nJet","Number of primary vertex vs number of Jets",50,0.,50., 50,0,50);
   _hNPvtx_nJet->SetXAxisTitle("nPvtx");
   _hNPvtx_nJet->SetYAxisTitle("nJet");
 
   // Histogram of MET
-  _hNPvtx_nElectron = DeclareTH2F("nPvtx_nElectron","Number of primary vertex vs number of Electrons",20,0.,20.,20,0,20);
+  _hNPvtx_nElectron = DeclareTH2F("nPvtx_nElectron","Number of primary vertex vs number of Electrons",50,0.,50.,50,0,50);
   _hNPvtx_nElectron->SetXAxisTitle("vPvtx");
   _hNPvtx_nElectron->SetYAxisTitle("nElectron");
 
   // Histogram of SUM ET
-  _hNPvtx_nMuon = DeclareTH2F("nPvtx_nMuon","Number of primary vertex vs number of Muon",20,0.,20.,20,0,20);
+  _hNPvtx_nMuon = DeclareTH2F("nPvtx_nMuon","Number of primary vertex vs number of Muon",50,0.,50.,50,0,50);
   _hNPvtx_nMuon->SetXAxisTitle("vPvtx");
   _hNPvtx_nMuon->SetYAxisTitle("nMuon");
 
   // Histogram of MET
-  _hNTrueInteractions = DeclareTH1F("nTrueInteractions","Number of true vertices",20,0.,20.);
+  _hNTrueInteractions = DeclareTH1F("nTrueInteractions","Number of true vertices",50,0.,50.);
   _hNTrueInteractions->SetXAxisTitle("nTrueInteractions");
   _hNTrueInteractions->SetYAxisTitle("Events");
 
   // Histogram of MEX 
-  _hNTrueInteractions_nJet = DeclareTH2F("nTrueInteractions_nJet","Number of true vertices vs number of Jets",20,0.,20., 20,0,20);
+  _hNTrueInteractions_nJet = DeclareTH2F("nTrueInteractions_nJet","Number of true vertices vs number of Jets",50,0.,50., 50,0,50);
   _hNTrueInteractions_nJet->SetXAxisTitle("nTrueInteractions");
   _hNTrueInteractions_nJet->SetYAxisTitle("nJet");
 
   // Histogram of MET
-  _hNTrueInteractions_nElectron = DeclareTH2F("nTrueInteractions_nElectron","Number of true vertices vs number of Electrons",20,0.,20.,20,0,20);
+  _hNTrueInteractions_nElectron = DeclareTH2F("nTrueInteractions_nElectron","Number of true vertices vs number of Electrons",50,0.,50.,50,0,50);
   _hNTrueInteractions_nElectron->SetXAxisTitle("vTrueInteractions");
   _hNTrueInteractions_nElectron->SetYAxisTitle("nElectron");
 
   // Histogram of SUM ET
-  _hNTrueInteractions_nMuon = DeclareTH2F("nTrueInteractions_nMuon","Number of true vertices vs number of Muon",20,0.,20.,20,0,20);
+  _hNTrueInteractions_nMuon = DeclareTH2F("nTrueInteractions_nMuon","Number of true vertices vs number of Muon",50,0.,50.,50,0,50);
   _hNTrueInteractions_nMuon->SetXAxisTitle("vTrueInteractions");
   _hNTrueInteractions_nMuon->SetYAxisTitle("nMuon");
 
   // Histogram of MET
-  _hNPUVertices = DeclareTH1F("nPUVertices","Number of PU vertices",20,0.,20.);
+  _hNPUVertices = DeclareTH1F("nPUVertices","Number of PU vertices",50,0.,50.);
   _hNPUVertices->SetXAxisTitle("nPUVertices");
   _hNPUVertices->SetYAxisTitle("Events");
 
   // Histogram of MEX 
-  _hNPUVertices_nJet = DeclareTH2F("nPUVertices_nJet","Number of PU vertices vs number of Jets",20,0.,20., 20,0,20);
+  _hNPUVertices_nJet = DeclareTH2F("nPUVertices_nJet","Number of PU vertices vs number of Jets",50,0.,50., 50,0,50);
   _hNPUVertices_nJet->SetXAxisTitle("nPUVertices");
   _hNPUVertices_nJet->SetYAxisTitle("nJet");
 
   // Histogram of MET
-  _hNPUVertices_nElectron = DeclareTH2F("nPUVertices_nElectron","Number of PU vertices vs number of Electrons",20,0.,20.,20,0,20);
+  _hNPUVertices_nElectron = DeclareTH2F("nPUVertices_nElectron","Number of PU vertices vs number of Electrons",50,0.,50.,50,0,50);
   _hNPUVertices_nElectron->SetXAxisTitle("vPUVertices");
   _hNPUVertices_nElectron->SetYAxisTitle("nElectron");
 
   // Histogram of SUM ET
-  _hNPUVertices_nMuon = DeclareTH2F("nPUVertices_nMuon","Number of PU vertices vs number of Muon",20,0.,20.,20,0,20);
+  _hNPUVertices_nMuon = DeclareTH2F("nPUVertices_nMuon","Number of PU vertices vs number of Muon",50,0.,50.,50,0,50);
   _hNPUVertices_nMuon->SetXAxisTitle("vPUVertices");
   _hNPUVertices_nMuon->SetYAxisTitle("nMuon");
 
