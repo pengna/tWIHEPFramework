@@ -10,6 +10,14 @@ inDirData = sys.argv[2]
 inDirQCD = sys.argv[3]
 outFile = open(sys.argv[4],"w")
 
+perMCSFs = {}
+#perMCSFs['qcd'] = 0.777791411029     
+#perMCSFs['wPlusJets'] = 1.21611224258
+perMCSFs['qcd'] = 0.7791
+perMCSFs['wJets'] = 1.2748
+perMCSFs['ttbar'] = 0.887389045755
+
+
 datasetPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"ST","tChan":"ST","zz":"VV","zPlusJetsLowMass":"zJets","zPlusJetsHighMass":"zJets","wz":"VV","ww":"VV","wPlusJets":"wJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd","wPlusJetsMCatNLO":"wJets","singleMuon":"Data","tChan_top":"tChan","tChan_antitop":"tChan"}
 
 sampleMC = [
