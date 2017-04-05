@@ -254,7 +254,7 @@ int main(int argc, char **argv)
 
   //Add in any variables to the skim tree that you want here
   //  mystudy.AddVars(new TestVar());
-  mystudy.AddVars(new BDTVars());
+  mystudy.AddVars(new BDTVars(true));
   mystudy.AddVars(new WeightVars());
 
   TFile *_skimBDTFile;
