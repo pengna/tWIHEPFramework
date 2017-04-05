@@ -12,7 +12,10 @@
 #include <iostream>
 
 //Test out a couple of variables, one int and one float I guess
-BDTVars::BDTVars(){
+BDTVars::BDTVars(bool makeHistos){
+
+  SetName("BDTVars");
+  
   _intVars["M_nJet2030"] = 0;
   _intVars["M_nJet3040"] = 0;
   _intVars["M_nJet4000"] = 0;
@@ -44,151 +47,151 @@ BDTVars::BDTVars(){
   _intVars["M_nBLJet40"] = 0;
   _intVars["M_nJet3500e24"] = 0;
 
-  _floatVars["M_likelihood_BJet4000"] = 0.;
-  _floatVars["M_likelihood_BJet2030"] = 0.;
-  _floatVars["M_likelihood_BJet3040"] = 0.;
-  _floatVars["M_likelihood_BJet2040"] = 0.;
+  _floatVars["M_likelihood_BJet4000"] = 0;
+  _floatVars["M_likelihood_BJet2030"] = 0;
+  _floatVars["M_likelihood_BJet3040"] = 0;
+  _floatVars["M_likelihood_BJet2040"] = 0;
 
-  _floatVars["M_Mass_Wlv"] = 0.;
-  _floatVars["M_E_Wlv"] = 0.;
-  _floatVars["M_Pt_Wlv"] = 0.;
-  _floatVars["M_Eta_Wlv"] = 0.;
-  _floatVars["M_Phi_Wlv"] = 0.;
-  _floatVars["M_Mass_AllJets"] = 0.;
-  _floatVars["M_E_AllJets"] = 0.;
-  _floatVars["M_Pt_AllJets"] = 0.;
-  _floatVars["M_Eta_AllJets"] = 0.;
-  _floatVars["M_Phi_AllJets"] = 0.;
+  _floatVars["M_Mass_Wlv"] = 0;
+  _floatVars["M_E_Wlv"] = 0;
+  _floatVars["M_Pt_Wlv"] = 0;
+  _floatVars["M_Eta_Wlv"] = 0;
+  _floatVars["M_Phi_Wlv"] = 0;
+  _floatVars["M_Mass_AllJets"] = 0;
+  _floatVars["M_E_AllJets"] = 0;
+  _floatVars["M_Pt_AllJets"] = 0;
+  _floatVars["M_Eta_AllJets"] = 0;
+  _floatVars["M_Phi_AllJets"] = 0;
 
-  _floatVars["M_Mass_AllJets2030"] = 0.;
-  _floatVars["M_E_AllJets2030"] = 0.;
-  _floatVars["M_Pt_AllJets2030"] = 0.;
-  _floatVars["M_Eta_AllJets2030"] = 0.;
-  _floatVars["M_Phi_AllJets2030"] = 0.;
-  _floatVars["M_Mass_AllJets2040"] = 0.;
-  _floatVars["M_E_AllJets2040"] = 0.;
-  _floatVars["M_Pt_AllJets2040"] = 0.;
-  _floatVars["M_Eta_AllJets2040"] = 0.;
-  _floatVars["M_Phi_AllJets2040"] = 0.;
-  _floatVars["M_Mass_AllJets3040"] = 0.;
-  _floatVars["M_E_AllJets3040"] = 0.;
-  _floatVars["M_Pt_AllJets3040"] = 0.;
-  _floatVars["M_Eta_AllJets3040"] = 0.;
-  _floatVars["M_Phi_AllJets3040"] = 0.;
-  _floatVars["M_Mass_AllJets4000"] = 0.;
-  _floatVars["M_E_AllJets4000"] = 0.;
-  _floatVars["M_Pt_AllJets4000"] = 0.;
-  _floatVars["M_Eta_AllJets4000"] = 0.;
-  _floatVars["M_Phi_AllJets4000"] = 0.;
+  _floatVars["M_Mass_AllJets2030"] = 0;
+  _floatVars["M_E_AllJets2030"] = 0;
+  _floatVars["M_Pt_AllJets2030"] = 0;
+  _floatVars["M_Eta_AllJets2030"] = 0;
+  _floatVars["M_Phi_AllJets2030"] = 0;
+  _floatVars["M_Mass_AllJets2040"] = 0;
+  _floatVars["M_E_AllJets2040"] = 0;
+  _floatVars["M_Pt_AllJets2040"] = 0;
+  _floatVars["M_Eta_AllJets2040"] = 0;
+  _floatVars["M_Phi_AllJets2040"] = 0;
+  _floatVars["M_Mass_AllJets3040"] = 0;
+  _floatVars["M_E_AllJets3040"] = 0;
+  _floatVars["M_Pt_AllJets3040"] = 0;
+  _floatVars["M_Eta_AllJets3040"] = 0;
+  _floatVars["M_Phi_AllJets3040"] = 0;
+  _floatVars["M_Mass_AllJets4000"] = 0;
+  _floatVars["M_E_AllJets4000"] = 0;
+  _floatVars["M_Pt_AllJets4000"] = 0;
+  _floatVars["M_Eta_AllJets4000"] = 0;
+  _floatVars["M_Phi_AllJets4000"] = 0;
 
-  _floatVars["M_Mass_LeadJet"] = 0.;
-  _floatVars["M_E_LeadJet"] = 0.;
-  _floatVars["M_Pt_LeadJet"] = 0.;
-  _floatVars["M_Eta_LeadJet"] = 0.;
-  _floatVars["M_Phi_LeadJet"] = 0.;
+  _floatVars["M_Mass_LeadJet"] = 0;
+  _floatVars["M_E_LeadJet"] = 0;
+  _floatVars["M_Pt_LeadJet"] = 0;
+  _floatVars["M_Eta_LeadJet"] = 0;
+  _floatVars["M_Phi_LeadJet"] = 0;
 
-  _floatVars["M_Pt_Jet1_2030"] = 0.;
-  _floatVars["M_Eta_Jet1_2030"] = 0.;
-  _floatVars["M_Phi_Jet1_2030"] = 0.;
-  _floatVars["M_Pt_Jet1_2040"] = 0.;
-  _floatVars["M_Eta_Jet1_2040"] = 0.;
-  _floatVars["M_Phi_Jet1_2040"] = 0.;
-  _floatVars["M_Pt_Jet1_3040"] = 0.;
-  _floatVars["M_Eta_Jet1_3040"] = 0.;
-  _floatVars["M_Phi_Jet1_3040"] = 0.;
-  _floatVars["M_Pt_Jet1_4000"] = 0.;
-  _floatVars["M_Eta_Jet1_4000"] = 0.;
-  _floatVars["M_Phi_Jet1_4000"] = 0.;
+  _floatVars["M_Pt_Jet1_2030"] = 0;
+  _floatVars["M_Eta_Jet1_2030"] = 0;
+  _floatVars["M_Phi_Jet1_2030"] = 0;
+  _floatVars["M_Pt_Jet1_2040"] = 0;
+  _floatVars["M_Eta_Jet1_2040"] = 0;
+  _floatVars["M_Phi_Jet1_2040"] = 0;
+  _floatVars["M_Pt_Jet1_3040"] = 0;
+  _floatVars["M_Eta_Jet1_3040"] = 0;
+  _floatVars["M_Phi_Jet1_3040"] = 0;
+  _floatVars["M_Pt_Jet1_4000"] = 0;
+  _floatVars["M_Eta_Jet1_4000"] = 0;
+  _floatVars["M_Phi_Jet1_4000"] = 0;
   
-  _floatVars["M_Pt_BJet1_2030"] = 0.;
-  _floatVars["M_Eta_BJet1_2030"] = 0.;
-  _floatVars["M_Phi_BJet1_2030"] = 0.;
-  _floatVars["M_Pt_BJet1_2040"] = 0.;
-  _floatVars["M_Eta_BJet1_2040"] = 0.;
-  _floatVars["M_Phi_BJet1_2040"] = 0.;
-  _floatVars["M_Pt_BJet1_3040"] = 0.;
-  _floatVars["M_Eta_BJet1_3040"] = 0.;
-  _floatVars["M_Phi_BJet1_3040"] = 0.;
-  _floatVars["M_Pt_BJet1_4000"] = 0.;
-  _floatVars["M_Eta_BJet1_4000"] = 0.;
-  _floatVars["M_Phi_BJet1_4000"] = 0.;
+  _floatVars["M_Pt_BJet1_2030"] = 0;
+  _floatVars["M_Eta_BJet1_2030"] = 0;
+  _floatVars["M_Phi_BJet1_2030"] = 0;
+  _floatVars["M_Pt_BJet1_2040"] = 0;
+  _floatVars["M_Eta_BJet1_2040"] = 0;
+  _floatVars["M_Phi_BJet1_2040"] = 0;
+  _floatVars["M_Pt_BJet1_3040"] = 0;
+  _floatVars["M_Eta_BJet1_3040"] = 0;
+  _floatVars["M_Phi_BJet1_3040"] = 0;
+  _floatVars["M_Pt_BJet1_4000"] = 0;
+  _floatVars["M_Eta_BJet1_4000"] = 0;
+  _floatVars["M_Phi_BJet1_4000"] = 0;
   
-  _floatVars["M_Pt_Jet1_2030e24"] = 0.;
-  _floatVars["M_Eta_Jet1_2030e24"] = 0.;
-  _floatVars["M_Phi_Jet1_2030e24"] = 0.;
-  _floatVars["M_Pt_Jet1_2040e24"] = 0.;
-  _floatVars["M_Eta_Jet1_2040e24"] = 0.;
-  _floatVars["M_Phi_Jet1_2040e24"] = 0.;
-  _floatVars["M_Pt_Jet1_3040e24"] = 0.;
-  _floatVars["M_Eta_Jet1_3040e24"] = 0.;
-  _floatVars["M_Phi_Jet1_3040e24"] = 0.;
-  _floatVars["M_Pt_Jet1_4000e24"] = 0.;
-  _floatVars["M_Eta_Jet1_4000e24"] = 0.;
-  _floatVars["M_Phi_Jet1_4000e24"] = 0.;
+  _floatVars["M_Pt_Jet1_2030e24"] = 0;
+  _floatVars["M_Eta_Jet1_2030e24"] = 0;
+  _floatVars["M_Phi_Jet1_2030e24"] = 0;
+  _floatVars["M_Pt_Jet1_2040e24"] = 0;
+  _floatVars["M_Eta_Jet1_2040e24"] = 0;
+  _floatVars["M_Phi_Jet1_2040e24"] = 0;
+  _floatVars["M_Pt_Jet1_3040e24"] = 0;
+  _floatVars["M_Eta_Jet1_3040e24"] = 0;
+  _floatVars["M_Phi_Jet1_3040e24"] = 0;
+  _floatVars["M_Pt_Jet1_4000e24"] = 0;
+  _floatVars["M_Eta_Jet1_4000e24"] = 0;
+  _floatVars["M_Phi_Jet1_4000e24"] = 0;
   
-  _floatVars["M_Mass_Lepton"] = 0.;
-  _floatVars["M_E_Lepton"] = 0.;
-  _floatVars["M_Pt_Lepton"] = 0.;
-  _floatVars["M_Eta_Lepton"] = 0.;
-  _floatVars["M_Phi_Lepton"] = 0.;
-  _floatVars["M_Pt_sys"] = 0.;
-  _floatVars["M_Pt_sys_sig"] = 0.;
-  _floatVars["M_Pt_sys_LeptonJet1"] = 0.;
-  _floatVars["M_eta_sys_LeptonJet1"] = 0.;
+  _floatVars["M_Mass_Lepton"] = 0;
+  _floatVars["M_E_Lepton"] = 0;
+  _floatVars["M_Pt_Lepton"] = 0;
+  _floatVars["M_Eta_Lepton"] = 0;
+  _floatVars["M_Phi_Lepton"] = 0;
+  _floatVars["M_Pt_sys"] = 0;
+  _floatVars["M_Pt_sys_sig"] = 0;
+  _floatVars["M_Pt_sys_LeptonJet1"] = 0;
+  _floatVars["M_eta_sys_LeptonJet1"] = 0;
   
-  _floatVars["M_Mass_AllJetsLepton"] = 0.;
-  _floatVars["M_E_AllJetsLepton"] = 0.;
-  _floatVars["M_Pt_AllJetsLepton"] = 0.;
-  _floatVars["M_Eta_AllJetsLepton"] = 0.;
-  _floatVars["M_Phi_AllJetsLepton"] = 0.;
-  _floatVars["M_Mass_AllJetsMET"] = 0.;
-  _floatVars["M_E_AllJetsMET"] = 0.;
-  _floatVars["M_Pt_AllJetsMET"] = 0.;
-  _floatVars["M_Eta_AllJetsMET"] = 0.;
-  _floatVars["M_Phi_AllJetsMET"] = 0.;
-  _floatVars["M_Mass_AllJetsLeptonMET"] = 0.;
-  _floatVars["M_E_AllJetsLeptonMET"] = 0.;
-  _floatVars["M_Pt_AllJetsLeptonMET"] = 0.;
-  _floatVars["M_Eta_AllJetsLeptonMET"] = 0.;
-  _floatVars["M_Phi_AllJetsLeptonMET"] = 0.;
+  _floatVars["M_Mass_AllJetsLepton"] = 0;
+  _floatVars["M_E_AllJetsLepton"] = 0;
+  _floatVars["M_Pt_AllJetsLepton"] = 0;
+  _floatVars["M_Eta_AllJetsLepton"] = 0;
+  _floatVars["M_Phi_AllJetsLepton"] = 0;
+  _floatVars["M_Mass_AllJetsMET"] = 0;
+  _floatVars["M_E_AllJetsMET"] = 0;
+  _floatVars["M_Pt_AllJetsMET"] = 0;
+  _floatVars["M_Eta_AllJetsMET"] = 0;
+  _floatVars["M_Phi_AllJetsMET"] = 0;
+  _floatVars["M_Mass_AllJetsLeptonMET"] = 0;
+  _floatVars["M_E_AllJetsLeptonMET"] = 0;
+  _floatVars["M_Pt_AllJetsLeptonMET"] = 0;
+  _floatVars["M_Eta_AllJetsLeptonMET"] = 0;
+  _floatVars["M_Phi_AllJetsLeptonMET"] = 0;
   
-  _floatVars["M_AllJetsLepton_Centrality"] = 0.;
-  _floatVars["M_Shat"] = 0.;
-  _floatVars["M_DeltaEtaWlvLepton"] = 0.;
-  _floatVars["M_DeltaPhiWlvLepton"] = 0.;
-  _floatVars["M_DeltaRWlvLepton"] = 0.;
+  _floatVars["M_AllJetsLepton_Centrality"] = 0;
+  _floatVars["M_Shat"] = 0;
+  _floatVars["M_DeltaEtaWlvLepton"] = 0;
+  _floatVars["M_DeltaPhiWlvLepton"] = 0;
+  _floatVars["M_DeltaRWlvLepton"] = 0;
   
-  _floatVars["M_DeltaEtaWlvMET"] = 0.;
-  _floatVars["M_DeltaPhiWlvMET"] = 0.;
-  _floatVars["M_DeltaRWlvMET"] = 0.;
+  _floatVars["M_DeltaEtaWlvMET"] = 0;
+  _floatVars["M_DeltaPhiWlvMET"] = 0;
+  _floatVars["M_DeltaRWlvMET"] = 0;
   
-  _floatVars["M_DeltaEtaLeptonMET"] = 0.;
-  _floatVars["M_DeltaPhiLeptonMET"] = 0.;
-  _floatVars["M_DeltaRLeptonMET"] = 0.;
+  _floatVars["M_DeltaEtaLeptonMET"] = 0;
+  _floatVars["M_DeltaPhiLeptonMET"] = 0;
+  _floatVars["M_DeltaRLeptonMET"] = 0;
   
-  _floatVars["M_DeltaEtaJet1MET"] = 0.;
-  _floatVars["M_DeltaPhiJet1MET"] = 0.;
-  _floatVars["M_DeltaRJet1MET"] = 0.;
+  _floatVars["M_DeltaEtaJet1MET"] = 0;
+  _floatVars["M_DeltaPhiJet1MET"] = 0;
+  _floatVars["M_DeltaRJet1MET"] = 0;
   
-  _floatVars["M_Mass_LeptonJet1"] = 0.;
-  _floatVars["M_E_LeptonJet1"] = 0.;
-  _floatVars["M_Pt_LeptonJet1"] = 0.;
-  _floatVars["M_Eta_LeptonJet1"] = 0.;
-  _floatVars["M_Phi_LeptonJet1"] = 0.;
+  _floatVars["M_Mass_LeptonJet1"] = 0;
+  _floatVars["M_E_LeptonJet1"] = 0;
+  _floatVars["M_Pt_LeptonJet1"] = 0;
+  _floatVars["M_Eta_LeptonJet1"] = 0;
+  _floatVars["M_Phi_LeptonJet1"] = 0;
   
-  _floatVars["M_Mass_Jet1MET"] = 0.;
-  _floatVars["M_E_Jet1MET"] = 0.;
-  _floatVars["M_Pt_Jet1MET"] = 0.;
-  _floatVars["M_Eta_Jet1MET"] = 0.;
-  _floatVars["M_Phi_Jet1MET"] = 0.;
+  _floatVars["M_Mass_Jet1MET"] = 0;
+  _floatVars["M_E_Jet1MET"] = 0;
+  _floatVars["M_Pt_Jet1MET"] = 0;
+  _floatVars["M_Eta_Jet1MET"] = 0;
+  _floatVars["M_Phi_Jet1MET"] = 0;
   
-  _floatVars["M_Mass_Jet1LeptonMET"] = 0.;
-  _floatVars["M_E_Jet1LeptonMET"] = 0.;
-  _floatVars["M_Pt_Jet1LeptonMET"] = 0.;
-  _floatVars["M_Eta_Jet1LeptonMET"] = 0.;
-  _floatVars["M_Phi_Jet1LeptonMET"] = 0.;
+  _floatVars["M_Mass_Jet1LeptonMET"] = 0;
+  _floatVars["M_E_Jet1LeptonMET"] = 0;
+  _floatVars["M_Pt_Jet1LeptonMET"] = 0;
+  _floatVars["M_Eta_Jet1LeptonMET"] = 0;
+  _floatVars["M_Phi_Jet1LeptonMET"] = 0;
   
-  _floatVars["M_Pt_RHT"] = 0.;
+  _floatVars["M_Pt_RHT"] = 0;
   
   _floatVars["M_DeltaEtaLeptonJet1"] = 0.;
   _floatVars["M_DeltaPhiLeptonJet1"] = 0.;
@@ -198,205 +201,207 @@ BDTVars::BDTVars(){
   _floatVars["M_DeltaPhiWlvJet1"] = 0.;
   _floatVars["M_DeltaRWlvJet1"] = 0.;
   
-  _floatVars["M_Mass_Jet1Jet2"] = 0.;
-  _floatVars["M_E_Jet1Jet2"] = 0.;
-  _floatVars["M_Pt_Jet1Jet2"] = 0.;
-  _floatVars["M_Eta_Jet1Jet2"] = 0.;
-  _floatVars["M_Phi_Jet1Jet2"] = 0.;
+  _floatVars["M_Mass_Jet1Jet2"] = 0;
+  _floatVars["M_E_Jet1Jet2"] = 0;
+  _floatVars["M_Pt_Jet1Jet2"] = 0;
+  _floatVars["M_Eta_Jet1Jet2"] = 0;
+  _floatVars["M_Phi_Jet1Jet2"] = 0;
   
-  _floatVars["M_Mass_Jet1Jet3"] = 0.;
-  _floatVars["M_E_Jet1Jet3"] = 0.;
-  _floatVars["M_Pt_Jet1Jet3"] = 0.;
-  _floatVars["M_Eta_Jet1Jet3"] = 0.;
-  _floatVars["M_Phi_Jet1Jet3"] = 0.;
+  _floatVars["M_Mass_Jet1Jet3"] = 0;
+  _floatVars["M_E_Jet1Jet3"] = 0;
+  _floatVars["M_Pt_Jet1Jet3"] = 0;
+  _floatVars["M_Eta_Jet1Jet3"] = 0;
+  _floatVars["M_Phi_Jet1Jet3"] = 0;
   
-  _floatVars["M_Mass_Jet2Jet3"] = 0.;
-  _floatVars["M_E_Jet2Jet3"] = 0.;
-  _floatVars["M_Pt_Jet2Jet3"] = 0.;
-  _floatVars["M_Eta_Jet2Jet3"] = 0.;
-  _floatVars["M_Phi_Jet2Jet3"] = 0.;
+  _floatVars["M_Mass_Jet2Jet3"] = 0;
+  _floatVars["M_E_Jet2Jet3"] = 0;
+  _floatVars["M_Pt_Jet2Jet3"] = 0;
+  _floatVars["M_Eta_Jet2Jet3"] = 0;
+  _floatVars["M_Phi_Jet2Jet3"] = 0;
   
-  _floatVars["M_Mass_Jet1Jet2Jet3"] = 0.;
-  _floatVars["M_E_Jet1Jet2Jet3"] = 0.;
-  _floatVars["M_Pt_Jet1Jet2Jet3"] = 0.;
-  _floatVars["M_Eta_Jet1Jet2Jet3"] = 0.;
-  _floatVars["M_Phi_Jet1Jet2Jet3"] = 0.;
+  _floatVars["M_Mass_Jet1Jet2Jet3"] = 0;
+  _floatVars["M_E_Jet1Jet2Jet3"] = 0;
+  _floatVars["M_Pt_Jet1Jet2Jet3"] = 0;
+  _floatVars["M_Eta_Jet1Jet2Jet3"] = 0;
+  _floatVars["M_Phi_Jet1Jet2Jet3"] = 0;
   
-  _floatVars["M_Mass_LeptonJet2"] = 0.;
-  _floatVars["M_E_LeptonJet2"] = 0.;
-  _floatVars["M_Pt_LeptonJet2"] = 0.;
-  _floatVars["M_Eta_LeptonJet2"] = 0.;
-  _floatVars["M_Phi_LeptonJet2"] = 0.;
+  _floatVars["M_Mass_LeptonJet2"] = 0;
+  _floatVars["M_E_LeptonJet2"] = 0;
+  _floatVars["M_Pt_LeptonJet2"] = 0;
+  _floatVars["M_Eta_LeptonJet2"] = 0;
+  _floatVars["M_Phi_LeptonJet2"] = 0;
   
-  _floatVars["M_Mass_LeptonJet3"] = 0.;
-  _floatVars["M_E_LeptonJet3"] = 0.;
-  _floatVars["M_Pt_LeptonJet3"] = 0.;
-  _floatVars["M_Eta_LeptonJet3"] = 0.;
-  _floatVars["M_Phi_LeptonJet3"] = 0.;
+  _floatVars["M_Mass_LeptonJet3"] = 0;
+  _floatVars["M_E_LeptonJet3"] = 0;
+  _floatVars["M_Pt_LeptonJet3"] = 0;
+  _floatVars["M_Eta_LeptonJet3"] = 0;
+  _floatVars["M_Phi_LeptonJet3"] = 0;
   
-  _floatVars["M_Mass_Jet2MET"] = 0.;
-  _floatVars["M_E_Jet2MET"] = 0.;
-  _floatVars["M_Pt_Jet2MET"] = 0.;
-  _floatVars["M_Eta_Jet2MET"] = 0.;
-  _floatVars["M_Phi_Jet2MET"] = 0.;
+  _floatVars["M_Mass_Jet2MET"] = 0;
+  _floatVars["M_E_Jet2MET"] = 0;
+  _floatVars["M_Pt_Jet2MET"] = 0;
+  _floatVars["M_Eta_Jet2MET"] = 0;
+  _floatVars["M_Phi_Jet2MET"] = 0;
   
-  _floatVars["M_Mass_Jet3MET"] = 0.;
-  _floatVars["M_E_Jet3MET"] = 0.;
-  _floatVars["M_Pt_Jet3MET"] = 0.;
-  _floatVars["M_Eta_Jet3MET"] = 0.;
-  _floatVars["M_Phi_Jet3MET"] = 0.;
+  _floatVars["M_Mass_Jet3MET"] = 0;
+  _floatVars["M_E_Jet3MET"] = 0;
+  _floatVars["M_Pt_Jet3MET"] = 0;
+  _floatVars["M_Eta_Jet3MET"] = 0;
+  _floatVars["M_Phi_Jet3MET"] = 0;
   
-  _floatVars["M_Mass_Jet1Jet2Lepton"] = 0.;
-  _floatVars["M_E_Jet1Jet2Lepton"] = 0.;
-  _floatVars["M_Pt_Jet1Jet2Lepton"] = 0.;
-  _floatVars["M_Eta_Jet1Jet2Lepton"] = 0.;
-  _floatVars["M_Phi_Jet1Jet2Lepton"] = 0.;
+  _floatVars["M_Mass_Jet1Jet2Lepton"] = 0;
+  _floatVars["M_E_Jet1Jet2Lepton"] = 0;
+  _floatVars["M_Pt_Jet1Jet2Lepton"] = 0;
+  _floatVars["M_Eta_Jet1Jet2Lepton"] = 0;
+  _floatVars["M_Phi_Jet1Jet2Lepton"] = 0;
   
-  _floatVars["M_Mass_Jet1Jet3Lepton"] = 0.;
-  _floatVars["M_E_Jet1Jet3Lepton"] = 0.;
-  _floatVars["M_Pt_Jet1Jet3Lepton"] = 0.;
-  _floatVars["M_Eta_Jet1Jet3Lepton"] = 0.;
-  _floatVars["M_Phi_Jet1Jet3Lepton"] = 0.;
+  _floatVars["M_Mass_Jet1Jet3Lepton"] = 0;
+  _floatVars["M_E_Jet1Jet3Lepton"] = 0;
+  _floatVars["M_Pt_Jet1Jet3Lepton"] = 0;
+  _floatVars["M_Eta_Jet1Jet3Lepton"] = 0;
+  _floatVars["M_Phi_Jet1Jet3Lepton"] = 0;
   
-  _floatVars["M_Mass_Jet2Jet3Lepton"] = 0.;
-  _floatVars["M_E_Jet2Jet3Lepton"] = 0.;
-  _floatVars["M_Pt_Jet2Jet3Lepton"] = 0.;
-  _floatVars["M_Eta_Jet2Jet3Lepton"] = 0.;
-  _floatVars["M_Phi_Jet2Jet3Lepton"] = 0.;
+  _floatVars["M_Mass_Jet2Jet3Lepton"] = 0;
+  _floatVars["M_E_Jet2Jet3Lepton"] = 0;
+  _floatVars["M_Pt_Jet2Jet3Lepton"] = 0;
+  _floatVars["M_Eta_Jet2Jet3Lepton"] = 0;
+  _floatVars["M_Phi_Jet2Jet3Lepton"] = 0;
   
-  _floatVars["M_Mass_Jet1Jet2Jet3Lepton"] = 0.;
-  _floatVars["M_E_Jet1Jet2Jet3Lepton"] = 0.;
-  _floatVars["M_Pt_Jet1Jet2Jet3Lepton"] = 0.;
-  _floatVars["M_Eta_Jet1Jet2Jet3Lepton"] = 0.;
-  _floatVars["M_Phi_Jet1Jet2Jet3Lepton"] = 0.;
+  _floatVars["M_Mass_Jet1Jet2Jet3Lepton"] = 0;
+  _floatVars["M_E_Jet1Jet2Jet3Lepton"] = 0;
+  _floatVars["M_Pt_Jet1Jet2Jet3Lepton"] = 0;
+  _floatVars["M_Eta_Jet1Jet2Jet3Lepton"] = 0;
+  _floatVars["M_Phi_Jet1Jet2Jet3Lepton"] = 0;
   
-  _floatVars["M_Mass_Jet1Jet2MET"] = 0.;
-  _floatVars["M_E_Jet1Jet2MET"] = 0.;
-  _floatVars["M_Pt_Jet1Jet2MET"] = 0.;
-  _floatVars["M_Eta_Jet1Jet2MET"] = 0.;
-  _floatVars["M_Phi_Jet1Jet2MET"] = 0.;
+  _floatVars["M_Mass_Jet1Jet2MET"] = 0;
+  _floatVars["M_E_Jet1Jet2MET"] = 0;
+  _floatVars["M_Pt_Jet1Jet2MET"] = 0;
+  _floatVars["M_Eta_Jet1Jet2MET"] = 0;
+  _floatVars["M_Phi_Jet1Jet2MET"] = 0;
   
-  _floatVars["M_Mass_Jet1Jet3MET"] = 0.;
-  _floatVars["M_E_Jet1Jet3MET"] = 0.;
-  _floatVars["M_Pt_Jet1Jet3MET"] = 0.;
-  _floatVars["M_Eta_Jet1Jet3MET"] = 0.;
-  _floatVars["M_Phi_Jet1Jet3MET"] = 0.;
+  _floatVars["M_Mass_Jet1Jet3MET"] = 0;
+  _floatVars["M_E_Jet1Jet3MET"] = 0;
+  _floatVars["M_Pt_Jet1Jet3MET"] = 0;
+  _floatVars["M_Eta_Jet1Jet3MET"] = 0;
+  _floatVars["M_Phi_Jet1Jet3MET"] = 0;
   
-  _floatVars["M_Mass_Jet2Jet3MET"] = 0.;
-  _floatVars["M_E_Jet2Jet3MET"] = 0.;
-  _floatVars["M_Pt_Jet2Jet3MET"] = 0.;
-  _floatVars["M_Eta_Jet2Jet3MET"] = 0.;
-  _floatVars["M_Phi_Jet2Jet3MET"] = 0.;
+  _floatVars["M_Mass_Jet2Jet3MET"] = 0;
+  _floatVars["M_E_Jet2Jet3MET"] = 0;
+  _floatVars["M_Pt_Jet2Jet3MET"] = 0;
+  _floatVars["M_Eta_Jet2Jet3MET"] = 0;
+  _floatVars["M_Phi_Jet2Jet3MET"] = 0;
   
-  _floatVars["M_Mass_Jet1Jet2Jet3MET"] = 0.;
-  _floatVars["M_E_Jet1Jet2Jet3MET"] = 0.;
-  _floatVars["M_Pt_Jet1Jet2Jet3MET"] = 0.;
-  _floatVars["M_Eta_Jet1Jet2Jet3MET"] = 0.;
-  _floatVars["M_Phi_Jet1Jet2Jet3MET"] = 0.;
+  _floatVars["M_Mass_Jet1Jet2Jet3MET"] = 0;
+  _floatVars["M_E_Jet1Jet2Jet3MET"] = 0;
+  _floatVars["M_Pt_Jet1Jet2Jet3MET"] = 0;
+  _floatVars["M_Eta_Jet1Jet2Jet3MET"] = 0;
+  _floatVars["M_Phi_Jet1Jet2Jet3MET"] = 0;
   
-  _floatVars["M_Mass_LeptonJet2MET"] = 0.;
-  _floatVars["M_E_LeptonJet2MET"] = 0.;
-  _floatVars["M_Pt_LeptonJet2MET"] = 0.;
-  _floatVars["M_Eta_LeptonJet2MET"] = 0.;
-  _floatVars["M_Phi_LeptonJet2MET"] = 0.;
+  _floatVars["M_Mass_LeptonJet2MET"] = 0;
+  _floatVars["M_E_LeptonJet2MET"] = 0;
+  _floatVars["M_Pt_LeptonJet2MET"] = 0;
+  _floatVars["M_Eta_LeptonJet2MET"] = 0;
+  _floatVars["M_Phi_LeptonJet2MET"] = 0;
   
-  _floatVars["M_Mass_LeptonJet1Jet2MET"] = 0.;
-  _floatVars["M_E_LeptonJet1Jet2MET"] = 0.;
-  _floatVars["M_Pt_LeptonJet1Jet2MET"] = 0.;
-  _floatVars["M_Eta_LeptonJet1Jet2MET"] = 0.;
-  _floatVars["M_Phi_LeptonJet1Jet2MET"] = 0.;
+  _floatVars["M_Mass_LeptonJet1Jet2MET"] = 0;
+  _floatVars["M_E_LeptonJet1Jet2MET"] = 0;
+  _floatVars["M_Pt_LeptonJet1Jet2MET"] = 0;
+  _floatVars["M_Eta_LeptonJet1Jet2MET"] = 0;
+  _floatVars["M_Phi_LeptonJet1Jet2MET"] = 0;
   
-  _floatVars["M_Mass_LeptonJet1Jet3MET"] = 0.;
-  _floatVars["M_E_LeptonJet1Jet3MET"] = 0.;
-  _floatVars["M_Pt_LeptonJet1Jet3MET"] = 0.;
-  _floatVars["M_Eta_LeptonJet1Jet3MET"] = 0.;
-  _floatVars["M_Phi_LeptonJet1Jet3MET"] = 0.;
+  _floatVars["M_Mass_LeptonJet1Jet3MET"] = 0;
+  _floatVars["M_E_LeptonJet1Jet3MET"] = 0;
+  _floatVars["M_Pt_LeptonJet1Jet3MET"] = 0;
+  _floatVars["M_Eta_LeptonJet1Jet3MET"] = 0;
+  _floatVars["M_Phi_LeptonJet1Jet3MET"] = 0;
   
-  _floatVars["M_Mass_LeptonJet2Jet3MET"] = 0.;
-  _floatVars["M_E_LeptonJet2Jet3MET"] = 0.;
-  _floatVars["M_Pt_LeptonJet2Jet3MET"] = 0.;
-  _floatVars["M_Eta_LeptonJet2Jet3MET"] = 0.;
-  _floatVars["M_Phi_LeptonJet2Jet3MET"] = 0.;
+  _floatVars["M_Mass_LeptonJet2Jet3MET"] = 0;
+  _floatVars["M_E_LeptonJet2Jet3MET"] = 0;
+  _floatVars["M_Pt_LeptonJet2Jet3MET"] = 0;
+  _floatVars["M_Eta_LeptonJet2Jet3MET"] = 0;
+  _floatVars["M_Phi_LeptonJet2Jet3MET"] = 0;
   
-  _floatVars["M_Mass_Jet1Jet2Jet3LeptonMET"] = 0.;
-  _floatVars["M_E_Jet1Jet2Jet3LeptonMET"] = 0.;
-  _floatVars["M_Pt_Jet1Jet2Jet3LeptonMET"] = 0.;
-  _floatVars["M_Eta_Jet1Jet2Jet3LeptonMET"] = 0.;
-  _floatVars["M_Phi_Jet1Jet2Jet3LeptonMET"] = 0.;
+  _floatVars["M_Mass_Jet1Jet2Jet3LeptonMET"] = 0;
+  _floatVars["M_E_Jet1Jet2Jet3LeptonMET"] = 0;
+  _floatVars["M_Pt_Jet1Jet2Jet3LeptonMET"] = 0;
+  _floatVars["M_Eta_Jet1Jet2Jet3LeptonMET"] = 0;
+  _floatVars["M_Phi_Jet1Jet2Jet3LeptonMET"] = 0;
   
-  _floatVars["M_TMass_Jet1Jet2"] = 0.;
-  _floatVars["M_TMass_Jet1Jet3"] = 0.;
-  _floatVars["M_TMass_Jet2Jet3"] = 0.;
-  _floatVars["M_TMass_Jet1Jet2Jet3"] = 0.;
+  _floatVars["M_TMass_Jet1Jet2"] = 0;
+  _floatVars["M_TMass_Jet1Jet3"] = 0;
+  _floatVars["M_TMass_Jet2Jet3"] = 0;
+  _floatVars["M_TMass_Jet1Jet2Jet3"] = 0;
   
-  _floatVars["M_DeltaRJet1Jet2"] = 0.;
-  _floatVars["M_DeltaEtaJet1Jet2"] = 0.;
-  _floatVars["M_DeltaPhiJet1Jet2"] = 0.;
+  _floatVars["M_DeltaRJet1Jet2"] = 0;
+  _floatVars["M_DeltaEtaJet1Jet2"] = 0;
+  _floatVars["M_DeltaPhiJet1Jet2"] = 0;
   
-  _floatVars["M_DeltaRJet1Jet3"] = 0.;
-  _floatVars["M_DeltaEtaJet1Jet3"] = 0.;
-  _floatVars["M_DeltaPhiJet1Jet3"] = 0.;
+  _floatVars["M_DeltaRJet1Jet3"] = 0;
+  _floatVars["M_DeltaEtaJet1Jet3"] = 0;
+  _floatVars["M_DeltaPhiJet1Jet3"] = 0;
   
-  _floatVars["M_DeltaRJet2Jet3"] = 0.;
-  _floatVars["M_DeltaEtaJet2Jet3"] = 0.;
-  _floatVars["M_DeltaPhiJet2Jet3"] = 0.;
+  _floatVars["M_DeltaRJet2Jet3"] = 0;
+  _floatVars["M_DeltaEtaJet2Jet3"] = 0;
+  _floatVars["M_DeltaPhiJet2Jet3"] = 0;
   
-  _floatVars["M_DeltaRJet2MET"] = 0.;
-  _floatVars["M_DeltaEtaJet2MET"] = 0.;
-  _floatVars["M_DeltaPhiJet2MET"] = 0.;
+  _floatVars["M_DeltaRJet2MET"] = 0;
+  _floatVars["M_DeltaEtaJet2MET"] = 0;
+  _floatVars["M_DeltaPhiJet2MET"] = 0;
   
-  _floatVars["M_DeltaRJet3MET"] = 0.;
-  _floatVars["M_DeltaEtaJet3MET"] = 0.;
-  _floatVars["M_DeltaPhiJet3MET"] = 0.;
+  _floatVars["M_DeltaRJet3MET"] = 0;
+  _floatVars["M_DeltaEtaJet3MET"] = 0;
+  _floatVars["M_DeltaPhiJet3MET"] = 0;
   
-  _floatVars["M_DeltaRLeptonJet2"] = 0.;
-  _floatVars["M_DeltaEtaLeptonJet2"] = 0.;
-  _floatVars["M_DeltaPhiLeptonJet2"] = 0.;
+  _floatVars["M_DeltaRLeptonJet2"] = 0;
+  _floatVars["M_DeltaEtaLeptonJet2"] = 0;
+  _floatVars["M_DeltaPhiLeptonJet2"] = 0;
   
-  _floatVars["M_DeltaRWlvJet2"] = 0.;
-  _floatVars["M_DeltaEtaWlvJet2"] = 0.;
-  _floatVars["M_DeltaPhiWlvJet2"] = 0.;
+  _floatVars["M_DeltaRWlvJet2"] = 0;
+  _floatVars["M_DeltaEtaWlvJet2"] = 0;
+  _floatVars["M_DeltaPhiWlvJet2"] = 0;
   
-  _floatVars["M_DeltaRLeptonJet3"] = 0.;
-  _floatVars["M_DeltaEtaLeptonJet3"] = 0.;
-  _floatVars["M_DeltaPhiLeptonJet3"] = 0.;
+  _floatVars["M_DeltaRLeptonJet3"] = 0;
+  _floatVars["M_DeltaEtaLeptonJet3"] = 0;
+  _floatVars["M_DeltaPhiLeptonJet3"] = 0;
   
-  _floatVars["M_DeltaRWlvJet3"] = 0.;
-  _floatVars["M_DeltaEtaWlvJet3"] = 0.;
-  _floatVars["M_DeltaPhiWlvJet3"] = 0.;
+  _floatVars["M_DeltaRWlvJet3"] = 0;
+  _floatVars["M_DeltaEtaWlvJet3"] = 0;
+  _floatVars["M_DeltaPhiWlvJet3"] = 0;
   
-  _floatVars["M_Jet1Jet2_Centrality"] = 0.;
+  _floatVars["M_Jet1Jet2_Centrality"] = 0;
   
-  _floatVars["M_Jet1Jet3_Centrality"] = 0.;
+  _floatVars["M_Jet1Jet3_Centrality"] = 0;
   
-  _floatVars["M_Jet2Jet3_Centrality"] = 0.;
+  _floatVars["M_Jet2Jet3_Centrality"] = 0;
   
-  _floatVars["M_Jet1Jet2Jet3_Centrality"] = 0.;
+  _floatVars["M_Jet1Jet2Jet3_Centrality"] = 0;
   
-  _floatVars["largestCSV"] = 0.;
+  _floatVars["largestCSV"] = 0;
   
-  _floatVars["M_hadronicWmass"] = 0.;
+  _floatVars["M_hadronicWmass"] = 0;
   
-  _floatVars["M_hadronicWPt"] = 0.;
+  _floatVars["M_hadronicWPt"] = 0;
   
-  _floatVars["M_hadronicWEta"] = 0.;
+  _floatVars["M_hadronicWEta"] = 0;
   
-  _floatVars["M_hadronicWPhi"] = 0.;
+  _floatVars["M_hadronicWPhi"] = 0;
   
-  _floatVars["M_topMass2"] = 0.;
-  _floatVars["M_topMassLep"] = 0.;
-  _floatVars["M_topMass2_lep"] = 0.;
-  _floatVars["M_topMassLep_had"] = 0.;
+  _floatVars["M_topMass2"] = 0;
+  _floatVars["M_topMassLep"] = 0;
+  _floatVars["M_topMass2_lep"] = 0;
+  _floatVars["M_topMassLep_had"] = 0;
   
-  _floatVars["M_DeltaRlightjets"] = 0.;
+  _floatVars["M_DeltaRlightjets"] = 0;
   
-  _floatVars["M_DeltaRBJethadronicW"] = 0.;
+  _floatVars["M_DeltaRBJethadronicW"] = 0;
   
-  _floatVars["M_DeltaRBJetLepton"] = 0.;
+  _floatVars["M_DeltaRBJetLepton"] = 0;
   
-  _floatVars["M_maxDeltaRBJetLightJet"] = 0.;
+  _floatVars["M_maxDeltaRBJetLightJet"] = 0;
   
-  _floatVars["M_HT"] = 0.;
+  _floatVars["M_HT"] = 0;
+
+  SetDoHists(makeHistos);
 
 }
 
@@ -960,5 +965,7 @@ void BDTVars::FillBranches(EventContainer * evtObj){
     }
     
   } //end 3 jet loop
+
+  if (DoHists()) FillHistograms();
 
 }

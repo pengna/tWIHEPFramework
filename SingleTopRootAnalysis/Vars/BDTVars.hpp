@@ -17,7 +17,7 @@
 class BDTVars: public VarBase {
   
 public:
-  BDTVars();
+  BDTVars(bool makeHistos = false);
   
   //void BookBranches(TTree * skimTree);
   void FillBranches(EventContainer * evtObj);

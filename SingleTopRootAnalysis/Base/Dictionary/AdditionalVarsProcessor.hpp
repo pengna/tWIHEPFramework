@@ -35,12 +35,31 @@ public:
   // Output the value of the branches
   void OutputBranches();
 
+  //Set the directory to write automatic histograms to
+  void SetVariableHistogramDirectory(TDirectory * histDir){_histogramDir = histDir;};
+  TDirectory * GetVarHistDirectory(){return _histogramDir;};
+
+  //Setter and getter for number of cuts in the analysis
+  void SetNCuts(int nCuts){_nCuts = nCuts;};
+  int GetNCuts(){return _nCuts;};
+
+  void SetVariableEventContainer(EventContainer* evtObj){_evtObj = evtObj;};
+  EventContainer* GetVariableEventContainer() {return _evtObj;};
+
+protected:
+  EventContainer * _evtObj;
+
 private:                                                                 
   static VarBase *_currentVarBase;                                       
   static EventContainer *_currentEventContainer;                         
                                                                          
   //The actual vector that contains the variables we add to the skim tree
   std::vector<VarBase *> _variableList;                                  
+
+  //Directory for storing histograms
+  TDirectory * _histogramDir;
+  //Number of cuts being proessed. This allows the directory for the new variables to be implemented correctly
+  int _nCuts; 
                                                                          
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system                                       

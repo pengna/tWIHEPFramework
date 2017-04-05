@@ -105,6 +105,11 @@ public:
     return _currentEventContainer;
   } // EventContainer
   
+  // Return the number of cuts in the cut lsit
+  inline int GetNumberOfCuts() {
+    return _vectorCutAndHist.size();
+  }
+
 private:
   int NumCutLines;
   std::vector<std::pair<TString,CutFlowLine> >  _cutLines;

@@ -968,6 +968,11 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
 
   // Add histogram to _histogramFile directory in memory
   SetDirectory (_histogramFile);
+  // Add this information to the additional variable processor
+  SetVariableHistogramDirectory (_histogramFile);
+  SetVariableEventContainer(GetEventContainer());
+  //Set the number of cuts
+  SetNCuts(GetNumberOfCuts());
   // Book Histograms
   cout << "<AnalysisMain::Loop::BookHistogram Start> " << endl;
   CutListProcessor::BookHistogram();

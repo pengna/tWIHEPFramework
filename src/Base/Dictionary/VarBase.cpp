@@ -31,8 +31,10 @@ ClassImp(VarBase);
  * Input:  None                                                               *  
  * Output: None                                                               *  
  ******************************************************************************/ 
-VarBase::VarBase(){
-  //Nothing immediately happens in here.
+VarBase::VarBase(bool addHists){
+  //Set up whether we want to make histograms of the BDT variables
+  _makeHists = addHists;
+//Nothing immediately happens in here.
 }
 
 
@@ -64,11 +66,19 @@ void VarBase::BookBranches(TTree * skimTree){
   for (auto intVar : _intVars){
     string tempString = intVar.first;
     _branchVec[tempString.c_str()] = skimTree->Branch(tempString.c_str(),&(_intVars[tempString.c_str()]),(tempString+"/I").c_str());
+    if (DoHists()) {
+      _histograms[tempString] = BookTH1FHistogram(tempString,tempString,10,0.,intVar.second);
+    }
   }
 
   for (auto floatVar: _floatVars){
     string tempString = floatVar.first;
     _branchVec[tempString.c_str()] = skimTree->Branch(tempString.c_str(),&(_floatVars[tempString.c_str()]),(tempString+"/F").c_str());
+    if (DoHists()) {
+      float startVar = 0.;
+      if (floatVar.second < 0.) startVar = floatVar.second;
+      _histograms[tempString] = BookTH1FHistogram(tempString,tempString,100,startVar,std::fabs(floatVar.second));
+    }
   }
 
 
@@ -123,5 +133,25 @@ void VarBase::TouchBranches(){
   }
   for (auto intVar : _intVars){
     int temp = intVar.second;
+  }
+}
+
+/****************************************************************************** 
+ * void VarBase::FillHistograms ()                                             * 
+ *                                                                            * 
+ * Fill the histograms we're making here *
+ *                                                                            * 
+ * Input:  None                                                               * 
+ * Output: None                                                               * 
+ ******************************************************************************/
+void VarBase::FillHistograms(){
+  for (auto intVar : _intVars){
+    //    std::cout << intVar.first << " " << intVar.second << std::endl;
+    _histograms[intVar.first]->FillWithoutWeight(intVar.second);
+  }
+  
+  for (auto floatVar : _floatVars){
+    //std::cout << floatVar.first << " " << floatVar.second << std::endl;
+    _histograms[floatVar.first]->FillWithoutWeight(floatVar.second);
   }
 }
