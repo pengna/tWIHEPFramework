@@ -241,6 +241,10 @@ void Electron::SetCuts(TEnv* config, TString electronType)
   _minPtCuts[electronType] =   	 config -> GetValue("ObjectID.Electron." + electronType + ".MinPt", 0.);
   _minEtaGapCuts[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".MinEtaGap", 100.);
   _maxEtaGapCuts[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".MaxEtaGap", -100.);
+  _dZCutEndcap[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".dZEndcap", 100.);
+  _dZCutBarrel[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".dZBarrel", 100.);
+  _d0CutEndcap[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".d0Endcap", 100.);
+  _d0CutBarrel[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".d0Barrel", 100.);
 
 } // End SetCuts
 
@@ -287,6 +291,8 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   SetCharge		( evtr -> patElectron_charge		  -> operator[](iE) );
   SetSCeta		( evtr -> patElectron_SCeta		  -> operator[](iE) );
   SetInCrack		( evtr -> patElectron_inCrack		  -> operator[](iE) );
+  SetpatElectron_d0	( evtr -> patElectron_d0		  -> operator[](iE) );
+  SetpatElectron_dz	( evtr -> patElectron_gsfTrack_dz_pv	  -> operator[](iE) );
   // **************************************************************
   // **************************************************************
   // **************************************************************
@@ -338,12 +344,17 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   Bool_t passMinPt  = kTRUE;
   Bool_t passMaxEta = kTRUE;
   Bool_t passTight  = kTRUE;
+  Bool_t passd0dZ   = kTRUE;
   
   // Test requirements
   if(elPt <= _minPtCuts[electronType])               passMinPt  = kFALSE;
   if(TMath::Abs(elEta) >= _maxEtaCuts[electronType]) passMaxEta = kFALSE;
   if(!passTightId())				     passTight  = kFALSE;
   
+  // Checking that the d0 and dz cuts pass
+  if(TMath::Abs(elEta) < 1.4442) passd0dZ = ((GetpatElectron_d0() < _d0CutBarrel[electronType]) && (GetpatElectron_dz() < _dZCutBarrel[electronType])); //barrel
+  else passd0dZ = ((GetpatElectron_d0() < _d0CutEndcap[electronType]) && (GetpatElectron_dz() < _dZCutEndcap[electronType])); //endcap
+
   // **************************************************************
   // Gap Electrons
   // **************************************************************
@@ -354,12 +365,12 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   if( (TMath::Abs(scEta()) >= _minEtaGapCuts[electronType]) && (TMath::Abs(scEta()) <= _maxEtaGapCuts[electronType]) ) passNoGapElectron = kFALSE;
   //SetNoGapElectron(passNoGapElectron);
   
-
+  
   // **************************************************************
   // Return value according to electron type passed to Fill
   // **************************************************************
   //if(     "Tight"      == electronType) return(GetIsRobusterTight() && passMinPt && passMaxEta && GetNoGapElectron() && Isolation());
-  if(     "Tight"      == electronType) return( passMinPt && passMaxEta && passTight && passNoGapElectron);
+  if(     "Tight"      == electronType) return( passMinPt && passMaxEta && passTight && passNoGapElectron && passd0dZ);
   //if(     "PtEtaCut"   == electronType) return(passMinPt && passMaxEta && IsRobusterTight());
   else if("Veto"       == electronType) return( passMinPt && passMaxEta);//no tight or isolation req.
   //else if("Isolated"   == electronType) return(GetIsolation()  && GetNoGapElectron()&& OverlapUse());

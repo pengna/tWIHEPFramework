@@ -172,6 +172,11 @@ class Electron: public Particle
   std::map<TString,Double_t> _minPtCuts;
   std::map<TString,Double_t> _minEtaGapCuts;
   std::map<TString,Double_t> _maxEtaGapCuts;
+  std::map<TString,Double_t> _dZCutEndcap;
+  std::map<TString,Double_t> _dZCutBarrel;
+  std::map<TString,Double_t> _d0CutEndcap;
+  std::map<TString,Double_t> _d0CutBarrel;
+  
   
 
   ////////////////////////////////////////////////////////////////////////////////
