@@ -6,14 +6,20 @@
 
 import sys,os
 
+treeName = "OutTree_"
+treeName = "OutTree_ttbar_"
+
 datasets = ["tW_top","tW_antitop","ttbar","ww","wz","zz","zPlusJetsHighMass","zPlusJetsLowMass","sChan","qcd100_200","qcd200_300","qcd300_500","qcd500_700","qcd700_1000","qcd1000_1500","qcd1500_2000","qcd2000_inf","wPlusJetsMCatNLO","tChan_top","tChan_antitop","SingMuB","SingMuC","SingMuD","SingMuE","SingMuF","SingMuG"]
 #datasets = ["SingMuB","SingMuC","SingMuD","SingMuE","SingMuF","SingMuG"]
 #datasets = ["singleMuon"]
-datasetID = {"tW_top":500000,"tW_antitop":500001,"ttbar":500003,"ww":500007,"wz":500008,"zz":500009,"zPlusJetsHighMass":500004,"zPlusJetsLowMass":500005,"tChan":500002,"sChan":500010,"wPlusJets":500006,"qcd100_200":500011,"qcd200_300":500012,"qcd300_500":500013,"qcd500_700":500014,"qcd700_1000":500015,"qcd1000_1500":500016,"qcd1500_2000":500017,"qcd2000_inf":500018,"wPlusJetsMCatNLO":500019,"tChan_antitop":500020,"tChan_top":500021,"SingMuB":400000,"SingMuB_1":400007,"SingMuC":400001,"SingMuD":400002,"SingMuE":400003,"SingMuF":400004,"SingMuG":400005,"SingMuG_1":400008,"SingMuH":400006}
-nFilesDataset = {"tW_top":14,"tW_antitop":17,"ttbar":138,"ww":11,"wz":30,"zz":12,"zPlusJetsHighMass":477,"zPlusJetsLowMass":237,"tChan":478,"sChan":21,"wPlusJets":422,"qcd100_200":738,"qcd200_300":179,"qcd300_500":199,"qcd500_700":210,"qcd700_1000":184,"qcd1000_1500":90,"qcd1500_2000":80,"qcd2000_inf":36,"singleMuon":1072,"wPlusJetsMCatNLO":300,"tChan_antitop":406,"tChan_top":723,"SingMuB":1756,"SingMuB_1":740,"SingMuC":580,"SingMuD":972,"SingMuE":826,"SingMuF":603,"SingMuG":1423,"SingMuG_1":320}
+datasets = ["ttbar","ttbarBU"]
+datasetID = {"tW_top":500000,"tW_antitop":500001,"ttbar":500024,"ww":500007,"wz":500008,"zz":500009,"zPlusJetsHighMass":500004,"zPlusJetsLowMass":500005,"tChan":500002,"sChan":500010,"wPlusJets":500006,"qcd100_200":500011,"qcd200_300":500012,"qcd300_500":500013,"qcd500_700":500014,"qcd700_1000":500015,"qcd1000_1500":500016,"qcd1500_2000":500017,"qcd2000_inf":500018,"wPlusJetsMCatNLO":500019,"tChan_antitop":500020,"tChan_top":500021,"SingMuB":400000,"SingMuB_1":400007,"SingMuC":400001,"SingMuD":400002,"SingMuE":400003,"SingMuF":400004,"SingMuG":400005,"SingMuG_1":400008,"SingMuH":400006,"ttbarBU":500025}
+nFilesDataset = {"tW_top":14,"tW_antitop":17,"ttbar":983,"ww":11,"wz":30,"zz":12,"zPlusJetsHighMass":477,"zPlusJetsLowMass":237,"tChan":478,"sChan":21,"wPlusJets":422,"qcd100_200":738,"qcd200_300":179,"qcd300_500":199,"qcd500_700":210,"qcd700_1000":184,"qcd1000_1500":90,"qcd1500_2000":80,"qcd2000_inf":36,"singleMuon":1072,"wPlusJetsMCatNLO":300,"tChan_antitop":406,"tChan_top":723,"SingMuB":1756,"SingMuB_1":740,"SingMuC":580,"SingMuD":972,"SingMuE":826,"SingMuF":603,"SingMuG":1423,"SingMuG_1":320,"ttbarBU":1192}
 datasetDirs = {"tW_top":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/crab_tW_topReTrig/170210_081934/0000/"],
 "tW_antitop":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/crab_tW_antitopReTrig/170210_082043/0000/"],
-"ttbar":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen/crab_TTpowhegReTrig/170210_081831/0000/"],
+#"ttbar":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen/crab_TTpowhegReTrig/170210_081831/0000/"],
+"ttbar":["/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttbarNewReTrig/170404_120840/0000/"],
+"ttbarBU":["/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttbarBackupNewReTrig/170404_121029/0000/","/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttbarBackupNewReTrig/170404_121029/0001/"],
 "ww":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/WW_TuneCUETP8M1_13TeV-pythia8/crab_WWReTrig/170210_103335/0000/"],
 "wz":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/WZ_TuneCUETP8M1_13TeV-pythia8/crab_WZReTrig/170210_083217/0000/"],
 "zz":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ZZ_TuneCUETP8M1_13TeV-pythia8/crab_ZZReTrig/170210_083340/0000/"],
@@ -71,14 +77,14 @@ for dataset in datasets:
         maxFiles = (i+1)*namesPerFile+1
         if nFilesDataset[dataset]+1 < maxFiles: maxFiles = nFilesDataset[dataset]+1
         for j in range(i*namesPerFile+1,maxFiles):
-            line = "OutTree_" + str(j) + ".root"
+            line = treeName + str(j) + ".root"
             fileLocation = ""
             fileSize = 0.
             for dataDir in datasetDirs[dataset]:
-                if os.path.exists(dataDir+"OutTree_"+str(j)+".root"):
-                    statinfo = os.stat(dataDir+"OutTree_"+str(j)+".root")
+                if os.path.exists(dataDir+treeName+str(j)+".root"):
+                    statinfo = os.stat(dataDir+treeName+str(j)+".root")
                     if statinfo.st_size > fileSize:
-                        fileLocation = dataDir+"OutTree_"+str(j)+".root"
+                        fileLocation = dataDir+treeName+str(j)+".root"
                         fileSize = statinfo.st_size
             if not fileLocation == "" and fileSize > 0:
                 currentFile.write(fileLocation+"\n")
@@ -86,7 +92,7 @@ for dataset in datasets:
                 fileNameForCopy = dataDir.split("tWlJetSamples/moriond17/")[-1]
                 if "mc/" in fileNameForCopy: fileNameForCopy = "mcMoriond17/" + fileNameForCopy.split("mc/")[-1]
                 else: fileNameForCopy = "reRecoData/"+fileNameForCopy.split("data/")[-1]
-                copyScript.write("srmcp --debug srm://srm.ihep.ac.cn/pnfs/ihep.ac.cn/data/cms/store/user/leggat/tWSamples/"+ fileNameForCopy + "OutTree_"+str(j) +".root file:///" + dataDir+"\n")
+                copyScript.write("srmcp --debug srm://srm.ihep.ac.cn/pnfs/ihep.ac.cn/data/cms/store/user/leggat/tWSamples/"+ fileNameForCopy + treeName+str(j) +".root file:///" + dataDir+"\n")
                 print "Couldn't find file " + str(j)
 #            if s.find(line) != -1:
 #                currentFile.write(datasetDirs[dataset] + line + "")
@@ -110,7 +116,7 @@ while False:
         maxFiles = (i+1)*namesPerFile+1
         if totalDatasetFiles+1 < maxFiles: maxFiles = totalDatasetFiles+1
         for j in range(i*namesPerFile+1,maxFiles):
-            line = "OutTree_" + str(j) + ".root"
+            line = treeName + str(j) + ".root"
             if s.find(line) != -1:
                 currentFile.write(remoteDir + line + "\n")
 #                print line
