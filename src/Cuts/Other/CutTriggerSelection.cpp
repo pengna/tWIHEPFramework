@@ -157,9 +157,7 @@ Bool_t CutTriggerSelection::Apply()
   
   if (_whichtrigger == 0) passesTrigger = electronTrigger != 0. and muonTrigger == 0;
   if (_whichtrigger == 1) passesTrigger = electronTrigger == 0. and muonTrigger != 0;
-
-  std::cout << passesTrigger << " " << electronTrigger << " " << muonTrigger << std::endl;
-
+  
   //if (triggerBit != 0.) passesTrigger = kTRUE;
 
   // Fill the histograms before the cuts
