@@ -272,3 +272,11 @@ Events.Source.500022: 77791
 #500023 = ttbar synch file
 Weight.Source.500023: 831.76
 Events.Source.500023: 47259
+
+#500024 = update ttbar files
+Weight.Source.500024: 831.76
+Events.Source.500024: 155235652
+
+#500025 = second ttbar dataset
+Weight.Source.500025: 831.76
+Events.Source.500025: 155235652
