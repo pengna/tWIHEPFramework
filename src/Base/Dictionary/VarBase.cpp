@@ -144,14 +144,16 @@ void VarBase::TouchBranches(){
  * Input:  None                                                               * 
  * Output: None                                                               * 
  ******************************************************************************/
-void VarBase::FillHistograms(){
+void VarBase::FillHistograms(double weight){
+  double fillWeight = weight;
+  if (weight == -999.) weight = 1.;
   for (auto intVar : _intVars){
     //    std::cout << intVar.first << " " << intVar.second << std::endl;
-    _histograms[intVar.first]->FillWithoutWeight(intVar.second);
+    _histograms[intVar.first]->Fill(intVar.second,weight);
   }
   
   for (auto floatVar : _floatVars){
     //std::cout << floatVar.first << " " << floatVar.second << std::endl;
-    _histograms[floatVar.first]->FillWithoutWeight(floatVar.second);
+    _histograms[floatVar.first]->Fill(floatVar.second,weight);
   }
 }

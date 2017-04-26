@@ -43,7 +43,7 @@ _histos.Add(h);
   void ResetBranches();
   
   //Do we want to make histograms for these variables?
-  bool SetDoHists(bool doHists){_makeHists = doHists;};
+  void SetDoHists(bool doHists){_makeHists = doHists;};
   bool DoHists(){return _makeHists;};
 
   //Fill the variables. There are two methods for this - the first is called from the AdditionalVarsProcessor which calls the individual VarBase classes filling routines before filling the branches themselves.
@@ -65,7 +65,7 @@ protected:
   std::map<string,TBranch*> _branchVec;
 
   //Fill the histograms if we're doinng that
-  void FillHistograms();
+  void FillHistograms(double weight = -999.);
 
   bool _makeHists;
 
