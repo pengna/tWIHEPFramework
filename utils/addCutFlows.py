@@ -31,7 +31,9 @@ histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan
 #samplesMC = ["tW_top","tW_antitop","ttbar","singleMuon"]
 #samplesMC = ["tW_top"]
 
-sampleData = ['SingMuB','SingMuC','SingMuD']
+sampleData = ['SingMuB','SingMuC','SingMuD','SingMuE','SingMuF','SingMuG']
+
+emptyFile = {}
 
 inDirMC = sys.argv[1]
 inDirData = ""
@@ -66,6 +68,12 @@ for sampleName in samplesMC:
                     cutYield['total'][cut] = "Total"
                 cutYield[sample][cut] = sample
                 continue
+            if "PV" in cut:
+                nEvt = float(line.split("|")[5])
+                if nEvt == 0:
+                    if sample not in emptyFile.keys():
+                        emptyFile[sample] = []
+                    emptyFile[sample].append(inDir+sampleName+"/logs/"+logFileName)
             if cut in cutYield[sample].keys():
                 cutYield[sample][cut] += float(line.split("|")[5])
             else:
@@ -86,10 +94,31 @@ for cut in cutYield['total'].keys():
         cutYield['totalMinusQCD'][cut] = cutYield['total'][cut] - cutYield['qcd'][cut]
         cutYield['sOverb'][cut] = cutYield['tW'][cut]/math.sqrt(cutYield['total'][cut])
 
+cutYield['Data'] = {}
+emptyFile["data"] = []
 for sampleName in sampleData:
-    
-
-
+    if inDirData == "": continue
+    logFiles = [f for f in os.listdir(inDirData+sampleName+"/logs/") if "log" in f and "#" not in f]
+    for logFileName in logFiles:
+        logFile = open(inDirData+sampleName+"/logs/"+logFileName,'r')
+        for line in logFile:
+            if not len(line.split("|")) == 7: continue
+            cut = line.split("|")[1]
+            if "Min" in cut or "Max" in cut: continue
+            if not cut in cutOrder:
+                cutOrder.append(cut)
+            if cut == "                                ":
+                cutYield['Data'][cut] = "Data"
+                continue
+            if "PV" in cut:
+                nEvt = float(line.split("|")[5])
+                if nEvt == 0:                            
+                    emptyFile["data"].append(inDirData+sampleName+"/logs/"+logFileName)
+            if cut in cutYield["Data"].keys():
+                cutYield["Data"][cut] += float(line.split("|")[5])
+            else:
+                cutYield["Data"][cut] = float(line.split("|")[5])
+                
     print sample
 
 tableDict = {"                             PV ":"Primary Vertex      ",
@@ -110,3 +139,11 @@ for cut in cutOrder:
     if inDirData == "": print " \t&",cutYield["total"][cut]," \t&",cutYield['totalMinusQCD'][cut]," \t&"," \t&",cutYield['sOverb'][cut],
     else: print " \t&",cutYield["total"][cut]," \t&",cutYield['totalMinusQCD'][cut]," \t&",cutYield["Data"][cut]," \t&",cutYield['sOverb'][cut], 
     print "\t\\\\"
+
+print "empty log files"
+
+for sample in emptyFile.keys():
+    print sample
+    print "missing files: ", len(emptyFile[sample])
+    for i in emptyFile[sample]:
+        print i
