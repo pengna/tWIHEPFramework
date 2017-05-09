@@ -163,7 +163,8 @@ Bool_t CutPrimaryVertex::Apply()
 
   Bool_t passesMETFilterFlags = kTRUE;
 
-  if ( !EventContainerObj->Flag_goodVertices || !EventContainerObj->Flag_HBHENoiseFilter || !EventContainerObj->Flag_HBHENoiseIsoFilter || !EventContainerObj->Flag_EcalDeadCellTriggerPrimitiveFilter || !EventContainerObj->Flag_globalTightHalo2016Filter) passesMETFilterFlags = kFALSE;
+  //  if ( !EventContainerObj->Flag_goodVertices || !EventContainerObj->Flag_HBHENoiseFilter || !EventContainerObj->Flag_HBHENoiseIsoFilter || !EventContainerObj->Flag_EcalDeadCellTriggerPrimitiveFilter || !EventContainerObj->Flag_globalTightHalo2016Filter) passesMETFilterFlags = kFALSE; //2016 version. 2016 halo filter not currently in full production, will be added next crab round.
+  if ( !EventContainerObj->Flag_goodVertices || !EventContainerObj->Flag_HBHENoiseFilter || !EventContainerObj->Flag_HBHENoiseIsoFilter || !EventContainerObj->Flag_EcalDeadCellTriggerPrimitiveFilter || !EventContainerObj->Flag_CSCTightHaloFilter) passesMETFilterFlags = kFALSE; //old halo filter. Will be changed after re-crab.
 
   //  if (!EventContainerObj->Flag_METFilters) passesMETFilterFlags = kFALSE;
 
@@ -178,7 +179,6 @@ Bool_t CutPrimaryVertex::Apply()
     hasPV = kTRUE;
   }
   //cout << endl;
-
   GetEventContainer()->SetnPvt(tmpCounter);
 
   // Fill the histograms before the cuts
