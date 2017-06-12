@@ -129,9 +129,9 @@ BDTVars::BDTVars(bool makeHistos){
   _floatVars["M_Eta_Jet1_4000e24"] = -6.;
   _floatVars["M_Phi_Jet1_4000e24"] = -3.2;
   
-  _floatVars["M_Mass_Lepton"] = 0;
-  _floatVars["M_E_Lepton"] = 0;
-  _floatVars["M_Pt_Lepton"] = 0;
+  _floatVars["M_Mass_Lepton"] = 100.;
+  _floatVars["M_E_Lepton"] = 200.;
+  _floatVars["M_Pt_Lepton"] = 300.;
   _floatVars["M_Eta_Lepton"] = -6.;
   _floatVars["M_Phi_Lepton"] = -3.2;
   _floatVars["M_Pt_sys"] = 300;
@@ -382,6 +382,9 @@ BDTVars::BDTVars(bool makeHistos){
   _floatVars["secondJetCSV"] = 1.;
   _floatVars["thirdJetCSV"] = 1.;
   
+  _floatVars["taggedJetCSV"] = 1.;
+  _floatVars["lightJet1CSV"] = 1.;
+  _floatVars["lightJet2CSV"] = 1.;
   
   _floatVars["M_hadronicWmass"] = 500.;
   
@@ -396,6 +399,10 @@ BDTVars::BDTVars(bool makeHistos){
   _floatVars["M_topMass2_lep"] = 500.;
   _floatVars["M_topMassLep_had"] = 500.;
   
+  _floatVars["M_cosThetaStar"] = -1.;
+  _floatVars["M_cosThetaStar_lepOnly"] = -1.;
+  _floatVars["M_cosThetaStar_hadOnly"] = -1.;
+
   _floatVars["M_DeltaRlightjets"] = 6.;
   
   _floatVars["M_DeltaRBJethadronicW"] = 6.;
@@ -931,6 +938,13 @@ void BDTVars::FillBranches(EventContainer * evtObj){
     if (evtObj->jets.size() > 1) _floatVars["secondJetCSV"] = evtObj->jets[1].GetbDiscriminator();
     if (evtObj->jets.size() > 2) _floatVars["thirdJetCSV"] = evtObj->jets[2].GetbDiscriminator();
     
+    _floatVars["taggedJetCSV"] = -1;
+    _floatVars["lightJet1CSV"] = -1;
+    _floatVars["lightJet2CSV"] = -1;
+    if (evtObj->taggedJets.size() > 0) _floatVars["taggedJetCSV"] = evtObj->taggedJets[0].GetbDiscriminator();
+    if (evtObj->unTaggedJets.size() > 0) _floatVars["lightJet1CSV"] = evtObj->unTaggedJets[0].GetbDiscriminator();
+    if (evtObj->unTaggedJets.size() > 0) _floatVars["lightJet2CSV"] = evtObj->unTaggedJets[1].GetbDiscriminator();
+
     std::vector<TLorentzVector> lightJets;
     TLorentzVector W(0,0,0,0), Top(0,0,0,0);
     for (unsigned int i = 0; i < 3; i++){
@@ -957,22 +971,39 @@ void BDTVars::FillBranches(EventContainer * evtObj){
     _floatVars["M_DeltaRBJetLepton"] = fabs(Jet.at(selectedBJetIndex).DeltaR(Lepton));
     _floatVars["M_DeltaRlightjets"] = fabs(lightJets.at(0).DeltaR(lightJets.at(1)));
 
+    _floatVars["M_cosThetaStar_lepOnly"] = -5.;
+    _floatVars["M_cosThetaStar_hadOnly"] = -5.;
+
     if(Jet.at(selectedBJetIndex).DeltaR(Lepton)>Jet.at(selectedBJetIndex).DeltaR(W)) {
-      Top = W + Jet.at(selectedBJetIndex);
-      _floatVars["M_topMass2"] = Top.M();
-      _floatVars["M_topMassLep"] = -1;
+      //Top is hadronic
+      
+      //Do the wrong top things first
       Top = Lepton + Jet.at(selectedBJetIndex) + Miss;
       _floatVars["M_topMass2_lep"] = -1;
       _floatVars["M_topMassLep_had"] = Top.M();
+      //Then apply the correct one.
+      Top = W + Jet.at(selectedBJetIndex);
+      _floatVars["M_topMass2"] = Top.M();
+      _floatVars["M_topMassLep"] = -1;
     }
-    else {
+    else { //Top is leptonic
+      Top = W + Jet.at(selectedBJetIndex); //fill the hadronic ones first
+      _floatVars["M_topMass2_lep"] = Top.M();
+      _floatVars["M_topMassLep_had"] = -1;
+
+      //Now fill the leptonic top variables
       Top = Lepton + Jet.at(selectedBJetIndex) + Miss;
       _floatVars["M_topMass2"] = -1;
       _floatVars["M_topMassLep"] = Top.M();
-      Top = W + Jet.at(selectedBJetIndex);
-      _floatVars["M_topMass2_lep"] = Top.M();
-      _floatVars["M_topMassLep_had"] = -1;
     }
+    TLorentzVector W_topRF = W;
+    TLorentzVector lep_wRF = Lepton;
+    
+    W_topRF.Boost( TVector3(-1.0*Top.BoostVector().Px(), -1.0*Top.BoostVector().Py(), -1.0*Top.BoostVector().Pz()));
+    lep_wRF.Boost( TVector3(-1.0*W.BoostVector().Px(), -1.0*W.BoostVector().Py(), -1.0*W.BoostVector().Pz()));
+    _floatVars["M_cosThetaStar"] = cos(lep_wRF.Vect().Angle(W_topRF.Vect()));
+    if(Jet.at(selectedBJetIndex).DeltaR(Lepton)>Jet.at(selectedBJetIndex).DeltaR(W)) _floatVars["M_cosThetaStar_hadOnly"] = cos(lep_wRF.Vect().Angle(W_topRF.Vect()));
+    else _floatVars["M_cosThetaStar_lepOnly"] = cos(lep_wRF.Vect().Angle(W_topRF.Vect()));
     
   } //end 3 jet loop
 
