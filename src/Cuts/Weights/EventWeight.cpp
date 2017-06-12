@@ -206,7 +206,7 @@ void EventWeight::BookHistogram()
   _hMCatNLOWeight -> SetYAxisTitle("Events");
 
   // Histogram of pile up Weight(vtx). This is one of the global weights
-  _hPileUpWeight =  DeclareTH1F("PileUpWgtWeight","Event Weight for PileUpWgt",100,0.,10.);
+  _hPileUpWeight =  DeclareTH1F("PileUpWgtWeight","Event Weight for PileUpWgt",100,-10.,10.);
   _hPileUpWeight -> SetXAxisTitle("PileUpWgt Weight");
   _hPileUpWeight -> SetYAxisTitle("Events");
 
@@ -329,7 +329,7 @@ Bool_t EventWeight::Apply()
     wgt *= mnwgt;
     _hMCatNLOWeight->FillWithoutWeight(mnwgt);
   }
-
+  
   // multiply by PileUpWgt weight if desired.
  float pileupEventWeight(-1.0);
  float pileupMinBiasUpWeight(-1.0);
@@ -369,6 +369,11 @@ Bool_t EventWeight::Apply()
        pileupMinBiasDownWeight = _minBiasDownPV->GetBinContent(tree->trueInteractions) / _mcPV->GetBinContent(tree->trueInteractions);
      }
    }
+   else {
+     pileupEventWeight = 1.;
+     pileupMinBiasUpWeight = 1.;
+     pileupMinBiasDownWeight = 1.;
+   }
    wgt *= pileupEventWeight;
  }
 
@@ -378,7 +383,7 @@ Bool_t EventWeight::Apply()
    bEventWeight = tree->bWeight;
    wgt *= bEventWeight;
  }
-
+  
  
  float lepSFWeight(1.0), lepSFWeightUp(1.0), lepSFWeightDown(1.0);
 
@@ -386,6 +391,7 @@ Bool_t EventWeight::Apply()
    std::tie(lepSFWeight,lepSFWeightUp,lepSFWeightDown) = getLeptonWeight(EventContainerObj);
    wgt *= lepSFWeight;
  }
+  
 
  std::map<std::string,float> bTagReshape;
 
@@ -393,6 +399,7 @@ Bool_t EventWeight::Apply()
    for (auto const bSystName: _bTagSystNames) bTagReshape[bSystName] = getBTagReshape(EventContainerObj,bSystName);
    wgt *= bTagReshape["central"];
  }
+  
 
  // if(isPileUpWgt()) {
     //This version is based on primary vertex number and no longer used
