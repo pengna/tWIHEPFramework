@@ -280,3 +280,11 @@ Events.Source.500024: 155235652
 #500025 = second ttbar dataset
 Weight.Source.500025: 831.76
 Events.Source.500025: 155235652
+
+#500026 = not fully hadronic tW
+Weight.Source.500026: 19.559
+Events.Source.500026: 11345619
+
+#500027 = not fully hadronic tW_antitop
+Weight.Source.500027: 19.559
+Events.Source.500027: 11408144
