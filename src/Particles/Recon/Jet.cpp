@@ -543,8 +543,12 @@ void Jet::SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met){
   met->SetPx(met->Px() + Px());
   met->SetPy(met->Py() + Py());
   //Apply the correction
+  std::cout << Px() << " " << Py() << " " << Pt() << std::endl;
   SetPx(Px()*ptSF);
   SetPy(Py()*ptSF);
+  SetPz(Pz()*ptSF);
+  std::cout << Px() << " " << Py() << " " << Pt() << std::endl << std::endl;
+  
   //Propagate to MET
   met->SetPx(met->Px() - Px());
   met->SetPy(met->Py() - Py());
