@@ -227,6 +227,11 @@ void EventWeight::BookHistogram()
     _hbTagReshape[bTagSystName] -> SetXAxisTitle("bTag Reshape " + bTagSystName);
     _hbTagReshape[bTagSystName] -> SetYAxisTitle("Events");
   }
+
+  //Create the histograms to show the gen weight of the sample.
+  _hGenWeight = DeclareTH1F("genWeight","Generator level event weight",10,-2.,2.);
+  _hGenWeight -> SetXAxisTitle("Gen Weight");
+  _hGenWeight -> SetYAxisTitle("Events");
     
   // Histogram of Output Weights
   _hOutputWeight =  DeclareTH1F("OutputWeight","Output Event Weight",100,-10.,10.);
@@ -330,6 +335,11 @@ Bool_t EventWeight::Apply()
     _hMCatNLOWeight->FillWithoutWeight(mnwgt);
   }
   
+  float genWeight(1.0);
+  if (tree->EVENT_genWeight < 0.) genWeight = -1.;
+
+  wgt *= genWeight;
+
   // multiply by PileUpWgt weight if desired.
  float pileupEventWeight(-1.0);
  float pileupMinBiasUpWeight(-1.0);
@@ -423,6 +433,7 @@ Bool_t EventWeight::Apply()
   EventContainerObj -> SetEventPileupMinBiasDownWeight(pileupMinBiasDownWeight);
   EventContainerObj -> SetEventbWeight(bEventWeight);
   EventContainerObj -> SetEventLepSFWeight(lepSFWeight);
+  EventContainerObj -> SetGenWeight(genWeight);
   for (auto const bSystName: _bTagSystNames) EventContainerObj -> SetEventbTagReshape(bTagReshape[bSystName],bSystName);
 
   EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
@@ -440,6 +451,7 @@ Bool_t EventWeight::Apply()
   _hPileUpWeight   -> FillWithoutWeight(EventContainerObj -> GetEventPileupWeight());
   _hbWeight	   -> FillWithoutWeight(EventContainerObj -> GetEventbWeight());
   _hLeptonSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventLepSFWeight());
+  _hGenWeight	   -> FillWithoutWeight(EventContainerObj -> GetGenWeight());
   for (auto const bSystName: _bTagSystNames) _hbTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventbTagReshape(bSystName));
 
   return kTRUE;
@@ -521,7 +533,7 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContain
     if (std::fabs(muon.Eta()) > 2.4) yAxisBinTrig = _muonTrigSF->GetYaxis()->FindBin(2.39);
     //Get the trigSF
     Float_t trigSF = _muonTrigSF->GetBinContent(xAxisBinTrig,yAxisBinTrig);
-    Float_t trigUnc = _muonTrigSF->GetBinContent(xAxisBinTrig,yAxisBinTrig);
+    Float_t trigUnc = _muonTrigSF->GetBinError(xAxisBinTrig,yAxisBinTrig);
 
     //Evaluate muon tk
     Float_t tkSF = _muonTkSF->Eval(std::fabs(muon.Eta()));

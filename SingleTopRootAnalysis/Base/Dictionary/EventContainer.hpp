@@ -350,6 +350,11 @@ class EventContainer
   inline Double_t GetEventbTagReshape(std::string systName = "central") {return _EventbTagReshape[systName];};
   inline Double_t EventbTagReshape() {return GetEventbTagReshape();};
 
+  //Gen weight for event (actually just up or down)
+  inline void SetGenWeight(const Double_t& genWeight) {_EventGenWeight = genWeight;};
+  inline Double_t GetGenWeight() const {return _EventGenWeight;};
+  inline Double_t GenWeight() const {return GetGenWeight();};
+
  //Tagging probabiliy weight per event
   inline void SetEventTagWeight(const Double_t& taggingweight) {_EventTagWeight = taggingweight;}; //tagging prob per event
   inline Double_t GetEventTagWeight() const {return _EventTagWeight;}; 
@@ -414,6 +419,7 @@ class EventContainer
   Float_t _EventPileupMinBiasDownWeight;
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventLepSFWeight;
+  Float_t _EventGenWeight;
   std::map<std::string,Float_t> _EventbTagReshape;
 
   //Add in the systematic variations to the SFs

@@ -92,6 +92,7 @@ private:
   myTH1F* _hbWeight; // Histogram of b weight
   myTH1F* _hLeptonSFWeight; //Histogram of the lepton SF claculated for the event
   std::map<std::string,myTH1F*> _hbTagReshape; //Map of histograms containing the information for b tag reshaping and its associated systematics
+  myTH1F* _hGenWeight; //Histogram of the gen weight for the event
   myTH1F* _hOutputWeight; // Histogram of output weights
   Double_t _totalMCatNLOEvents;
   BTagCalibration _bTagCalib;

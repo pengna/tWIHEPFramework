@@ -544,13 +544,14 @@ Int_t EventContainer::ReadEvent()
     if (_metShift != 0){
       float oldEt = missingEt;
       missingEt = (_metShift == 1) ? _eventTree->Met_type1PF_shiftedPtUp : _eventTree->Met_type1PF_shiftedPtDown;
-      missingEx *= missingEt/oldEt;
-      missingEy *= missingEt/oldEt;
 
-      float oldEt_xy = missingEt_xy;
-      missingEt_xy = (_metShift == 1) ? _eventTree->Met_type1PF_shiftedPtUp : _eventTree->Met_type1PF_shiftedPtDown;
-      missingEx_xy *= missingEt_xy/oldEt_xy;
-      missingEy_xy *= missingEt_xy/oldEt_xy;
+      float ratioSF = missingEt/oldEt;
+      missingEx *= ratioSF;
+      missingEy *= ratioSF;
+
+      missingEt_xy *= ratioSF;
+      missingEx_xy *= ratioSF;
+      missingEy_xy *= ratioSF;
     }
 
     missingEtVec.SetPtEtaPhiE(missingEt,0.,missingPhi,missingEt);
