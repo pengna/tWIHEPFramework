@@ -10,24 +10,63 @@ samples=[
 "qcd500_700",
 "qcd700_1000",
 "sChan",
-"tChan",
+"tChan_top",
+"tChan_antitop",
 "ttbar",
+"ttbarBU",
 "tW_top",
 "tW_antitop",
-"wPlusJets",
 "ww",
 "wz",
 "zz",
 "zPlusJetsLowMass",
 "zPlusJetsHighMass",
 "wPlusJetsMCatNLO",
-"singleMuon",
+"tW_top_nfh",
+"tW_antitop_nfh"
+]
+
+dataSamples=[
 "SingMuB",
 "SingMuC",
 "SingMuD",
 "SingMuE",
 "SingMuF",
-"SingMuG"
+"SingMuG",
+"SingMuH"
+]
+
+samplesSyst = [
+"tW_antitop_DS",
+"tW_antitop_isrup",
+"tW_antitop_isrdown",
+"tW_antitop_fsrup",
+"tW_antitop_fsrdown",
+"tW_antitop_herwig",
+"tW_antitop_MEup",
+"tW_antitop_MEdown",
+"tW_antitop_PSup",
+"tW_antitop_PSdown",
+"tW_top_DS",
+"tW_top_isrup",
+"tW_top_isrdown",
+"tW_top_fsrup",
+"tW_top_fsrdown",
+"tW_top_herwig",
+"tW_top_MEup",
+"tW_top_MEdown",
+"tW_top_PSup",
+"tW_top_PSdown",
+"ttbar_isrup",
+"ttbar_isrdown",
+"ttbar_fsrup",
+"ttbar_fsrdown",
+"ttbar_tuneup",
+"ttbar_tunedown",
+"ttbar_herwig",
+"ttbar_amcatnlo",
+"ttbar_hdampup",
+"ttbar_hdampdown"
 ]
 
 nJobs = {
@@ -42,6 +81,7 @@ nJobs = {
 "sChan":3,
 "tChan":48,
 "ttbar":242,
+
 "tW_top":3,
 "tW_antitop":3,
 "wPlusJets":115,
@@ -51,28 +91,49 @@ nJobs = {
 "zPlusJetsLowMass":76,
 "zPlusJetsHighMass":69,
 "wPlusJetsMCatNLO":60,
-"singleMuon":108,
+"tW_top_nfh":20,
+"tW_antitop_nfh":10,
 "SingMuB":174,
 "SingMuC":58,
 "SingMuD":98,
 "SingMuE":83,
 "SingMuF":61,
-"SingMuG":132
+"SingMuG":132,
+"SingMuH":147
 }
-
-dirToCheck = sys.argv[1]
 
 missedFile = open("missingFiles.sh","w")
 
 missedFile.write("#!/bin/bash\n")
 
-for sample in samples:
-    print sample, nJobs[sample]
-    prefix = dirToCheck + sample
-    for i in range(nJobs[sample]):
-        if not os.path.exists(prefix + "/logs/"+sample+str(i)+".error"): continue
-        statinfo = os.stat(prefix + "/logs/"+sample+str(i)+".error")
-#        if statinfo.st_size < 1000 and statinfo.st_size > 10:
-        if statinfo.st_size < 10000:
-            print prefix + "/logs/"+sample+str(i)+".error"
-            missedFile.write("condor_submit "+prefix + "/scripts/"+sample+str(i)+".submit -group cms -name job@schedd01.ac.cn\n")
+
+dirsToCheck = ["tW/","tWInv/","tWData/","tWInvData/","tW2j1t/","tWInv2j1t/","tW2j1tData/","tWInv2j1tData/","tW3j2t/","tWInv3j2t/","tW3j2tData/","tWInv3j2tData/","tW3j0t/","tWInv3j0t/","tW3j0tData/","tWInv3j0tData/","tWJESUp/","tWJESDown/","tWJERUp/","tWJERDown/","tWSysts/"]
+
+skippedDirs = []
+nErrorFiles = {}
+totalResubmits = 0
+
+for dirToCheck in dirsToCheck:
+    if not os.path.isdir(dirToCheck):
+        print "!!!!!!!!!!!!!!!!!!!! Skipping {0} directory which doesn't exist !!!!!!!!!!!!!!!!!!!!!!!!!!!!".format(dirToCheck)
+        skippedDirs.append(dirToCheck)
+        continue
+    print ">>>>>>>>>>>>>>>>> Executing over {0} directory <<<<<<<<<<<<<<<<".format(dirToCheck)
+    samplesToCheck = samples if not "Data" in dirToCheck else dataSamples
+    if "Syst" in dirToCheck: samplesToCheck = samplesSyst
+    nErrorFiles[dirToCheck] = 0
+    for sample in samplesToCheck:
+        print "Sample: {0}".format(sample)
+        prefix = dirToCheck + sample
+        files = [f for f in os.listdir(prefix + "/logs/") if "error" in f]
+        for errorFile in files:
+            if "Aborted" in open(prefix+"/logs/"+errorFile).read():
+                print prefix + "/logs/"+ errorFile
+                nErrorFiles[dirToCheck] += 1
+                totalResubmits += 1
+                missedFile.write("condor_submit "+prefix + "/scripts/"+errorFile.split(".error")[0]+".submit -group cms -name job@schedd01.ac.cn\n")
+
+print "Skipping the following directories: ", skippedDirs
+for dirChecked in dirsToCheck:
+    if dirChecked in nErrorFiles.keys(): print "There were {0} jobs to resubmit in {1} directory".format(nErrorFiles[dirChecked],dirChecked)
+print "There were {0} error files".format(totalResubmits)

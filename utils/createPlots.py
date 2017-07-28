@@ -21,26 +21,32 @@ perMCSFs = {}
 #perMCSFs['wPlusJets'] = 1.1282169724
 #perMCSFs["ttbar"] = 1.1830538502
 #perMCSFs['ttbar'] = 0.887389045755
-perMCSFs["qcd"] = 0.656613069407
-perMCSFs["ttbar"] = 2.*0.745811171792
-perMCSFs["wPlusJets"] = 1.12662454373
+
+perMCSFs["qcd"] = 0.837106815504
+perMCSFs["ttbar"] = 2.
+
+perMCSFs["ttbar"] = 2.*0.891728577865
+perMCSFs["wPlusJets"] = 3.44115208943
 
 perRegMCSFs = {}
 perRegMCSFs[""] = {}
 perRegMCSFs["3j2t"] = {}
 perRegMCSFs["2j1t"] = {}
-perRegMCSFs[""]["zPlusJets"] = 1.106
-perRegMCSFs["3j2t"]["singleTop"] = 1.033
-perRegMCSFs["2j1t"]["singleTop"] = 1.033
-perRegMCSFs["3j2t"]["wPlusJets"] = 1.009
-perRegMCSFs["2j1t"]["wPlusJets"] = 1.009
+#perRegMCSFs[""]["zPlusJets"] = 1.106
+#perRegMCSFs["3j2t"]["singleTop"] = 1.033
+#perRegMCSFs["2j1t"]["singleTop"] = 1.033
+#perRegMCSFs["3j2t"]["wPlusJets"] = 1.009
+#perRegMCSFs["2j1t"]["wPlusJets"] = 1.009
 
 
-nBinsForPlots = 40.
+nBinsForPlots = 20.
 
 masterMCScale = 12554./27217. #runs B-D scale
 masterMCScale = 1.
-masterMCScale = 27217./35900.
+#masterMCScale = 27217./35900.
+
+ratioMin = 0.5
+ratioMax = 1.5
 
 if len(sys.argv) > 3: 
     doData = True
@@ -96,14 +102,15 @@ text2.SetTextSize(0.0610687)
 #samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 samples = ["tW_top","tW_antitop","tChan_top","tChan_antitop","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
+samples = ["tW_top_nfh","tW_antitop_nfh","tChan_top","tChan_antitop","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 #samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","wPlusJetsMCatNLO","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 #samples = ["tW_top","tW_antitop","tChan","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJets","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200"]
 #samples = ["tW_top","tW_antitop","tChan","zz","wz","ww","ttbar","qcd700_1000","qcd500_700","qcd300_500","qcd200_300","qcd2000_inf","qcd1500_2000","qcd100_200","qcd1000_1500"]
 hists = ["singleTop","VV","ttbar","wPlusJets","zPlusJets","qcd","tW"]
 #hists = ["tW","singleTop","VV","ttbar","qcd"]
 
-histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan":"singleTop","zz":"VV","zPlusJetsLowMass":"zPlusJets","zPlusJetsHighMass":"zPlusJets","wz":"VV","ww":"VV","wPlusJets":"wPlusJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd","wPlusJetsMCatNLO":"wPlusJets","tChan_top":"singleTop","tChan_antitop":"singleTop","ttbarBU":"ttbar"}
-colourPerSample = {"tW_top":kGreen+2,"tW_antitop":kGreen+2,"tChan":kYellow,"zPlusJetsLowMass":kBlue,"zPlusJetsHighMass":kBlue,"wz":kPink,"ww":kPink,"zz":kPink,"wPlusJets":kTeal,"ttbar":kRed,"qcd700_1000":kGray,"qcd500_700":kGray,"qcd300_500":kGray,"qcd200_300":kGray,"qcd2000_inf":kGray,"qcd1500_2000":kGray,"qcd100_200":kGray,"qcd1000_1500":kGray,"sChan":kOrange,"VV":kPink,"qcd":kGray,"tW":kGreen+2,"zPlusJets":kBlue,"singleTop":kYellow}
+histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan":"singleTop","zz":"VV","zPlusJetsLowMass":"zPlusJets","zPlusJetsHighMass":"zPlusJets","wz":"VV","ww":"VV","wPlusJets":"wPlusJets","ttbar":"ttbar","qcd700_1000":"qcd","qcd500_700":"qcd","qcd300_500":"qcd","qcd200_300":"qcd","qcd2000_inf":"qcd","qcd1500_2000":"qcd","qcd100_200":"qcd","qcd1000_1500":"qcd","wPlusJetsMCatNLO":"wPlusJets","tChan_top":"singleTop","tChan_antitop":"singleTop","ttbarBU":"ttbar","tW_top_nfh":"tW","tW_antitop_nfh":"tW"}
+colourPerSample = {"tW_top":kGreen+2,"tW_antitop":kGreen+2,"tW_top_nfh":kGreen+2,"tW_antitop_nfh":kGreen+2,"tChan":kYellow,"zPlusJetsLowMass":kBlue,"zPlusJetsHighMass":kBlue,"wz":kPink,"ww":kPink,"zz":kPink,"wPlusJets":kTeal,"ttbar":kRed,"qcd700_1000":kGray,"qcd500_700":kGray,"qcd300_500":kGray,"qcd200_300":kGray,"qcd2000_inf":kGray,"qcd1500_2000":kGray,"qcd100_200":kGray,"qcd1000_1500":kGray,"sChan":kOrange,"VV":kPink,"qcd":kGray,"tW":kGreen+2,"zPlusJets":kBlue,"singleTop":kYellow}
 
 reducedHists = ["tW","ttbar","zPlusJets"]
 #reducedHists = ["tW","ttbar"]
@@ -121,10 +128,10 @@ if useQCD: inFiles['qcdData'] = TFile(qcdFolder+"/singleMuon/hists/mergedsingleM
 
 plotPaths = []
 
-print inFiles.keys()
+#print inFiles.keys()
 
-for obj in inFiles["tW_top"].GetListOfKeys():
-    tempThing = inFiles["tW_top"].Get(obj.GetName())
+for obj in inFiles["tW_top_nfh"].GetListOfKeys():
+    tempThing = inFiles["tW_top_nfh"].Get(obj.GetName())
     print obj.GetName()
     if not tempThing.ClassName().find("TH1") == -1 : plotPaths.append(tempThing.GetName())
     if not tempThing.ClassName().find("Directory") == -1:
@@ -138,8 +145,9 @@ for obj in inFiles["tW_top"].GetListOfKeys():
 
 #ignorePlots = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23"]
 ignorePlots = ["01","02","03","04","05","10","23"]
-ignorePlots = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","23"]
-ignorePlots = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","21","22","23"]
+ignorePlots = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","24"]
+#ignorePlots = ["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","20","23"]ignorePlots = ["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"]
+#ignorePlots = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"]
 ignorePlots += ["Jet4","Jet5","Jet6","Jet7"]
 
 for plotName in plotPaths:
@@ -173,7 +181,8 @@ for plotName in plotPaths:
     for sample in samples:
         if histoGramPerSample[sample] in histMap.keys():
             if "2000_inf" in sample and "BDTVars" in plotName: continue
- #           if not inFiles[sample].Get(plotName): continue
+            #           if not inFiles[sample].Get(plotName): continue
+            #print sample
             histMap[histoGramPerSample[sample]].Add(inFiles[sample].Get(plotName))
         else:
             histMap[histoGramPerSample[sample]] = inFiles[sample].Get(plotName)
@@ -249,7 +258,7 @@ for plotName in plotPaths:
         histMap[histName].Scale(masterMCScale)
         #Now do per MC scaling if there's a SF in there somewhere
         if histName in perMCSFs.keys():
-            print histName, "rescaling",perMCSFs[histName]
+            #print histName, "rescaling",perMCSFs[histName]
             histMap[histName].Scale(perMCSFs[histName])
         if "2j1t" in inDir:
             if histName in perRegMCSFs["2j1t"].keys():
@@ -264,6 +273,8 @@ for plotName in plotPaths:
         if histMap[histName].GetXaxis().GetNbins() > int(nBinsForPlots):
             rebin = int(histMap[histName].GetXaxis().GetNbins() / nBinsForPlots)
             histMap[histName].Rebin(rebin)
+        #Now grab the systematic variations per sample
+
 #        if "MET" in plotName: histMap[histName].Rebin(4)
 
 #    hists.reverse()
@@ -274,7 +285,7 @@ for plotName in plotPaths:
 
     for histName in hists:
         mcstack.Add(histMap[histName])
-        print histName,histMap[histName].Integral()
+#        print histName,histMap[histName].Integral()
         sumHistoMC.Add(histMap[histName])
 
 
@@ -314,7 +325,7 @@ for plotName in plotPaths:
     latex.SetTextSize(0.04*0.76)
     latex.DrawLatex(0.35, 0.95 , extraText )
     
-    latex2.DrawLatex(0.95, 0.95, "27.2 fb^{-1} (13TeV)");
+    latex2.DrawLatex(0.95, 0.95, "35.9 fb^{-1} (13TeV)");
     
     text2.Draw()
     
@@ -341,8 +352,8 @@ for plotName in plotPaths:
         sumHistoData.GetYaxis().SetTitleOffset(1.3)
         ratioCanvy.cd()
         SetOwnership(sumHistoData,False)
-        sumHistoData.SetMinimum(0.0)
-        sumHistoData.SetMaximum(2.0)
+        sumHistoData.SetMinimum(ratioMin)
+        sumHistoData.SetMaximum(ratioMax)
         sumHistoData.GetXaxis().SetTitleOffset(1.2)
         sumHistoData.GetXaxis().SetLabelSize(0.04)
         sumHistoData.GetYaxis().SetNdivisions(6)

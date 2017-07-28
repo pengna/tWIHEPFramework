@@ -13,7 +13,8 @@ datasets = ["tW_top","tW_antitop","ttbar","ww","wz","zz","zPlusJetsHighMass","zP
 #datasets = ["SingMuB","SingMuC","SingMuD","SingMuE","SingMuF","SingMuG"]
 #datasets = ["singleMuon"]
 datasets = ["ttbar","ttbarBU"]
-datasetID = {"tW_top":500000,"tW_antitop":500001,"ttbar":500024,"ww":500007,"wz":500008,"zz":500009,"zPlusJetsHighMass":500004,"zPlusJetsLowMass":500005,"tChan":500002,"sChan":500010,"wPlusJets":500006,"qcd100_200":500011,"qcd200_300":500012,"qcd300_500":500013,"qcd500_700":500014,"qcd700_1000":500015,"qcd1000_1500":500016,"qcd1500_2000":500017,"qcd2000_inf":500018,"wPlusJetsMCatNLO":500019,"tChan_antitop":500020,"tChan_top":500021,"SingMuB":400000,"SingMuB_1":400007,"SingMuC":400001,"SingMuD":400002,"SingMuE":400003,"SingMuF":400004,"SingMuG":400005,"SingMuG_1":400008,"SingMuH":400006,"ttbarBU":500025}
+datasets = ["tW_top_nfh","tW_antitop_nfh","SingMuH"]
+datasetID = {"tW_top":500000,"tW_antitop":500001,"ttbar":500024,"ww":500007,"wz":500008,"zz":500009,"zPlusJetsHighMass":500004,"zPlusJetsLowMass":500005,"tChan":500002,"sChan":500010,"wPlusJets":500006,"qcd100_200":500011,"qcd200_300":500012,"qcd300_500":500013,"qcd500_700":500014,"qcd700_1000":500015,"qcd1000_1500":500016,"qcd1500_2000":500017,"qcd2000_inf":500018,"wPlusJetsMCatNLO":500019,"tChan_antitop":500020,"tChan_top":500021,"SingMuB":400000,"SingMuB_1":400007,"SingMuC":400001,"SingMuD":400002,"SingMuE":400003,"SingMuF":400004,"SingMuG":400005,"SingMuG_1":400008,"SingMuH":400006,"ttbarBU":500025,"tW_top_nfh":500026,"tW_antitop_nfh":500027}
 nFilesDataset = {"tW_top":14,"tW_antitop":17,"ttbar":983,"ww":11,"wz":30,"zz":12,"zPlusJetsHighMass":477,"zPlusJetsLowMass":237,"tChan":478,"sChan":21,"wPlusJets":422,"qcd100_200":738,"qcd200_300":179,"qcd300_500":199,"qcd500_700":210,"qcd700_1000":184,"qcd1000_1500":90,"qcd1500_2000":80,"qcd2000_inf":36,"singleMuon":1072,"wPlusJetsMCatNLO":300,"tChan_antitop":406,"tChan_top":723,"SingMuB":1756,"SingMuB_1":740,"SingMuC":580,"SingMuD":972,"SingMuE":826,"SingMuF":603,"SingMuG":1423,"SingMuG_1":320,"ttbarBU":1192}
 datasetDirs = {"tW_top":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/crab_tW_topReTrig/170210_081934/0000/"],
 "tW_antitop":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M2T4/crab_tW_antitopReTrig/170210_082043/0000/"],
@@ -45,7 +46,11 @@ datasetDirs = {"tW_top":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond
 "SingMuD":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuDReTrig/170210_105844/0000/"],
 "SingMuE":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuEReTrig/170210_102817/0000/"],
 "SingMuF":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuFReTrig/170210_083759/0000/"],
-"SingMuG":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuGReTrig/170210_084032/0000/","/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuGReTrig/170210_084032/0001/"]
+"SingMuG":["/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuGReTrig/170210_084032/0000/","/acfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuGReTrig/170210_084032/0001/"],
+"tW_top_nfh":["/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/crab_tW_top_NFHReTrig/170602_140456/0000/","/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/crab_tW_top_NFHext1ReTrig/170602_140615/0000/","/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/crab_tW_top_NFHext2ReTrig/170602_140730/0000/"],
+"tW_antitop_nfh":["/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/crab_tW_antitop_NFHReTrig/170602_140845/0000/","/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/crab_tW_antitop_NFHext1ReTrig/170602_141003/0000/","/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/mc/ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/crab_tW_antitop_NFHext2ReTrig/170602_141119/0000/"],
+"SingMuH":["/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuHReTrig/170210_084205/0000/","/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuH2ReTrig/170425_131349/0000/","/publicfs/cms/data/TopQuark/cms13TeV/tWlJetSamples/moriond17/data/SingleMuon/crab_SingMuH2ReTrig/170425_131349/0001/"]
+
 }
 
 import sys, math, mmap, subprocess
@@ -63,6 +68,25 @@ if finishCopyScripts:
     print copyScript.write("#!/bin/bash\n")
 
 for dataset in datasets:
+    
+    fileList = []
+    for datasetDir in datasetDirs[dataset]:
+        fileList += [os.path.join(datasetDir,f) for f in os.listdir(datasetDir) if ".root" in f]
+    nJobs = int(math.ceil(len(fileList)/namesPerFile))
+    print ("Dataset: {0}, ID: {1}. Number of jobs created = {2}".format(dataset,datasetID[dataset],nJobs))
+    nFile = 0
+    for i in range(nJobs):
+        currentFile = open(outputDirectory + dataset + str(i) + ".list","w")
+        currentFile.write("Name: " + dataset)
+        currentFile.write("\nNumber: " + str(datasetID[dataset]) + "_1\n")
+        for j in range(namesPerFile):
+            if nFile >= len(fileList): continue
+            currentFile.write(fileList[nFile]+"\n")
+            nFile+=1
+        currentFile.close()
+        
+    continue
+
     nJobs = int(math.ceil(nFilesDataset[dataset]/namesPerFile))
     print ("Dataset: {0}, ID: {1}. Number of jobs created = {2}".format(dataset,datasetID[dataset],nJobs))
 #    if os.path.exists("config/files/full80X/"+dataset+".list"): subprocess.call("rm config/files/full80X/"+dataset+".list",shell=True)

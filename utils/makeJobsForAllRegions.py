@@ -18,3 +18,6 @@ for i in [""," data"]:
 #        for j in [""]:
             print "maketWSubmit.py"+i+k+j
             subprocess.call( "python "+baseDir+"utils/maketWSubmit.py skims"+i+k+j,shell=True)
+
+for i in ["jesUp","jesDown","jerUp","jerDown"]:
+    subprocess.call( "python "+baseDir+"utils/maketWSubmit.py skims "+i,shell=True)

@@ -57,7 +57,9 @@ samplesMC=[
 "zz",
 "zPlusJetsLowMass",
 "zPlusJetsHighMass",
-"wPlusJetsMCatNLO"
+"wPlusJetsMCatNLO",
+"tW_top_nfh",
+"tW_antitop_nfh"
 ]
 samplesData2015=[
 "singleMuon"
@@ -69,7 +71,42 @@ samplesData=[
 "SingMuE",
 "SingMuF",
 "SingMuG",
+"SingMuH"
 ]
+samplesSyst = [
+"tW_antitop_DS",
+"tW_antitop_isrup",
+"tW_antitop_isrdown",
+"tW_antitop_fsrup",
+"tW_antitop_fsrdown",
+"tW_antitop_herwig",
+"tW_antitop_MEup",
+"tW_antitop_MEdown",
+"tW_antitop_PSup",
+"tW_antitop_PSdown",
+"tW_top_DS",
+"tW_top_isrup",
+"tW_top_isrdown",
+"tW_top_fsrup",
+"tW_top_fsrdown",
+"tW_top_herwig",
+"tW_top_MEup",
+"tW_top_MEdown",
+"tW_top_PSup",
+"tW_top_PSdown",
+"ttbar_isrup",
+"ttbar_isrdown",
+"ttbar_fsrup",
+"ttbar_fsrdown",
+"ttbar_tuneup",
+"ttbar_tunedown",
+"ttbar_herwig",
+"ttbar_amcatnlo",
+"ttbar_hdampup",
+"ttbar_hdampdown"
+]
+
+fileListDirectory = "moriond17/"
 sample = samplesMC
 if "inv" in sys.argv:
 	invPostfix = " -InvertIsolation"
@@ -83,6 +120,18 @@ if "ttbarReg" in sys.argv:
 if "wJets2" in sys.argv:
 	configFile = "config/overall/wJets2j1t.config"
 	analysis += "2j1t"
+if "jesUp" in sys.argv:
+	configFile = "config/overall/signal3j1tJESUp.config"
+	analysis += "JESUp"
+if "jesDown" in sys.argv:
+	configFile = "config/overall/signal3j1tJESDown.config"
+	analysis += "JESDown"
+if "jerUp" in sys.argv:
+	configFile = "config/overall/signal3j1tJERUp.config"
+	analysis += "JERUp"
+if "jerDown" in sys.argv:
+	configFile = "config/overall/signal3j1tJERDown.config"
+	analysis += "JERDown"
 if "wJetsReg" in sys.argv and "ttbarReg" in sys.argv:
 	print "Please only use one of ttbar and wJets -Reg! Exiting..."
 	sys.exit()
@@ -90,6 +139,10 @@ if "data" in sys.argv:
 	mcPostfix = ""
 	analysis += "Data"
 	sample = samplesData
+if "systs" in sys.argv:
+	analysis += "Systs"
+	sample = samplesSyst
+	fileListDirectory = "systSamples/"
 if "skims" in sys.argv:
 	makeSkims = True 
 #executable = "Wt_generic.x"
@@ -97,7 +150,6 @@ if "skims" in sys.argv:
 workpath    = os.getcwd()+"/"+analysis +"/"
 frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
 jobDir      = workpath+"/"+"Jobs"
-fileListDirectory = "moriond17/"
 smallerJobs = True
 AnalyzerDir = workpath+"/"+"Analyzer"
 task        = analysis+"_"+taskname
@@ -124,6 +176,8 @@ nJobs = {
 "ww":2,
 "wz":3,
 "zz":2,
+"tW_top_nfh":20,
+"tW_antitop_nfh":19,
 "zPlusJetsLowMass":24,
 "zPlusJetsHighMass":48,
 "wPlusJetsMCatNLO":30,
@@ -132,8 +186,40 @@ nJobs = {
 "SingMuD":98,
 "SingMuE":83,
 "SingMuF":61,
-"SingMuG":143
+"SingMuG":143,
+"SingMuH":147,
+"tW_antitop_DS":9,
+"tW_antitop_isrup":10,
+"tW_antitop_isrdown":8,
+"tW_antitop_fsrup":7,
+"tW_antitop_fsrdown":11,
+"tW_antitop_herwig":8,
+"tW_antitop_MEup":5,
+"tW_antitop_MEdown":6,
+"tW_antitop_PSup":5,
+"tW_antitop_PSdown":4,
+"tW_top_DS":9,
+"tW_top_isrup":8,
+"tW_top_isrdown":11,
+"tW_top_fsrup":9,
+"tW_top_fsrdown":7,
+"tW_top_herwig":10,
+"tW_top_MEup":9,
+"tW_top_MEdown":9,
+"tW_top_PSup":8,
+"tW_top_PSdown":10,
+"ttbar_isrup":76,
+"ttbar_isrdown":35,
+"ttbar_fsrup":39,
+"ttbar_fsrdown":42,
+"ttbar_tuneup":38,
+"ttbar_tunedown":40,
+"ttbar_herwig":46,
+"ttbar_amcatnlo":88,
+"ttbar_hdampup":59,
+"ttbar_hdampdown":5
 }
+
 nJobsSum16 = {
 "qcd1000_1500":12,
 "qcd100_200":54,
