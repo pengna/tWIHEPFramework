@@ -237,6 +237,8 @@ int main(int argc, char **argv)
   
   mystudy.AddCut(new CutTaggedJetN(particlesObj));
 
+  mystudy.AddCut(new HistogrammingMuon(particlesObj,"Tight"));  // make the muon plots, hopefully.
+
   mystudy.AddCut(new HistogrammingMET(particlesObj));
   mystudy.AddCut(new HistogrammingMtW(particlesObj,useInvertedIsolation));
   mystudy.AddCut(new HistogrammingJetAngular(particlesObj,useInvertedIsolation));
