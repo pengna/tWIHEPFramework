@@ -288,3 +288,125 @@ Events.Source.500026: 11345619
 #500027 = not fully hadronic tW_antitop
 Weight.Source.500027: 19.559
 Events.Source.500027: 11408144
+
+#700000 - systematic samples
+
+#700000 = tW_antitop_DS
+Weight.Source.700000: 19.559
+Events.Source.700000: 3257313
+
+#700001 = tW_antitop_isrup
+Weight.Source.700001: 19.559
+Events.Source.700001: 3076356
+
+#700002 = tW_antitop_isrdown
+Weight.Source.700002: 19.559
+Events.Source.700002: 3101414
+
+#700003 = tW_antitop_fsrup
+Weight.Source.700003: 19.559
+Events.Source.700003: 3001597
+
+#700004 = tW_antitop_fsrdown
+Weight.Source.700004: 19.559
+Events.Source.700004: 3235062
+
+#700005 = tW_antitop_herwig
+Weight.Source.700005: 19.559
+Events.Source.700005: 3216427
+
+#700006 = tW_antitop_MEup
+Weight.Source.700006: 19.559
+Events.Source.700006: 1607001
+
+#700007 = tW_antitop_MEdown
+Weight.Source.700007: 19.559
+Events.Source.700007: 1575183
+
+#700008 = tW_antitop_PSup
+Weight.Source.700008: 19.559
+Events.Source.700008: 1628527
+
+#700009 = tW_antitop_PSdown
+Weight.Source.700009: 19.559
+Events.Source.700009: 1628344
+
+#700010 = tW_top_DS
+Weight.Source.700010: 19.559
+Events.Source.700010: 3192627
+
+#700011 = tW_top_isrup
+Weight.Source.700011: 19.559
+Events.Source.700011: 3129831
+
+#700012 = tW_top_isrdown
+Weight.Source.700012: 19.559
+Events.Source.700012: 3201658
+
+#700013 = tW_top_fsrup
+Weight.Source.700013: 19.559
+Events.Source.700013: 3212416
+
+#700014 = tW_top_fsrdown
+Weight.Source.700014: 19.559
+Events.Source.700014: 2975405
+
+#700015 = tW_top_herwig
+Weight.Source.700015: 19.559
+Events.Source.700015: 3201087
+
+#7000016 = tW_top_MEup
+Weight.Source.7000016: 19.559
+Events.Source.7000016: 3188774
+
+#700017 = tW_top_MEdown
+Weight.Source.700017: 19.559
+Events.Source.700017: 3052085
+
+#700018 = tW_top_PSup
+Weight.Source.700018: 19.559
+Events.Source.700018: 3124934
+
+#700019 = tW_top_PSdown
+Weight.Source.700019: 19.559
+Events.Source.700019: 3181663
+
+#700020 = ttbar_isrup
+Weight.Source.700020: 831.76
+Events.Source.700020: 59033604
+
+#700021 = ttbar_isrdown
+Weight.Source.700021: 831.76
+Events.Source.700021: 29084029
+
+#700022 = ttbar_fsrup
+Weight.Source.700022: 831.76
+Events.Source.700022: 29777488
+
+#700023 = ttbar_fsrdown
+Weight.Source.700023: 831.76
+Events.Source.700023: 29716580
+
+#700024 = ttbar_tuneup
+Weight.Source.700024: 831.76
+Events.Source.700024: 29310620
+
+#700025 = ttbar_tunedown
+Weight.Source.700025: 831.76
+Events.Source.700025: 28354188
+
+#700026 = ttbar_herwig
+Weight.Source.700026: 831.76
+Events.Source.700026: 29412687
+
+#700027 = ttbar_amcatnlo
+Weight.Source.700027: 831.76
+Events.Source.700027: 43561608
+
+#700028 = ttbar_hdampup
+Weight.Source.700028: 831.76
+Events.Source.700028: 29689380
+
+#700029 = ttbar_hdampdown
+Weight.Source.700029: 831.76
+Events.Source.700029: 29117820
