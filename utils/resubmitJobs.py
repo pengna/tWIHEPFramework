@@ -109,6 +109,10 @@ missedFile.write("#!/bin/bash\n")
 
 dirsToCheck = ["tW/","tWInv/","tWData/","tWInvData/","tW2j1t/","tWInv2j1t/","tW2j1tData/","tWInv2j1tData/","tW3j2t/","tWInv3j2t/","tW3j2tData/","tWInv3j2tData/","tW3j0t/","tWInv3j0t/","tW3j0tData/","tWInv3j0tData/","tWJESUp/","tWJESDown/","tWJERUp/","tWJERDown/","tWSysts/"]
 
+dirsToCheck = [f for f in os.listdir(".") if os.path.isdir(f)]
+
+print dirsToCheck
+
 skippedDirs = []
 nErrorFiles = {}
 totalResubmits = 0
@@ -119,19 +123,34 @@ for dirToCheck in dirsToCheck:
         skippedDirs.append(dirToCheck)
         continue
     print ">>>>>>>>>>>>>>>>> Executing over {0} directory <<<<<<<<<<<<<<<<".format(dirToCheck)
-    samplesToCheck = samples if not "Data" in dirToCheck else dataSamples
+#    samplesToCheck = samples if not "Data" in dirToCheck else dataSamples
     if "Syst" in dirToCheck: samplesToCheck = samplesSyst
     nErrorFiles[dirToCheck] = 0
+    samplesToCheck = [dirToCheck + "/" + f for f in os.listdir(dirToCheck) if os.path.isdir(dirToCheck + "/" + f)]
     for sample in samplesToCheck:
+        if "Inv" in dirToCheck and not "Data" in dirToCheck: continue
         print "Sample: {0}".format(sample)
-        prefix = dirToCheck + sample
+#        prefix = dirToCheck + "/" + sample
+        prefix = sample
+        if not os.path.isdir(prefix + "/logs/") : continue
+        scriptFiles = [f for f in os.listdir(prefix+"/scripts/")]
+        
         files = [f for f in os.listdir(prefix + "/logs/") if "error" in f]
-        for errorFile in files:
-            if "Aborted" in open(prefix+"/logs/"+errorFile).read():
-                print prefix + "/logs/"+ errorFile
+        for scFile in scriptFiles:
+            errorFile = prefix + "/logs/" + scFile.split(".")[0] + ".error"
+            if not os.path.isfile(errorFile):
+                print errorFile, "doesn't have a log file"
                 nErrorFiles[dirToCheck] += 1
                 totalResubmits += 1
-                missedFile.write("condor_submit "+prefix + "/scripts/"+errorFile.split(".error")[0]+".submit -group cms -name job@schedd01.ac.cn\n")
+                missedFile.write("hep_sub "+prefix+"/scripts/"+scFile+" -e "+errorFile.split(".sh")[0]+" -o "+errorFile.split(".error")[0]+".log\n")
+                continue
+            if "Aborted" in open(errorFile).read() or "*** Break ***" in open(errorFile).read():
+                print errorFile
+                nErrorFiles[dirToCheck] += 1
+                totalResubmits += 1
+                missedFile.write("hep_sub "+prefix+"/scripts/"+scFile+" -e "+errorFile.split(".sh")[0]+" -o "+errorFile.split(".error")[0]+".log\n")
+#                missedFile.write("hep_sub "+prefix+"/scripts/"+errorFile.split(".error")[0]+".sh  -e "+prefix+"/logs/"+errorFile.split(".error")[0]+".error -o "+prefix+"/logs/"+errorFile.split(".error")[0]+".log\n")
+#                missedFile.write("condor_submit "+prefix + "/scripts/"+errorFile.split(".error")[0]+".submit -group cms -name job@schedd01.ac.cn\n")
 
 print "Skipping the following directories: ", skippedDirs
 for dirChecked in dirsToCheck:
