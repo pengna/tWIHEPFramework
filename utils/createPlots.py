@@ -3,7 +3,7 @@
 from ROOT import *
 
 from setTDRStyle import setTDRStyle
-import sys
+import sys, os
 
 inDir = sys.argv[1]
 outDir = sys.argv[2]
@@ -22,11 +22,21 @@ perMCSFs = {}
 #perMCSFs["ttbar"] = 1.1830538502
 #perMCSFs['ttbar'] = 0.887389045755
 
-perMCSFs["qcd"] = 0.837106815504
+#No weighting
 perMCSFs["ttbar"] = 2.
+perMCSFs["qcd"] = 4955582.30255/12356321.0 #This is the number of QCD MC (numerator) and DD driven events (denominator) in the nJets distribution. I am picking this so we have one consistent SF so that we don't get random changes in normalisation where they shouldn't appear (i.e. nJetsAfterSelection)
+perMCSFs["qcd"] = 5099897.0/2604652.19727 #This is the number of QCD MC (numerator) and DD driven events (denominator) in the nJets distribution. I am picking this so we have one consistent SF so that we don't get random changes in normalisation where they shouldn't appear (i.e. nJetsAfterSelection)
 
-perMCSFs["ttbar"] = 2.*0.891728577865
-perMCSFs["wPlusJets"] = 3.44115208943
+#muon channel
+#perMCSFs["qcd"] = 0.837106815504
+#perMCSFs["ttbar"] = 2.*0.891728577865
+#perMCSFs["wPlusJets"] = 3.44115208943
+
+#ele channel
+perMCSFs["qcd"] *= 0.575639172238
+perMCSFs["ttbar"] *= 0.905594867235
+perMCSFs["wPlusJets"] = 3.08934118354
+
 
 perRegMCSFs = {}
 perRegMCSFs[""] = {}
@@ -122,9 +132,13 @@ plotNames = []
 for sample in samples:
     inFiles[sample] = TFile(inDir+sample+"/hists/merged"+sample+".root","READ")
     
-if doData: inFiles['data'] = TFile(dataFolder+"/singleMuon/hists/mergedsingleMuon.root","READ")
+if doData: 
+    if os.path.exists(dataFolder+"/singleMuon/hists/mergedsingleMuon.root"): inFiles['data'] = TFile(dataFolder+"/singleMuon/hists/mergedsingleMuon.root","READ")
+    else: inFiles['data'] = TFile(dataFolder+"/singleEle/hists/mergedsingleEle.root","READ") 
 
-if useQCD: inFiles['qcdData'] = TFile(qcdFolder+"/singleMuon/hists/mergedsingleMuon.root","READ")
+if useQCD: 
+    if os.path.exists(qcdFolder+"/singleMuon/hists/mergedsingleMuon.root"): inFiles['qcdData'] = TFile(qcdFolder+"/singleMuon/hists/mergedsingleMuon.root","READ")
+    else: inFiles['qcdData'] = TFile(qcdFolder+"/singleEle/hists/mergedsingleEle.root","READ") 
 
 plotPaths = []
 
@@ -140,14 +154,14 @@ for obj in inFiles["tW_top_nfh"].GetListOfKeys():
             if not temp2.ClassName().find("TH1") == -1:
                 plotPaths.append(tempThing.GetName() + "/"+ temp2.GetName())
                 
-
+print
 #print plotPaths
 
 #ignorePlots = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23"]
 ignorePlots = ["01","02","03","04","05","10","23"]
-ignorePlots = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","24"]
+ignorePlots = ["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","24","26"]
 #ignorePlots = ["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","20","23"]ignorePlots = ["01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"]
-#ignorePlots = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"]
+ignorePlots = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","19","20","23","24","25","26"]
 ignorePlots += ["Jet4","Jet5","Jet6","Jet7"]
 
 for plotName in plotPaths:
@@ -203,9 +217,10 @@ for plotName in plotPaths:
         else:
             print "Couldn't find "+plotName+" in the data enriched QCD sample so skipping this histogram."
             continue
-        if histMap['qcd'].Integral() > 0.:
-            histMap['qcd'].Scale(qcdNormalisation/histMap['qcd'].Integral())
+#        if histMap['qcd'].Integral() > 0.: #we now no longer do that here, as it leads to weird changes in normalisation where there shouldn't be any.
+#            histMap['qcd'].Scale(qcdNormalisation/histMap['qcd'].Integral())
         histMap['qcd'].SetName(histMap['qcd'].GetName() + "qcd")
+#        print histMap['qcd'].Integral()
         #If I need to do any scaling I will do it here I suppose.
 #        print "Doing scaling:", histMap['qcd'].Integral(),
 #        histMap['qcd'].Scale(0.5)
@@ -260,6 +275,7 @@ for plotName in plotPaths:
         if histName in perMCSFs.keys():
             #print histName, "rescaling",perMCSFs[histName]
             histMap[histName].Scale(perMCSFs[histName])
+#            print histName, perMCSFs[histName]
         if "2j1t" in inDir:
             if histName in perRegMCSFs["2j1t"].keys():
                 histMap[histName].Scale(perRegMCSFs["2j1t"][histName])
@@ -283,11 +299,16 @@ for plotName in plotPaths:
     sumHistoMC = histMap[hists[0]].Clone()
     sumHistoMC.Reset()
 
+#    totalCount = 0.
+
     for histName in hists:
         mcstack.Add(histMap[histName])
+#        totalCount += histMap[histName].GetBinContent(4)
+#        print histName, histMap[histName].GetBinContent(4)
 #        print histName,histMap[histName].Integral()
         sumHistoMC.Add(histMap[histName])
 
+#    print "Total MC Count: ",totalCount, 
 
     maxi = mcstack.GetMaximum() #if not doData or dataHist.GetMaximum() < mcstack.GetMaximum() else dataHist.GetMaximum()
     if doData and dataHist.GetMaximum() > mcstack.GetMaximum(): maxi = dataHist.GetMaximum()
