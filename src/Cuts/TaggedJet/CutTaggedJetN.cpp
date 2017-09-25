@@ -38,9 +38,12 @@ using namespace std;
  * Input:  Event Object class                                                 *
  * Output: None                                                               *
  ******************************************************************************/
-CutTaggedJetN::CutTaggedJetN(EventContainer *EventContainerObj)
+CutTaggedJetN::CutTaggedJetN(EventContainer *EventContainerObj, Int_t nbJetsDefault)
 {
   SetEventContainer(EventContainerObj);
+  _JetNumberMin = nbJetsDefault; // Overriding configuration file.
+  _JetNumberMax = nbJetsDefault;
+  
 } // CutTaggedJetN
 
 
@@ -81,10 +84,12 @@ void CutTaggedJetN::BookHistogram(){
   EventContainer *EventContainerObj = GetEventContainer();
   TEnv *config = EventContainerObj -> GetConfig();
 
-  // Use configuration to set min and max number of jets to cut on
-  _JetNumberMin = config -> GetValue("Cut.Tagged.Jet.Number.Min", 999);
-  _JetNumberMax = config -> GetValue("Cut.Tagged.Jet.Number.Max", 999);
-
+  // Use configuration to set min and max number of jets to cut on if default value used
+  if (_JetNumberMax < 0.){
+    _JetNumberMin = config -> GetValue("Cut.Tagged.Jet.Number.Min", 999);
+    _JetNumberMax = config -> GetValue("Cut.Tagged.Jet.Number.Max", 999);
+  }
+  
   //
   // also add these two cuts to the cut flow table
   ostringstream titleStr;

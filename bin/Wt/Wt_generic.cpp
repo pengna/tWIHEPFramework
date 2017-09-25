@@ -102,7 +102,11 @@ int main(int argc, char **argv)
   TString leptonTypeToSelect = "Tight"; //This variable is altered to unisolated when running QCD estimation.
   string evtListFileName="";
   int whichtrig = -1;
-  
+  // A couple of jet selection overrides to limit the number of config faces.  
+  // -1 means use the value from the config file
+  Int_t nJets = -1;
+  Int_t nbJets = -1;
+
   //  cout << "<Driver> Reading arguments" << end;
   for (int i = 1; i < argc; ++i) {
     cout<<"Command line parameter "<<i<<" is "<<argv[i]<<endl;
@@ -174,6 +178,12 @@ int main(int argc, char **argv)
       } //if
       mystudy.SetBkgdTreeName(argv[i+1]);
     }// if BkgdTreeName
+    if (!strcmp(argv[i],"-nJets")){
+      nJets = atoi(argv[i+1]);
+    }// if nJets
+    if (!strcmp(argv[i],"-nbJets")){
+      nbJets = atoi(argv[i+1]);
+    }// if nbJets
   } // for
 
   TChain *chainBkgd = new TChain(mystudy.GetBkgdTreeName());//if nothing specified on commandline, this is just a "" string, which is ok if you don't want to use this chain (don't want a tree of multivariate variables).
@@ -217,11 +227,12 @@ int main(int argc, char **argv)
   mystudy.AddCut(new CutMuonN(particlesObj, "Veto"));     //require that lepton to be isolated, central, high pt
  
 
-  mystudy.AddCut(new HistogrammingElectron(particlesObj,"Tight"));  // make the muon plots, hopefully.
-  mystudy.AddCut(new HistogrammingElectron(particlesObj,"Veto"));  // make the muon plots, hopefully.
 
-
+  mystudy.AddCut(new CutElectronN(particlesObj, leptonTypeToSelect)); //require that lepton to be isolated, central, high pt
   mystudy.AddCut(new CutElectronN(particlesObj, "Veto")); //require that lepton to be isolated, central, high pt
+
+  mystudy.AddCut(new HistogrammingElectron(particlesObj,leptonTypeToSelect));  // make the muon plots, hopefully.
+  mystudy.AddCut(new HistogrammingElectron(particlesObj,"Veto"));  // make the muon plots, hopefully.
 
   mystudy.AddCut(new HistogrammingMET(particlesObj));
   mystudy.AddCut(new HistogrammingMtW(particlesObj,useInvertedIsolation));
@@ -233,9 +244,11 @@ int main(int argc, char **argv)
   //  mystudy.AddCut(new CutEMuOverlap(particlesObj));
   //}
   //mystudy.AddCut(new CutJetPt1(particlesObj));
-  mystudy.AddCut(new CutJetN(particlesObj));
+  mystudy.AddCut(new CutJetN(particlesObj,nJets));
   
-  mystudy.AddCut(new CutTaggedJetN(particlesObj));
+  mystudy.AddCut(new CutTaggedJetN(particlesObj,nbJets));
+
+  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight, useLeptonSFs, usebTagReweight));
 
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Tight"));  // make the muon plots, hopefully.
 
@@ -256,6 +269,7 @@ int main(int argc, char **argv)
 
   //Add in any variables to the skim tree that you want here
   //  mystudy.AddVars(new TestVar());
+  //if (whichtrig) mystudy.AddVars(new BDTVars(true));
   mystudy.AddVars(new BDTVars(true));
   mystudy.AddVars(new WeightVars());
 
