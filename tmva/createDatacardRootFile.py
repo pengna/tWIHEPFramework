@@ -6,17 +6,34 @@ histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan
 
 samples = ["tW_top_nfh","tW_antitop_nfh","tChan_top","tChan_antitop","sChan","zz","zPlusJetsLowMass","zPlusJetsHighMass","wz","ww","wPlusJetsMCatNLO","ttbar"]
 
-samplesData = ["SingMuB","SingMuC","SingMuD","SingMuE","SingMuF","SingMuG","SingMuH"]
+samplesDataMu = ["SingMuB","SingMuC","SingMuD","SingMuE","SingMuF","SingMuG","SingMuH"]
+samplesDataEle = ["SingEleB","SingEleC","SingEleD","SingEleE","SingEleF","SingEleG","SingEleH"]
+samplesData = samplesDataMu
+
+plotLeptonSampleName = "Mu"
 
 inDir = sys.argv[1]
 outDir = sys.argv[2]
 systDir = inDir+"Systs/"
-if len(sys.argv) > 3: systDir = sys.argv[3]
+isEle = False
+if "ele" in sys.argv:
+    samplesData = samplesDataEle
+    plotLeptonSampleName = "Ele"
+#if len(sys.argv) > 3: systDir = sys.argv[3]
 
 perMCSFs = {}
-perMCSFs["qcd"] = 0.837106815504
-perMCSFs["ttbar"] = 2.*0.891728577865
-perMCSFs["wPlusJets"] = 3.44115208943
+perMCSFs["ttbar"] = 2.
+perMCSFs["qcd"] = 5099897.0/2604652.19727
+
+if isEle:
+    perMCSFs["qcd"] *= 0.575639172238
+    perMCSFs["ttbar"] *= 0.905594867235
+    perMCSFs["wPlusJets"] = 3.08934118354
+
+else:
+    perMCSFs["qcd"] *= 0.837106815504
+    perMCSFs["ttbar"] *= 0.891728577865
+    perMCSFs["wPlusJets"] = 3.44115208943
 
 
 if (not os.path.isdir(outDir)):
@@ -64,7 +81,7 @@ for sample in samples:
         for sys in systs:
             #print sys, "MVA_"+sample+"_"+sys+"_up"
             systNameForClone = histoGramPerSample[sample]+"_"+sys
-            if "statbin" in sys: systNameForClone = histoGramPerSample[sample]+"_"+histoGramPerSample[sample]+"_Mu_"+sys
+            if "statbin" in sys: systNameForClone = histoGramPerSample[sample]+"_"+histoGramPerSample[sample]+"_"+plotLeptonSampleName+"_"+sys
             systHists[histoGramPerSample[sample]][sys+"Up"] = inFile.Get("MVA_"+sample+"_"+sys+"_up").Clone(systNameForClone+"Up")
             systHists[histoGramPerSample[sample]][sys+"Up"].SetDirectory(0)
             systHists[histoGramPerSample[sample]][sys+"Down"] = inFile.Get("MVA_"+sample+"_"+sys+"_down").Clone(systNameForClone+"Down")
