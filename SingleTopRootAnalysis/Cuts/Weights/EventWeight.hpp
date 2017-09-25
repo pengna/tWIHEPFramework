@@ -44,7 +44,7 @@ class EventWeight : public HistoCut
 public:
 
   // Parameterized Constructor
-  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE);
+  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE, Bool_t verbose = kFALSE);
   
   // Default Destructor
   ~EventWeight();
@@ -104,6 +104,8 @@ private:
   TH2F* _muonIDSF;
   TH2F* _muonTrigSF;
   TGraphAsymmErrors* _muonTkSF;
+  TH2F* _eleRecoSF;
+  TH2F* _eleIDSF;
 
   //Pileup reweighting hisotgrams
   TH1F* _dataPV;
@@ -112,11 +114,14 @@ private:
   TH1F* _minBiasUpPV;
   TH1F* _minBiasDownPV;
 
+  //For debugging
+  Bool_t _verbose;
+
   std::vector<std::string> _bTagSystNames;
   std::map<std::string,float> _bTagSystValues;
 
   std::tuple<Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
-  void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName);
+  void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName);
   Double_t getBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
 
  //Root::TPileupReweighting* PileupReweighting;
