@@ -83,7 +83,7 @@ Bool_t HistogrammingMtW::Apply()
   //cout<<"Begin of HistogrammingMtW::Apply()"<<endl;
   
   EventContainer *evc = GetEventContainer();
-  
+
   if (!_unisolated){
     if (evc->tightMuons.size() > 0){
       lepton = evc->tightMuons[0];
