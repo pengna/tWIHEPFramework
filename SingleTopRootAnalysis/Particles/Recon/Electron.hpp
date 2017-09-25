@@ -145,6 +145,34 @@ class Electron: public Particle
   inline Int_t GetInCrack() const {return _inCrack;};
   inline Int_t inCrack() const {return _inCrack;};
 
+  inline void SetSigmaEtaEta(Double_t sigmaEtaEta){_sigmaEtaEta = sigmaEtaEta;};
+  inline Double_t GetSigmaEtaEta() const {return _sigmaEtaEta;};
+  inline Double_t sigmaEtaEta() const {return _sigmaEtaEta;};
+
+  inline void SetDEtaInSeed(Double_t dEtaInSeed){_dEtaInSeed = dEtaInSeed;};
+  inline Double_t GetDEtaInSeed() const {return _dEtaInSeed;};
+  inline Double_t dEtaInSeed() const {return _dEtaInSeed;};
+
+  inline void SetDPhiIn(Double_t dPhiIn){_dPhiIn = dPhiIn;};
+  inline Double_t GetDPhiIn() const {return _dPhiIn;};
+  inline Double_t dPhiIn() const {return _dPhiIn;};
+
+  inline void SetHOverE(Double_t hOverE){_hOverE = hOverE;};
+  inline Double_t GetHOverE() const {return _hOverE;};
+  inline Double_t hOverE() const {return _hOverE;};
+
+  inline void SetOoEmooP(Double_t ooEmooP){_ooEmooP = ooEmooP;};
+  inline Double_t GetOoEmooP() const {return _ooEmooP;};
+  inline Double_t ooEmooP() const {return _ooEmooP;};
+
+  inline void SetRelIsoPFRhoEA(Double_t relIsoPFRhoEA){_relIsoPFRhoEA = relIsoPFRhoEA;};
+  inline Double_t GetRelIsoPFRhoEA() const {return _relIsoPFRhoEA;};
+  inline Double_t relIsoPFRhoEA() const {return _relIsoPFRhoEA;};
+
+  inline void SetMissingHits(Int_t missingHits){_missingHits = missingHits;};
+  inline Int_t GetMissingHits() const {return _missingHits;};
+  inline Int_t missingHits() const {return _missingHits;};
+
  private:
 
   Int_t _passVetoId;
@@ -165,6 +193,17 @@ class Electron: public Particle
   Double_t _charge;
   Double_t _scEta;
   Int_t _inCrack;
+
+  //The ID values
+  Double_t _sigmaEtaEta;
+  Double_t _dEtaInSeed;
+  Double_t _dPhiIn;
+  Double_t _hOverE;
+  Double_t _ooEmooP;
+  Int_t _missingHits;
+  
+  //Isolation
+  Double_t _relIsoPFRhoEA;
 
   ///////////////////////////////////////////
   // Maps containing the cut values to be placed on the different type of selected leptons
