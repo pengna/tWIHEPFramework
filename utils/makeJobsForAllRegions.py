@@ -9,15 +9,22 @@ for i in [""," data"]:
     for k in [""," inv"]:
 #    for k in [""]:
 #        for j in ["", " ttbarReg", " wJetsReg"," wJets2"]:
-        for j in ["", " ttbarReg"," wJets2"]:
+#        for j in ["", " ttbarReg"," wJets2", " ttbar2"," sig2"]:
+        for j in [" ttbar2"," sig2"]:
+
 #        for j in [" ttbarReg", " wJetsReg"," wJets2"]:
 #        for j in [" ttbarReg", " wJetsReg"]:
 #        for j in [" ttbarReg", " wJets2"]:
 #        for j in [" wJets2"]:
 #        for j in [" wJetsReg"]:
 #        for j in [""]:
-            print "maketWSubmit.py"+i+k+j
-            subprocess.call( "python "+baseDir+"utils/maketWSubmit.py skims"+i+k+j,shell=True)
+            for l in [""," electron"]:
+#                for m in [""," jesUp"," jesDown"," jerUp"," jerDown"]:
+                for m in [""]:
+                    if i == " data" and not m == "": continue
+                    print "makeHEPSubmit.py"+i+k+j+l
+                    subprocess.call( "python "+baseDir+"utils/makeHEPSubmit.py skims"+i+k+j+l+m,shell=True)
 
-for i in ["jesUp","jesDown","jerUp","jerDown"]:
-    subprocess.call( "python "+baseDir+"utils/maketWSubmit.py skims "+i,shell=True)
+#for i in ["jesUp","jesDown","jerUp","jerDown"]:
+#    for j in [" electron"]:
+#        subprocess.call( "python "+baseDir+"utils/makeHEPSubmit.py skims "+i+j,shell=True)
