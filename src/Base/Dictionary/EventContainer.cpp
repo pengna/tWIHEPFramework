@@ -356,6 +356,7 @@ void EventContainer::SetupObjectDefinitions(){
   newElectron.SetCuts(GetConfig(),"Tight");
   newElectron.SetCuts(GetConfig(),"All");
   newElectron.SetCuts(GetConfig(),"Veto");
+  newElectron.SetCuts(GetConfig(),"UnIsolated");
 
   newJet.SetCuts(GetConfig());
 
@@ -375,20 +376,18 @@ void EventContainer::SetupObjectDefinitions(){
 void EventContainer::SetUseUnisolatedLeptons(const Bool_t& useUnisolatedLeptons, int whichtrig){
   _useUnisolatedLeptons = useUnisolatedLeptons;
   _trigID = whichtrig;
-  if (_trigID == 0){
-    electronsToUsePtr = _useUnisolatedLeptons ? &unIsolatedElectrons : &tightElectrons;
-    muonsToUsePtr = _useUnisolatedLeptons ? &tightMuons : &unIsolatedMuons;
+  electronsToUsePtr = &tightElectrons;
+  muonsToUsePtr = &tightMuons;
+  if (_trigID == 0 && _useUnisolatedLeptons){
+    electronsToUsePtr = &unIsolatedElectrons;
   }
-  else if (_trigID == 1){
-    electronsToUsePtr = !_useUnisolatedLeptons ? &unIsolatedElectrons : &tightElectrons;
-    muonsToUsePtr = !_useUnisolatedLeptons ? &tightMuons : &unIsolatedMuons;
+  else if (_trigID == 1 && useUnisolatedLeptons){
+    muonsToUsePtr = &unIsolatedMuons;
   }
 
   //For the synch excercise we want it to always be tight leptons, so I'm gonna add here the ability to just make it all tight.
-  if (GetChannelName() == "ee" || GetChannelName() == "emu" || GetChannelName() == "mumu"){
-    electronsToUsePtr = &tightElectrons;
-    muonsToUsePtr = &tightMuons;
-  }
+  //  if (GetChannelName() == "ee" || GetChannelName() == "emu" || GetChannelName() == "mumu"){
+  // }
 } //SetUseUnisolatedLeptons
 
 /******************************************************************************
@@ -593,6 +592,11 @@ Int_t EventContainer::ReadEvent()
         vetoElectrons.push_back(newElectron);
       }
 
+      newElectron.Clear();
+      useObj=newElectron.Fill(_eventTree,  io,"UnIsolated",isSimulation);
+      if(useObj) {
+        unIsolatedElectrons.push_back(newElectron);
+      }
     } //for
     ///////////////////////////////////////////
     // Muons

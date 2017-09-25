@@ -44,9 +44,10 @@ using namespace std;
  * Input:  Particle class                                                     *
  * Output: None                                                               *
  ******************************************************************************/
-EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight, Bool_t useLeptonSFs, Bool_t usebTagReshape):
+EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight, Bool_t useLeptonSFs, Bool_t usebTagReshape, Bool_t verbose):
   _useLeptonSFs(useLeptonSFs),
-  _usebTagReshape(usebTagReshape)
+  _usebTagReshape(usebTagReshape),
+  _verbose(verbose)
 {
   //pileup is NOT applied by default.  Instead it is applied by the user, and stored in the tree for later application
 
@@ -285,7 +286,7 @@ void EventWeight::BookHistogram()
   } //if
 
   //Set up the lepton efficiency SF histograms
-  if (_useLeptonSFs) setLeptonHistograms(conf->GetValue("Include.MuonIDSFsFile","null"),conf->GetValue("LeptonID.MuonIDSFHistName","null"),conf->GetValue("Include.MuonISOSFsFile","null"),conf->GetValue("LeptonID.MuonIsoSFHistName","null"),conf->GetValue("Include.MuonTrigSFsFile","null"),conf->GetValue("LeptonID.MuonTrigSHHistName","null"),conf->GetValue("Include.MuonTKSFsFile","null"));
+  if (_useLeptonSFs) setLeptonHistograms(conf->GetValue("Include.MuonIDSFsFile","null"),conf->GetValue("LeptonID.MuonIDSFHistName","null"),conf->GetValue("Include.MuonISOSFsFile","null"),conf->GetValue("LeptonID.MuonIsoSFHistName","null"),conf->GetValue("Include.MuonTrigSFsFile","null"),conf->GetValue("LeptonID.MuonTrigSHHistName","null"),conf->GetValue("Include.MuonTKSFsFile","null"),conf->GetValue("Include.EleRecoFileName","null"),conf->GetValue("LeptonID.EleRecoHistName","null"),conf->GetValue("Include.EleIDFileName","null"),conf->GetValue("LeptonID.EleIDHistName","null"));
 
   if (_usebTagReshape){
     _bTagCalib = BTagCalibration(conf->GetValue("BTaggerAlgo","CSVv2"),conf->GetValue("Include.BTagCSVFile","null"));
@@ -467,7 +468,7 @@ Bool_t EventWeight::Apply()
  * Input:  Names of files and histograms that are relevant to the calculation * 
  * Output: none                                                               * 
  ******************************************************************************/
-void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName){
+void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName){
 
   if (muonIsoFileName == "null" || muonIDFileName == "null"){
     std::cout << "You want lepton SFs included in the weight but you haven't specified files for this! Fix your config!" << std::endl;
@@ -497,7 +498,18 @@ void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHist
   //  _muonTkSF->SetDirectory(0);
   muonTkFile->Close();
 
-  delete muonIsoFile,muonIDFile,muonTrigFile,muonTkFile;
+  TFile* eleRecoFile = TFile::Open(eleRecoFileName,"READ");
+  if (!eleRecoFile) std::cout << "Electron reco SF file not found!" << std::endl;
+  _eleRecoSF = (TH2F*)eleRecoFile->Get(eleRecoHistName)->Clone();
+  _eleRecoSF->SetDirectory(0);
+  eleRecoFile->Close();
+
+  TFile* eleIDFile = TFile::Open(eleIDFileName,"READ");
+  if (!eleIDFile) std::cout << "Electron ID SF file not found!" << std::endl;
+  _eleIDSF = (TH2F*)eleIDFile->Get(eleIDHistName)->Clone();
+  _eleIDSF->SetDirectory(0);
+  eleIDFile->Close();
+  delete muonIsoFile,muonIDFile,muonTrigFile,muonTkFile,eleRecoFile,eleIDFile;
 
 }
 
@@ -541,6 +553,28 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContain
     leptonWeight *= isoSF * idSF * trigSF * tkSF;
     leptonWeightUp *= (isoSF + isoUnc) * (idSF + idUnc) * (trigSF + trigUnc) * tkSF;
     leptonWeightDown *= (isoSF - isoUnc) * (idSF - idUnc) * (trigSF - trigUnc) * tkSF;
+  }
+
+  for (auto const & ele : *EventContainerObj->electronsToUsePtr){
+    //Get which bins we're in need of for the reco SF
+    Int_t xAxisBin = _eleRecoSF->GetXaxis()->FindBin(ele.scEta());
+    if (ele.scEta() > 2.5) xAxisBin = _eleRecoSF->GetXaxis()->FindBin(2.49);
+    Int_t yAxisBin = _eleRecoSF->GetYaxis()->FindBin(ele.Pt());
+    if (ele.Pt() > 500) xAxisBin = _eleRecoSF->GetYaxis()->FindBin(499.);
+    //Now get the reco and id SFs
+    Float_t recoSF = _eleRecoSF->GetBinContent(xAxisBin,yAxisBin);
+    Float_t recoUnc = _eleRecoSF->GetBinError(xAxisBin,yAxisBin);
+    //Now do ID
+    xAxisBin = _eleIDSF->GetXaxis()->FindBin(ele.scEta());
+    if (ele.scEta() > 2.5) xAxisBin = _eleIDSF->GetXaxis()->FindBin(2.49);
+    yAxisBin = _eleIDSF->GetYaxis()->FindBin(ele.Pt());
+    if (ele.Pt() > 500) xAxisBin = _eleIDSF->GetYaxis()->FindBin(499.);
+    Float_t idSF = _eleIDSF->GetBinContent(xAxisBin,yAxisBin);
+    Float_t idUnc = _eleIDSF->GetBinError(xAxisBin,yAxisBin);
+    if (_verbose) std::cout << "Reco: " << recoSF << " ID: " << idSF << " x: " << xAxisBin << " y: " << yAxisBin <<std::endl;
+    leptonWeight *= recoSF * idSF;
+    leptonWeightUp *= (recoSF + recoUnc) * (idSF + idUnc);
+    leptonWeightDown *= (recoSF - recoUnc) * (idSF - idUnc);
   }
 
   return std::make_tuple(leptonWeight,leptonWeightUp,leptonWeightDown);
