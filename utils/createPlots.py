@@ -24,18 +24,17 @@ perMCSFs = {}
 
 #No weighting
 perMCSFs["ttbar"] = 2.
-perMCSFs["qcd"] = 4955582.30255/12356321.0 #This is the number of QCD MC (numerator) and DD driven events (denominator) in the nJets distribution. I am picking this so we have one consistent SF so that we don't get random changes in normalisation where they shouldn't appear (i.e. nJetsAfterSelection)
-perMCSFs["qcd"] = 5099897.0/2604652.19727 #This is the number of QCD MC (numerator) and DD driven events (denominator) in the nJets distribution. I am picking this so we have one consistent SF so that we don't get random changes in normalisation where they shouldn't appear (i.e. nJetsAfterSelection)
-
-#muon channel
-#perMCSFs["qcd"] = 0.837106815504
-#perMCSFs["ttbar"] = 2.*0.891728577865
-#perMCSFs["wPlusJets"] = 3.44115208943
-
-#ele channel
-perMCSFs["qcd"] *= 0.575639172238
-perMCSFs["ttbar"] *= 0.905594867235
-perMCSFs["wPlusJets"] = 3.08934118354
+#perMCSFs["qcd"] = 4955582.30255/12356321.0 #This is the number of QCD MC (numerator) and DD driven events (denominator) in the nJets distribution. I am picking this so we have one consistent SF so that we don't get random changes in normalisation where they shouldn't appear (i.e. nJetsAfterSelection)
+if "Ele" in inDir: 
+    perMCSFs["qcd"] = 5099897.0/2604652.19727 #This is the number of QCD MC (numerator) and DD driven events (denominator) in the nJets distribution. I am picking this so we have one consistent SF so that we don't get random changes in normalisation where they shouldn't appear (i.e. nJetsAfterSelection)
+    perMCSFs["qcd"] *= 0.575639172238
+    perMCSFs["ttbar"] *= 0.905594867235
+    perMCSFs["wPlusJets"] = 3.08934118354
+else:
+    perMCSFs["qcd"] = 5227921/8899239.0 #This will be the muon channel once I've re-run all of the files.
+    perMCSFs["qcd"] *= 1.10329115653
+    perMCSFs["ttbar"] *= 0.937952128327
+    perMCSFs["wPlusJets"] = 3.48537322128
 
 
 perRegMCSFs = {}
@@ -133,11 +132,11 @@ for sample in samples:
     inFiles[sample] = TFile(inDir+sample+"/hists/merged"+sample+".root","READ")
     
 if doData: 
-    if os.path.exists(dataFolder+"/singleMuon/hists/mergedsingleMuon.root"): inFiles['data'] = TFile(dataFolder+"/singleMuon/hists/mergedsingleMuon.root","READ")
+    if os.path.exists(dataFolder+"/singleMu/hists/mergedsingleMu.root"): inFiles['data'] = TFile(dataFolder+"/singleMu/hists/mergedsingleMu.root","READ")
     else: inFiles['data'] = TFile(dataFolder+"/singleEle/hists/mergedsingleEle.root","READ") 
 
 if useQCD: 
-    if os.path.exists(qcdFolder+"/singleMuon/hists/mergedsingleMuon.root"): inFiles['qcdData'] = TFile(qcdFolder+"/singleMuon/hists/mergedsingleMuon.root","READ")
+    if os.path.exists(qcdFolder+"/singleMu/hists/mergedsingleMu.root"): inFiles['qcdData'] = TFile(qcdFolder+"/singleMu/hists/mergedsingleMu.root","READ")
     else: inFiles['qcdData'] = TFile(qcdFolder+"/singleEle/hists/mergedsingleEle.root","READ") 
 
 plotPaths = []
@@ -273,7 +272,7 @@ for plotName in plotPaths:
         histMap[histName].Scale(masterMCScale)
         #Now do per MC scaling if there's a SF in there somewhere
         if histName in perMCSFs.keys():
-            #print histName, "rescaling",perMCSFs[histName]
+#            print histName, "rescaling",perMCSFs[histName]
             histMap[histName].Scale(perMCSFs[histName])
 #            print histName, perMCSFs[histName]
         if "2j1t" in inDir:

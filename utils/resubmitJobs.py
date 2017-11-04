@@ -144,7 +144,7 @@ for dirToCheck in dirsToCheck:
                 totalResubmits += 1
                 missedFile.write("hep_sub "+prefix+"/scripts/"+scFile+" -e "+errorFile.split(".sh")[0]+" -o "+errorFile.split(".error")[0]+".log\n")
                 continue
-            if "Aborted" in open(errorFile).read() or "*** Break ***" in open(errorFile).read():
+            if "Aborted" in open(errorFile).read() or "*** Break ***" in open(errorFile).read() or "invalid ELF header" in open(errorFile).read():
                 print errorFile
                 nErrorFiles[dirToCheck] += 1
                 totalResubmits += 1

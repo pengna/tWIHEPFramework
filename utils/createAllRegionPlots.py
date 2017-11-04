@@ -4,7 +4,7 @@ postfix = ""
 if len(sys.argv) > 1:
     postfix = sys.argv[1]
 
-dirMap = {"":"signal","2j1t":"wJets","3j2t":"ttbar"}
+dirMap = {"":"signal","2j1t":"wJets","3j2t":"ttbar","4j1t":"signal2","4j2t":"ttbar2"}
 
 subprocesses = []
 

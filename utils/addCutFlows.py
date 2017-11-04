@@ -3,14 +3,14 @@
 import sys,os,math
 
 samplesMC=[
-"qcd1000_1500",
-"qcd100_200",
-"qcd1500_2000",
-"qcd2000_inf",
-"qcd200_300",
-"qcd300_500",
-"qcd500_700",
-"qcd700_1000",
+#"qcd1000_1500",
+#"qcd100_200",
+#"qcd1500_2000",
+#"qcd2000_inf",
+#"qcd200_300",
+#"qcd300_500",
+#"qcd500_700",
+#"qcd700_1000",
 "sChan",
 "tChan_top",
 "tChan_antitop",
@@ -32,15 +32,14 @@ histoGramPerSample = {"tW_top":"tW","tW_antitop":"tW","sChan":"singleTop","tChan
 #samplesMC = ["tW_top"]
 
 perMCSFs = {}
-perMCSFs["qcd"] = 0.837106815504
 perMCSFs["ttbar"] = 2.
-
-perMCSFs["ttbar"] = 2.*0.891728577865
-perMCSFs["wPlusJets"] = 3.44115208943
+perMCSFs["qcd"] = 5099897.0/2604652.19727
 
 masterScale =  1.
 
-sampleData = ['SingMuB','SingMuC','SingMuD','SingMuE','SingMuF','SingMuG',"SingMuH"]
+sampleDataMu = ['SingMuB','SingMuC','SingMuD','SingMuE','SingMuF','SingMuG',"SingMuH"]
+sampleDataEle = ['SingEleB','SingEleC','SingEleD','SingEleE','SingEleF','SingEleG',"SingEleH"]
+sampleData = sampleDataMu
 
 emptyFile = {}
 
@@ -49,12 +48,29 @@ inDirData = ""
 if len(sys.argv) > 2:
     inDirData = sys.argv[2]
 
+if "Ele" in inDirMC:
+    sampleData = sampleDataEle
+    perMCSFs["qcd"] *= 0.575639172238
+    perMCSFs["ttbar"] *= 0.905594867235
+    perMCSFs["wPlusJets"] = 3.08934118354
+
+else:
+    perMCSFs["qcd"] = 5227921/8899239.0 #This will be the muon channel once I've re-run all of the files.
+    perMCSFs["qcd"] *= 1.10329115653
+    perMCSFs["ttbar"] *= 0.937952128327
+    perMCSFs["wPlusJets"] = 3.48537322128
+
+
 cutYield = {}
 cutOrder = []
 
 cutYield["total"] = {}
 
+logFilesWithNothing = {}
+
 for sampleName in samplesMC:
+    logFilesWithNothing[sampleName] = 0
+    print sampleName
     inDir = inDirMC
     sample = histoGramPerSample[sampleName]
     scaleFactor = 1. * masterScale
@@ -68,11 +84,13 @@ for sampleName in samplesMC:
         cutYield[sample] = {}
     logFiles = [f for f in os.listdir(inDir+sampleName+"/logs/") if "log" in f and "#" not in f]
     for logFileName in logFiles:
+        hasInfo = False
         logFile = open(inDir+sampleName+"/logs/"+logFileName,'r')
         for line in logFile:
             if not len(line.split("|")) == 7: continue
             cut = line.split("|")[1]
             if "Min" in cut or "Max" in cut: continue
+            hasInfo = True
             if not cut in cutOrder:
                 cutOrder.append(cut)
             if cut == "                                ":
@@ -95,6 +113,7 @@ for sampleName in samplesMC:
                 cutYield['total'][cut] += scaleFactor * float(line.split("|")[5])
             else:
                 cutYield['total'][cut] = scaleFactor * float(line.split("|")[5])
+        if not hasInfo: logFilesWithNothing[sampleName] += 1
 
 cutYield['totalMinusQCD'] = {}
 cutYield['sOverb'] = {}
@@ -103,10 +122,11 @@ for cut in cutYield['total'].keys():
         cutYield['totalMinusQCD'][cut] = "Total (no QCD)"
         cutYield['sOverb'][cut] = "S/sqrt(S+B)"
     else:
-        cutYield['totalMinusQCD'][cut] = cutYield['total'][cut] - cutYield['qcd'][cut]
+        cutYield['totalMinusQCD'][cut] = cutYield['total'][cut]
         cutYield['sOverb'][cut] = cutYield['tW'][cut]/math.sqrt(cutYield['total'][cut])
 
 cutYield['Data'] = {}
+cutYield['qcd'] = {}
 
 for sampleName in sampleData:
     if inDirData == "": continue
@@ -133,10 +153,47 @@ for sampleName in sampleData:
             else:
                 cutYield["Data"][cut] = float(line.split("|")[5])
                 
-    print sample
+                
+    print sampleName
+
+inDirQCD = "tWInv"+inDirData.split("tW")[-1]
+for sampleName in sampleData:
+    print sampleName
+    if inDirData == "": continue
+    logFiles = [f for f in os.listdir(inDirQCD+sampleName+"/logs/") if "log" in f and "#" not in f]
+    scaleFactor = perMCSFs["qcd"]
+    for logFileName in logFiles:
+        logFile = open(inDirQCD+sampleName+"/logs/"+logFileName,'r')
+        for line in logFile:
+            if not len(line.split("|")) == 7: continue
+            cut = line.split("|")[1]
+            
+            if "UnIsolated" in cut:
+                cut = cut.split("UnIsolated")[0]+"     Tight"+cut.split("UnIsolated")[1]
+            if "Min" in cut or "Max" in cut: continue
+            if not cut in cutOrder:
+                cutOrder.append(cut)
+            if cut == "                                ":
+                cutYield['qcd'][cut] = "QCD"
+                continue
+            if "PV" in cut:
+                nEvt = float(line.split("|")[5])
+                if nEvt == 0:                            
+                    if not sampleName in emptyFile.keys():
+                        emptyFile[sampleName] = []
+                    emptyFile[sampleName].append(inDirQCD+sampleName+"/logs/"+logFileName)
+            if cut in cutYield["qcd"].keys():
+                cutYield["qcd"][cut] += scaleFactor * float(line.split("|")[5])
+            else:
+                cutYield["qcd"][cut] = scaleFactor * float(line.split("|")[5])
+            cutYield['total'][cut] += scaleFactor * float(line.split("|")[5])
 
 tableDict = {"                             PV ":"Primary Vertex      ",
              "                    MuonTrigger ":"Trigger             ",
+             "                ElectronTrigger ":"Trigger             ",
+             "       TightElectron.Number.All ":"1 Electron          ",
+             "       UnIsolatedMuon.Number.All ":"1 Muon              ",
+             "  UnIsolatedElectron.Number.All ":"1 Electron          ",
              "           TightMuon.Number.All ":"1 muon              ",
              "            VetoMuon.Number.All ":"Loose muon veto     ",
              "        VetoElectron.Number.All ":"Loose electron veto ",
@@ -185,3 +242,6 @@ for sample in sampleData:
         print >> resubmitDataFile, "condor_submit",sample+"/scripts/"+i.split("/")[-1].split(".")[0]+".submit -group cms -name job@schedd01.ihep.ac.cn"
 
 resubmitDataFile.close()
+
+for sample in logFilesWithNothing.keys():
+    if logFilesWithNothing[sample] > 0: print sample, "has ",logFilesWithNothing[sample],"empty logs"
