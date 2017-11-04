@@ -539,6 +539,7 @@ void Jet::SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met){
   if (_jerDown){
     ptSF = evtr->Jet_JerSFdown->operator[](iE)/evtr->Jet_JerSF->operator[](iE);
   }
+  //  float ptBefore = Pt();
   //Remove jet from MET
   met->SetPx(met->Px() + Px());
   met->SetPy(met->Py() + Py());
@@ -552,5 +553,17 @@ void Jet::SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met){
   //Propagate to MET
   met->SetPx(met->Px() - Px());
   met->SetPy(met->Py() - Py());
+
+  //  float ptAfter = Pt();
+  //  if (ptBefore < 30 && ptAfter > 30) {
+  //  std::cout << "Now selected: Jet #" << iE << "Jet Pt: " << ptBefore << " JER SF: " << evtr->Jet_JerSF->operator[](iE) << " up: " << evtr->Jet_JerSFup->operator[](iE) << " down: " << evtr->Jet_JerSFdown->operator[](iE) << " JES SF: " << evtr->Jet_JesSF->operator[](iE) << " up: " << evtr->Jet_JesSFup->operator[](iE) << " down: " << evtr->Jet_JesSFdown->operator[](iE);
+  //  std::cout << " Pt SF: " << ptSF << " Jet pt after: " << Pt() << std::endl;
+  //}
+  //if (ptBefore > 30 && ptAfter < 30) {
+  //  std::cout << "No longer selected: Jet #" << iE << "Jet Pt: " << ptBefore << " JER SF: " << evtr->Jet_JerSF->operator[](iE) << " up: " << evtr->Jet_JerSFup->operator[](iE) << " down: " << evtr->Jet_JerSFdown->operator[](iE) << " JES SF: " << evtr->Jet_JesSF->operator[](iE) << " up: " << evtr->Jet_JesSFup->operator[](iE) << " down: " << evtr->Jet_JesSFdown->operator[](iE);
+  //  std::cout << " Pt SF: " << ptSF << " Jet pt after: " << Pt() << std::endl;
+  //}
+
+
 
 }
