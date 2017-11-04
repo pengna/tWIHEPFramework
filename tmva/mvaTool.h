@@ -47,7 +47,8 @@ class mvaTool {
   mvaTool();
   //  ~mvaTool();
 
-  void doTraining(TString inDir);
+  void doBothTraining(TString inDir);
+  void doTraining(TString inDir, bool isttbar);
   void doReading(TString sampleName, TString inDir = "tW",TString outDir = "mvaOutput/", bool isData = false);
 
   //  void doReading();
@@ -58,7 +59,7 @@ class mvaTool {
   void processMCSample(TString sampleName,TString inDir,TString outDir, float * treevars, bool isData);
   void loopInSample(TString dirName, TString sampleName, float* treevars, bool isData);
   void createHists(TString sampleName);
-  void fillHists(TString sampleName, float* treevars, double mvaValue, double theweight);
+  void fillHists(TString sampleName, float* treevars, double mvaValue, double mvawJets, double theweight);
   void saveHists(TFile * outFile);
   void setbTagVars(TChain* theTree);
 
@@ -67,6 +68,8 @@ class mvaTool {
   std::tuple<float,float> calculatebTagSyst(float,std::vector<float>);
 
   std::map<TString,std::vector<TH1F*> > theHistoMap;
+  std::map<TString,std::vector<TH1F*> > bdtHistoMap;
+  std::map<TString,TH2F*> the2DHistoMap;
 
   std::vector<TString > varList;
   std::vector<TString > samplelist;
@@ -78,6 +81,7 @@ class mvaTool {
 
   float theweight;
   float mvaValue;
+  float mvawJetsValue;
 };
 
 #endif

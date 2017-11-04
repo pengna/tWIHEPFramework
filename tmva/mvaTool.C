@@ -16,10 +16,10 @@ mvaTool::mvaTool(){
     //  varList.push_back("M_nJet2040e24");
     //    varList.push_back("M_hadronicWPt");
     //    varList.push_back("M_hadronicWPhi");
-
+  
   baseName = "";
 
-    varList.push_back("M_nJet2040");
+  varList.push_back("M_nJet2040");
     varList.push_back("M_HT");
     varList.push_back("M_DeltaRBJetLepton");
     varList.push_back("M_DeltaRlightjets");
@@ -31,7 +31,7 @@ mvaTool::mvaTool(){
     varList.push_back("M_Jet1Jet2Jet3_Centrality");
     varList.push_back("M_DeltaRLeptonJet1");
     varList.push_back("M_nJet3040e24");
-
+    
     varList.push_back("M_Mass_Jet1Jet2Jet3LeptonMET");
     //varList.push_back("M_Pt_BJet1_4000");
     varList.push_back("M_Pt_Jet1_2040");
@@ -61,7 +61,12 @@ mvaTool::mvaTool(){
   
 }
 
-void mvaTool::doTraining(TString inDir){
+void mvaTool::doBothTraining(TString inDir){
+  doTraining(inDir,true);
+  doTraining(inDir,false);
+}
+
+void mvaTool::doTraining(TString inDir, bool isttbar = true){
   
   //This needs to be done first
   TMVA::Tools::Instance();
@@ -79,11 +84,13 @@ void mvaTool::doTraining(TString inDir){
   //Make TChains for signal and background
   TChain signal("TNT/BOOM");
   TChain bkg_ttbar("TNT/BOOM");
+  TChain bkg_wJets("TNT/BOOM");
 
   //From the inDir, add all skim files to the trees
   signal.Add(inDir+"tW_top_nfh/skims/tW_top*Skim.root");
   signal.Add(inDir+"tW_antitop_nfh/skims/tW_antitop*Skim.root");
   bkg_ttbar.Add(inDir+"ttbar/skims/ttbar*Skim.root");
+  bkg_wJets.Add(inDir+"wPlusJetsMCatNLO/skims/wPlusJetsMCatNLO*Skim.root");
 
   //Grab the input files now
   //  TFile * sigFile = TFile::Open("../condorStuff/skims20161129_bdtVariables/tW/tW_top/skims/tW_top0Skim.root"); //Not the final one, of course. Will probably need to sum the skims
@@ -95,7 +102,12 @@ void mvaTool::doTraining(TString inDir){
 
   //Add the trees to the factory
   loader.AddSignalTree    (&signal,    1.);
-  loader.AddBackgroundTree(&bkg_ttbar,1.);
+  if (isttbar){
+    loader.AddBackgroundTree(&bkg_ttbar,1.);
+  }
+  else {
+    loader.AddBackgroundTree(&bkg_wJets,1.);
+  }
   
   for (unsigned int i=0; i < varList.size(); i++) loader.AddVariable(varList[i].Data(),'F');
 
@@ -107,9 +119,12 @@ void mvaTool::doTraining(TString inDir){
 
   loader.PrepareTrainingAndTestTree( mycutsSig, mycutsBkg,"nTrain_Signal=0:nTrain_Background=0:SplitMode=Random:NormMode=NumEvents:!V" );
 
+  TString postfix = "_ttbar";
+  if (!isttbar) postfix = "_wJets";
+
   //  factory->BookMethod(&loader,TMVA::Types::kBDT, "BDT_200_10", "!H:!V:NTrees=200:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=10:PruneMethod=NoPruning" );
   //  factory->BookMethod(&loader,TMVA::Types::kBDT, "BDT_200_5", "!H:!V:NTrees=200:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:SeparationType=GiniIndex:nCuts=5:PruneMethod=NoPruning" );
-    factory->BookMethod(&loader,TMVA::Types::kBDT, "BDT_Grad_1000_20_0.1", "!H:!V:NTrees=1000:MaxDepth=3:BoostType=Grad:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning:Shrinkage=0.1" );
+    factory->BookMethod(&loader,TMVA::Types::kBDT, "BDT_Grad_1000_20_0.1"+postfix, "!H:!V:NTrees=1000:MaxDepth=3:BoostType=Grad:SeparationType=GiniIndex:nCuts=20:PruneMethod=NoPruning:Shrinkage=0.1" );
   //  factory->BookMethod(&loader,TMVA::Types::kBDT, "BDT_Grad_400_10", "!H:!V:NTrees=400:MaxDepth=3:BoostType=Grad:SeparationType=GiniIndex:nCuts=10:PruneMethod=NoPruning" );
   //factory->BookMethod(&loader,TMVA::Types::kBDT, "BDT_Grad_400_5", "!H:!V:NTrees=400:MaxDepth=3:BoostType=Grad:SeparationType=GiniIndex:nCuts=5:PruneMethod=NoPruning" );
   //factory->BookMethod(&loader,TMVA::Types::kBDT, "BDT_Grad_200_10", "!H:!V:NTrees=200:MaxDepth=3:BoostType=Grad:SeparationType=GiniIndex:nCuts=10:PruneMethod=NoPruning" );
@@ -148,7 +163,8 @@ void mvaTool::doReading(TString sampleName, TString inDir, TString outDir, bool 
     reader->AddVariable( varList[i].Data(), &(treevars[i]) );
   }
 
-  reader->BookMVA( "BDT", baseName+"loader/weights/tWLepJet_training_BDT_Grad_1000_20_0.1.weights.xml" );
+  reader->BookMVA( "BDT_ttbar", baseName+"loader/weights/tWLepJet_training_BDT_Grad_1000_20_0.1_ttbar.weights.xml" );
+  reader->BookMVA( "BDT_wJets", baseName+"loader/weights/tWLepJet_training_BDT_Grad_1000_20_0.1_wJets.weights.xml" );
 
   std::cout << "Finished reading BDT training" << std::endl;
 
@@ -257,18 +273,19 @@ void mvaTool::loopInSample(TString dirWithTrees, TString sampleName, float* tree
     }
     theTree->GetEntry(i);
 
-    mvaValue = reader->EvaluateMVA("BDT");
+    mvaValue = reader->EvaluateMVA("BDT_ttbar");
+    mvawJetsValue = reader->EvaluateMVA("BDT_wJets");
 
-    fillHists(sampleName,treevars,mvaValue,theweight);
+    fillHists(sampleName,treevars,mvaValue,mvawJetsValue,theweight);
     //Now fill the weight-based systematic histograms
     if (!isData){
-      fillHists(sampleName+"_PU_up",treevars,mvaValue,theweight * (puWeightUp/puWeight));
-      fillHists(sampleName+"_PU_down",treevars,mvaValue,theweight * (puWeightDown/puWeight));
-      fillHists(sampleName+"_LSF_up",treevars,mvaValue,theweight * (lepSFWeightUp/lepSFWeight));
-      fillHists(sampleName+"_LSF_down",treevars,mvaValue,theweight * (lepSFWeightDown/lepSFWeight));
+      fillHists(sampleName+"_PU_up",treevars,mvaValue,mvawJetsValue,theweight * (puWeightUp/puWeight));
+      fillHists(sampleName+"_PU_down",treevars,mvaValue,mvawJetsValue,theweight * (puWeightDown/puWeight));
+      fillHists(sampleName+"_LSF_up",treevars,mvaValue,mvawJetsValue,theweight * (lepSFWeightUp/lepSFWeight));
+      fillHists(sampleName+"_LSF_down",treevars,mvaValue,mvawJetsValue,theweight * (lepSFWeightDown/lepSFWeight));
       bSysts = calculatebTagSyst(bWeight,{bWeighthfs1Up,bWeighthfs1Down,bWeighthfs2Up,bWeighthfs2Down,bWeightcferr1Up,bWeightcferr1Down,bWeightcferr2Up,bWeightcferr2Down,bWeightjerUp,bWeightjerDown,bWeightlfUp,bWeightlfDown});
-      fillHists(sampleName+"_bTag_up",treevars,mvaValue,theweight * std::get<0>(bSysts));
-      fillHists(sampleName+"_bTag_down",treevars,mvaValue,theweight * std::get<1>(bSysts));
+      fillHists(sampleName+"_bTag_up",treevars,mvaValue,mvawJetsValue,theweight * std::get<0>(bSysts));
+      fillHists(sampleName+"_bTag_down",treevars,mvaValue,mvawJetsValue,theweight * std::get<1>(bSysts));
     }
   }
 
@@ -277,6 +294,7 @@ void mvaTool::loopInSample(TString dirWithTrees, TString sampleName, float* tree
 void mvaTool::createHists(TString sampleName){
 
   std::vector<TH1F*> histovect;
+  std::vector<TH1F*> bdtVect;
 
   //Make a histogram per variable
   for (unsigned int i = 0; i<varList.size(); i++){
@@ -313,25 +331,49 @@ void mvaTool::createHists(TString sampleName){
     histo->Sumw2();
     histovect.push_back(histo);
   }
-  TH1F* histo = new TH1F(("MVA_"+sampleName).Data(),("MVA_"+sampleName).Data(),20,-0.8,0.8);
-  histo->Sumw2();
-  histovect.push_back(histo);
-  
-  theHistoMap[sampleName] = histovect;
+  for (int nBins = 10; nBins < 60; nBins+=10){
+    TH1F* histo = new TH1F(("MVA_ttbar_bin"+std::to_string(nBins)+"_"+sampleName).Data(),("MVA_ttbar_bin"+std::to_string(nBins)+"_"+sampleName).Data(),nBins,-0.8,0.8);
+    histo->Sumw2();
+    bdtVect.push_back(histo);
+  }
+  TH1F* histo2 = new TH1F(("MVA_wJets_"+sampleName).Data(),("MVA_wJets_"+sampleName).Data(),20,-0.3,0.3);
+    histo2->Sumw2();
+  histovect.push_back(histo2);
 
+  TH2F* bdt2D = new TH2F(("MVA_2D_"+sampleName).Data(),("MVA_2D_"+sampleName).Data(),20,-0.8,0.8,20,-0.3,0.3);
+  bdt2D->Sumw2();
+  the2DHistoMap[sampleName] = bdt2D;
+
+  theHistoMap[sampleName] = histovect;
+  bdtHistoMap[sampleName] = bdtVect;
 }
 
-void mvaTool::fillHists(TString sampleName, float* treevars, double mvaValue, double theweight){
+void mvaTool::fillHists(TString sampleName, float* treevars, double mvaValue, double mvawJetsValue, double theweight){
   std::vector<TH1F*> histovect = theHistoMap[sampleName];
+  std::vector<TH1F*> bdtVector = bdtHistoMap[sampleName];
 
   for (unsigned int i=0; i < varList.size(); i++) histovect[i]->Fill(treevars[i],theweight);
-  histovect.back()->Fill(mvaValue,theweight);
+  for (unsigned int j = 0; j < bdtVector.size(); j++) bdtVector[j]->Fill(mvaValue,theweight);
+    
+  if (histovect.size() > 1){
+    //    histovect[histovect.size()-2]->Fill(mvaValue,theweight);
+     histovect[histovect.size()-1]->Fill(mvawJetsValue,theweight);
+  }
+  the2DHistoMap[sampleName]->Fill(mvaValue,mvawJetsValue,theweight);
+  
 }
 
 void mvaTool::saveHists(TFile* outFile){
   outFile->cd();
   for (auto histoMapElement: theHistoMap){
     for (auto hist: histoMapElement.second) hist->Write();
+  }
+  for (auto histoMapElement: bdtHistoMap){
+    for (auto hist: histoMapElement.second) hist->Write();
+  }
+  
+  for (auto hist2D: the2DHistoMap){
+    hist2D.second->Write();
   }
 }
 
