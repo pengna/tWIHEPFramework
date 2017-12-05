@@ -91,6 +91,7 @@ private:
   myTH1F* _hPileUpWeight; // Histogram of PileUpWgt weight
   myTH1F* _hbWeight; // Histogram of b weight
   myTH1F* _hLeptonSFWeight; //Histogram of the lepton SF claculated for the event
+  myTH1F* _hTriggerSFWeight; //Histogram of trigger SF
   std::map<std::string,myTH1F*> _hbTagReshape; //Map of histograms containing the information for b tag reshaping and its associated systematics
   myTH1F* _hGenWeight; //Histogram of the gen weight for the event
   myTH1F* _hOutputWeight; // Histogram of output weights
@@ -120,7 +121,7 @@ private:
   std::vector<std::string> _bTagSystNames;
   std::map<std::string,float> _bTagSystValues;
 
-  std::tuple<Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
+  std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
   void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName);
   Double_t getBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
 

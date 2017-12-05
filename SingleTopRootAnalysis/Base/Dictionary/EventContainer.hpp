@@ -345,6 +345,22 @@ class EventContainer
   inline Double_t GetEventLepSFWeightDown() const {return _EventLepSFWeightDown;};
   inline Double_t EventLepSFWeightDown() const {return GetEventLepSFWeightDown();};
 
+  //lepton SF weight per event
+  inline void SetEventTrigSFWeight(const Double_t& lepSFweight) {_EventTrigSFWeight = lepSFweight;};
+  inline Double_t GetEventTrigSFWeight() const {return _EventTrigSFWeight;};
+  inline Double_t EventTrigSFWeight() const {return GetEventTrigSFWeight();};
+
+  //lepton SF weight up variation per event
+  inline void SetEventTrigSFWeightUp(const Double_t& lepSFweight) {_EventTrigSFWeightUp = lepSFweight;};
+  inline Double_t GetEventTrigSFWeightUp() const {return _EventTrigSFWeightUp;};
+  inline Double_t EventTrigSFWeightUp() const {return GetEventTrigSFWeightUp();};
+
+  //lepton SF weight down variation per event
+  inline void SetEventTrigSFWeightDown(const Double_t& lepSFweight) {_EventTrigSFWeightDown = lepSFweight;};
+  inline Double_t GetEventTrigSFWeightDown() const {return _EventTrigSFWeightDown;};
+  inline Double_t EventTrigSFWeightDown() const {return GetEventTrigSFWeightDown();};
+
+
   //set and get btag weights for central and systematics
   inline void SetEventbTagReshape(const Double_t& lepSFweight, std::string systName = "central" ) {_EventbTagReshape[systName] = lepSFweight;};
   inline Double_t GetEventbTagReshape(std::string systName = "central") {return _EventbTagReshape[systName];};
@@ -419,12 +435,15 @@ class EventContainer
   Float_t _EventPileupMinBiasDownWeight;
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventLepSFWeight;
+  Float_t _EventTrigSFWeight;
   Float_t _EventGenWeight;
   std::map<std::string,Float_t> _EventbTagReshape;
 
   //Add in the systematic variations to the SFs
   Float_t _EventLepSFWeightUp;
   Float_t _EventLepSFWeightDown;
+  Float_t _EventTrigSFWeightUp;
+  Float_t _EventTrigSFWeightDown;
 
   //MultijetJESUncertaintyProvider myJES;
   // CalibrationDataVariables CalibVar;

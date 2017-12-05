@@ -221,6 +221,11 @@ void EventWeight::BookHistogram()
   _hLeptonSFWeight -> SetXAxisTitle("Lep SF");
   _hLeptonSFWeight -> SetYAxisTitle("Events");
 
+  // Histogram of trigger weight
+  _hTriggerSFWeight =  DeclareTH1F("triggerSFWeight","Event Weight for trigger SF",100,0.,2.);
+  _hTriggerSFWeight -> SetXAxisTitle("Trigger SF");
+  _hTriggerSFWeight -> SetYAxisTitle("Events");
+
   //Create one histogtam per b-tag systematic (and central value)
   for (auto const bTagSystName: _bTagSystNames){
     // Histogram of bTag shape weight
@@ -233,7 +238,7 @@ void EventWeight::BookHistogram()
   _hGenWeight = DeclareTH1F("genWeight","Generator level event weight",10,-2.,2.);
   _hGenWeight -> SetXAxisTitle("Gen Weight");
   _hGenWeight -> SetYAxisTitle("Events");
-    
+
   // Histogram of Output Weights
   _hOutputWeight =  DeclareTH1F("OutputWeight","Output Event Weight",100,-10.,10.);
   _hOutputWeight -> SetXAxisTitle("Output Weight");
@@ -373,11 +378,17 @@ Bool_t EventWeight::Apply()
 
  //only apply pileup weight if specified
  if(isPileUpWgt()) {
-   if (_mcPV->GetBinContent(tree->trueInteractions) > 0){
-     pileupEventWeight = _dataPV->GetBinContent(tree->trueInteractions) / _mcPV->GetBinContent(tree->trueInteractions);
+   Int_t binOfInterest = _mcPV->GetXaxis()->FindBin(tree->trueInteractions);
+   if (_mcPV->GetBinContent(binOfInterest) > 0){
+     pileupEventWeight = _dataPV->GetBinContent(binOfInterest) / _mcPV->GetBinContent(binOfInterest);
+     Float_t pileupEventWeightDebug = _dataPV->GetBinContent(tree->trueInteractions+1) / _mcPV->GetBinContent(tree->trueInteractions+1);
      if (isPileupSysts()){
-       pileupMinBiasUpWeight = _minBiasUpPV->GetBinContent(tree->trueInteractions) / _mcPV->GetBinContent(tree->trueInteractions);
-       pileupMinBiasDownWeight = _minBiasDownPV->GetBinContent(tree->trueInteractions) / _mcPV->GetBinContent(tree->trueInteractions);
+       pileupMinBiasUpWeight = _minBiasUpPV->GetBinContent(binOfInterest) / _mcPV->GetBinContent(binOfInterest);
+       pileupMinBiasDownWeight = _minBiasDownPV->GetBinContent(binOfInterest) / _mcPV->GetBinContent(binOfInterest);
+       Float_t pileupMinBiasUpWeightDebug = _minBiasUpPV->GetBinContent(tree->trueInteractions+1) / _mcPV->GetBinContent(tree->trueInteractions+1);
+       Float_t pileupMinBiasDownWeightDebug = _minBiasDownPV->GetBinContent(tree->trueInteractions+1) / _mcPV->GetBinContent(tree->trueInteractions+1);
+       //       std::cout << tree->trueInteractions << " " << binOfInterest << " " << pileupEventWeight << " up: " << pileupMinBiasUpWeight << " down: " << pileupMinBiasDownWeight << std::endl;
+       //       std::cout << tree->trueInteractions << " " << binOfInterest << " nominal: " << pileupEventWeight << " up: " << pileupMinBiasUpWeight << " down: " << pileupMinBiasDownWeight <<  " old: " << pileupEventWeightDebug << " up: " << pileupMinBiasUpWeightDebug << " down: " << pileupMinBiasDownWeightDebug << std::endl;
      }
    }
    else {
@@ -397,10 +408,12 @@ Bool_t EventWeight::Apply()
   
  
  float lepSFWeight(1.0), lepSFWeightUp(1.0), lepSFWeightDown(1.0);
+ float trigSFWeight(1.0), trigSFWeightUp(1.0), trigSFWeightDown(1.0);
 
  if(_useLeptonSFs){
-   std::tie(lepSFWeight,lepSFWeightUp,lepSFWeightDown) = getLeptonWeight(EventContainerObj);
+   std::tie(lepSFWeight,lepSFWeightUp,lepSFWeightDown,trigSFWeight,trigSFWeightUp,trigSFWeightDown) = getLeptonWeight(EventContainerObj);
    wgt *= lepSFWeight;
+   wgt *= trigSFWeight;
  }
   
 
@@ -411,6 +424,8 @@ Bool_t EventWeight::Apply()
    wgt *= bTagReshape["central"];
  }
   
+ //PDF weights
+ 
 
  // if(isPileUpWgt()) {
     //This version is based on primary vertex number and no longer used
@@ -425,7 +440,7 @@ Bool_t EventWeight::Apply()
     wgt *= mnwgt;
     _hPileUpWgtWeight->FillWithoutWeight(mnwgt);
     **/
- // }
+ // 
  // cout << wgt << endl;
   EventContainerObj -> SetOutputEventWeight(wgt);
   EventContainerObj -> SetEventPileupWeight(pileupEventWeight);
@@ -434,11 +449,16 @@ Bool_t EventWeight::Apply()
   EventContainerObj -> SetEventPileupMinBiasDownWeight(pileupMinBiasDownWeight);
   EventContainerObj -> SetEventbWeight(bEventWeight);
   EventContainerObj -> SetEventLepSFWeight(lepSFWeight);
+  EventContainerObj -> SetEventTrigSFWeight(trigSFWeight);
   EventContainerObj -> SetGenWeight(genWeight);
+
   for (auto const bSystName: _bTagSystNames) EventContainerObj -> SetEventbTagReshape(bTagReshape[bSystName],bSystName);
 
   EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
   EventContainerObj -> SetEventLepSFWeightDown(lepSFWeightDown);
+
+  EventContainerObj -> SetEventTrigSFWeightUp(trigSFWeightUp);
+  EventContainerObj -> SetEventTrigSFWeightDown(trigSFWeightDown);
 
   //Also save the systematic variations in these SFs
   //  EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
@@ -452,6 +472,7 @@ Bool_t EventWeight::Apply()
   _hPileUpWeight   -> FillWithoutWeight(EventContainerObj -> GetEventPileupWeight());
   _hbWeight	   -> FillWithoutWeight(EventContainerObj -> GetEventbWeight());
   _hLeptonSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventLepSFWeight());
+  _hTriggerSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventTrigSFWeight());
   _hGenWeight	   -> FillWithoutWeight(EventContainerObj -> GetGenWeight());
   for (auto const bSystName: _bTagSystNames) _hbTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventbTagReshape(bSystName));
 
@@ -522,9 +543,10 @@ void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHist
  * Input:  None                                                               * 
  * Output: Double_t weight to be applied to the event weight                  * 
  ******************************************************************************/
-std::tuple<Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContainer* EventContainerObj){
+std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContainer* EventContainerObj){
 
   Double_t leptonWeight = 1.0, leptonWeightUp = 1.0, leptonWeightDown = 1.0;
+  Double_t triggerWeight = 1.0, triggerWeightUp = 1.0, triggerWeightDown = 1.0;
 
   for (auto const & muon : *EventContainerObj->muonsToUsePtr){
     //Get the bin shared by iso and id SFs
@@ -550,9 +572,14 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContain
     //Evaluate muon tk
     Float_t tkSF = _muonTkSF->Eval(std::fabs(muon.Eta()));
 
-    leptonWeight *= isoSF * idSF * trigSF * tkSF;
-    leptonWeightUp *= (isoSF + isoUnc) * (idSF + idUnc) * (trigSF + trigUnc) * tkSF;
-    leptonWeightDown *= (isoSF - isoUnc) * (idSF - idUnc) * (trigSF - trigUnc) * tkSF;
+    leptonWeight *= isoSF * idSF * tkSF;
+    leptonWeightUp *= (isoSF + isoUnc) * (idSF + idUnc) * tkSF;
+    leptonWeightDown *= (isoSF - isoUnc) * (idSF - idUnc) * tkSF;
+
+    triggerWeight = trigSF;
+    triggerWeightUp = trigSF + trigUnc;
+    triggerWeightDown = trigSF - trigUnc;
+
   }
 
   for (auto const & ele : *EventContainerObj->electronsToUsePtr){
@@ -577,7 +604,7 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContain
     leptonWeightDown *= (recoSF - recoUnc) * (idSF - idUnc);
   }
 
-  return std::make_tuple(leptonWeight,leptonWeightUp,leptonWeightDown);
+  return std::make_tuple(leptonWeight,leptonWeightUp,leptonWeightDown,triggerWeight,triggerWeightUp,triggerWeightDown);
 }
 
 /******************************************************************************  
