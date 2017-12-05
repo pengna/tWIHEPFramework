@@ -65,7 +65,7 @@ class Jet: public Particle
   ~Jet();
 
   // Set all contents to their defaults
-  inline void Clear() { Particle::Clear(); _numberOfConstituents=0; _chargedMultiplicity=0;  _bDiscriminator = -999.0; _pileupId = 0.0; _mass = 0.0; _uncorrPt = 0.0; _neutralHadEnergyFraction=0.0; _neutralEmEmEnergyFraction = 0.0; _chargedHadronEnergyFraction =0.0; _chargedEmEnergyFraction=0.0; _muonEnergyFraction=0.0; _electronEnergy=0.0; _photonEnergy=0.0; _tagged = kFALSE;
+  inline void Clear() { Particle::Clear(); _numberOfConstituents=0; _chargedMultiplicity=0;  _bDiscriminator = -999.0; _pileupId = 0.0; _mass = 0.0; _uncorrPt = 0.0; _neutralHadEnergyFraction=0.0; _neutralEmEmEnergyFraction = 0.0; _chargedHadronEnergyFraction =0.0; _chargedEmEnergyFraction=0.0; _muonEnergyFraction=0.0; _electronEnergy=0.0; _photonEnergy=0.0; _tagged = kFALSE; _hadronFlavour=-1;
 }
 
   void SetCuts(TEnv* config);
@@ -79,6 +79,10 @@ class Jet: public Particle
   inline void SetnumberOfConstituents(Int_t numberOfConstituents){_numberOfConstituents = numberOfConstituents;};
   inline Int_t GetnumberOfConstituents() const {return _numberOfConstituents;};
   inline Int_t numberOfConstituents() const {return _numberOfConstituents;};
+
+  inline void SethadronFlavour(Int_t hadronFlavour){_hadronFlavour = hadronFlavour;};
+  inline Int_t GethadronFlavour() const {return _hadronFlavour;};
+  inline Int_t hadronFlavour() const {return _hadronFlavour;};
 
   inline void SetchargedMultiplicity(Int_t chargedMultiplicity){_chargedMultiplicity = chargedMultiplicity;};
   inline Int_t GetchargedMultiplicity() const {return _chargedMultiplicity;};
@@ -152,6 +156,7 @@ class Jet: public Particle
  private:
   Int_t _numberOfConstituents;   
   Int_t _chargedMultiplicity;   
+  Int_t _hadronFlavour;
   Double_t _bDiscriminator;   
   Double_t _pileupId;   
   Double_t _mass;   
@@ -162,7 +167,7 @@ class Jet: public Particle
   Double_t _muonEnergyFraction;   
   Double_t _electronEnergy;   
   Double_t _photonEnergy;   
-  Double_t _uncorrPt; 
+  Double_t _uncorrPt;  
   Bool_t _tagged;
   Double_t _closestLep;
 

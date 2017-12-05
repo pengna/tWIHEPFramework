@@ -66,7 +66,7 @@ ClassImp(Jet)
  * Output: None                                                               *
  ******************************************************************************/
   Jet::Jet() : Particle::Particle(),
-  _numberOfConstituents(0), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0), _jesUp(false), _jesDown(false), _jerUp(false), _jerDown(false)
+  _numberOfConstituents(0), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0), _jesUp(false), _jesDown(false), _jerUp(false), _jerDown(false), _hadronFlavour = -1
 {
 } //Jet()
 
@@ -92,6 +92,7 @@ Jet::~Jet()
  ******************************************************************************/
 Jet::Jet(const Jet& other): Particle(other),
 _numberOfConstituents		(other.GetnumberOfConstituents()), 
+_hadronFlavour		        (other.GethadronFlavour()), 
 _chargedMultiplicity		(other.GetchargedMultiplicity()),  
 _bDiscriminator 		(other.GetbDiscriminator()), 
 _pileupId 			(other.GetpileupId()), 
@@ -116,7 +117,7 @@ _photonEnergy			(other.GetphotonEnergy())
  * Output: None                                                               *
  ******************************************************************************/
 Jet::Jet(const Particle& other): Particle(other),
-_numberOfConstituents(0), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0)
+ _numberOfConstituents(0), _hadronFlavour(-1), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0)
 {
  
 } //Jet()
@@ -166,6 +167,7 @@ Jet& Jet::operator=(const Particle& other)
   
   Particle::operator=(other);
   SetnumberOfConstituents(0), 
+  SethadronFlavour(-1),
   SetchargedMultiplicity(0),  
   SetbDiscriminator ( -999.0), 
   SetpileupId ( 0.0), 
@@ -195,6 +197,7 @@ Jet& Jet::operator=(const Jet& other)
   
   Particle::operator=(other);
   SetnumberOfConstituents		(other.GetnumberOfConstituents());
+  SethadronFlavour	         	(other.GethadronFlavour());
   SetchargedMultiplicity		(other.GetchargedMultiplicity()); 
   SetbDiscriminator 			(other.GetbDiscriminator());
   SetpileupId 				(other.GetpileupId());
@@ -222,6 +225,7 @@ Jet& Jet::operator=(Jet& other)
 {
   Particle::operator=(other);
   SetnumberOfConstituents		(other.GetnumberOfConstituents());
+  SethadronFlavour	         	(other.GethadronFlavour());
   SetchargedMultiplicity		(other.GetchargedMultiplicity()); 
   SetbDiscriminator 			(other.GetbDiscriminator());
   SetpileupId 				(other.GetpileupId());
@@ -299,6 +303,7 @@ Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selecte
   SetmuonEnergyFraction			(evtr -> Jet_muonEnergyFraction     	-> operator[](iE));
   SetelectronEnergy			(evtr -> Jet_electronEnergy     	-> operator[](iE));
   SetphotonEnergy			(evtr -> Jet_photonEnergy     		-> operator[](iE));
+  SethadronFlavour                      (evtr -> Jet_hadronFalvour              -> operator[](iE));
 
   // Now we want to do the JER and JES systematic adjustments to the jet. This also requires correcting the MET.
   if (_jesUp || _jesDown || _jerUp || _jerDown) SystematicPtShift(evtr, iE, met);  
