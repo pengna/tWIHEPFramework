@@ -201,9 +201,9 @@ Events.Source.500004: 49144274
 Weight.Source.500005: 18610.
 Events.Source.500005: 30920596
 
-# 500006 - wPlusJets
+# 500006 - wPlusJetsMadgraph
 Weight.Source.500006: 20508.9
-Events.Source.500006: 24120319
+Events.Source.500006: 29705748
 
 #500007 - WW
 Weight.Source.500007: 118.7
