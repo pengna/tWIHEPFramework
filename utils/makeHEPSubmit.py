@@ -62,6 +62,7 @@ samplesMC=[
 "zPlusJetsLowMass",
 "zPlusJetsHighMass",
 "wPlusJetsMCatNLO",
+"wPlusJetsMadgraph",
 "tW_top_nfh",
 "tW_antitop_nfh"
 ]
@@ -119,7 +120,10 @@ samplesSyst = [
 "ttbar_hdampup",
 "ttbar_hdampdown"
 ]
-
+jesTestSamples = ["JESTest"]
+#systSamples = ["ttbar_hdampdown"]
+#mcSamples = []
+#samplesData = []
 fileListDirectory = "moriond17/"
 sample = samplesMC
 if "inv" in sys.argv:
@@ -177,6 +181,9 @@ if "electron" in sys.argv:
 	triggerName = "Electron "
 #	if not "data" in sys.argv:
 	analysis += "Ele"
+if "jesTest" in sys.argv:
+	sample = jesTestSamples
+	analysis += "JESTest"
 #executable = "Wt_generic.x"
 #for the queue
 workpath    = os.getcwd()+"/"+analysis +"/"
@@ -212,7 +219,8 @@ nJobs = {
 "tW_antitop_nfh":19,
 "zPlusJetsLowMass":24,
 "zPlusJetsHighMass":48,
-"wPlusJetsMCatNLO":30,
+"wPlusJetsMCatNLO":322,
+"wPlusJetsMadgraph":106,
 "SingMuB":176,
 "SingMuC":58,
 "SingMuD":98,
@@ -256,7 +264,8 @@ nJobs = {
 "ttbar_herwig":46,
 "ttbar_amcatnlo":88,
 "ttbar_hdampup":59,
-"ttbar_hdampdown":5
+"ttbar_hdampdown":55,
+"JESTest":11
 }
 
 nJobsSum16 = {
@@ -280,6 +289,7 @@ nJobsSum16 = {
 "zPlusJetsLowMass":74,
 "zPlusJetsHighMass":72,
 "wPlusJetsMCatNLO":24,
+"wPlusJetsMadgraph":43,
 "SingMuB":174,
 "SingMuC":58,
 "SingMuD":98,
