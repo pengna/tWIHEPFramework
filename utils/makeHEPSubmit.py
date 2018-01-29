@@ -9,7 +9,8 @@ import subprocess
 #analysis and task
 analysis = "tW"
 taskname = "EvtSel"
-executable = "Wt_generic.x"
+frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
+executable = "bin/Wt/Wt_generic.x"
 #executable = "Wt_nVertOnly.x"
 configFile = "config/overall/SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config"
 invPostfix = ""
@@ -17,6 +18,7 @@ mcPostfix = " -MCatNLO -mc -bTagReshape -lepSFs -PileUpWgt"
 triggerName = "Muon "
 nJets = 3
 nbJets = 1
+fileListDirectory = "config/files/moriond17/"
 makeSkims = False
 samplesMC76=[
 "qcd1000_1500",
@@ -124,7 +126,6 @@ jesTestSamples = ["JESTest"]
 #systSamples = ["ttbar_hdampdown"]
 #mcSamples = []
 #samplesData = []
-fileListDirectory = "moriond17/"
 sample = samplesMC
 if "inv" in sys.argv:
 	invPostfix = " -InvertIsolation"
@@ -173,7 +174,7 @@ if "data" in sys.argv:
 if "systs" in sys.argv:
 	analysis += "Systs"
 	sample = samplesSyst
-	fileListDirectory = "systSamples/"
+	fileListDirectory = "config/files/systSamples/"
 if "skims" in sys.argv:
 	makeSkims = True 
 if "electron" in sys.argv:
@@ -187,7 +188,6 @@ if "jesTest" in sys.argv:
 #executable = "Wt_generic.x"
 #for the queue
 workpath    = os.getcwd()+"/"+analysis +"/"
-frameworkDir = "/publicfs/cms/user/duncanleg/tW13TeV/framework/"
 jobDir      = workpath+"/"+"Jobs"
 smallerJobs = True
 AnalyzerDir = workpath+"/"+"Analyzer"
@@ -382,7 +382,7 @@ def prepareCshJob(sample,shFile,frameworkDir,workpath,samplePost=""):
 #	print >> subFile, frameworkDir+"bin/Wt/Wt_generic.x -config "+frameworkDir+"SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon -PileUpWgt -BWgt"
 	skimString = ""
 	if makeSkims: skimString = " -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root "
-	print >> subFile, frameworkDir+"bin/Wt/"+executable+" -config "+frameworkDir+configFile+" -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -SelectTrigger " + triggerName + invPostfix + mcPostfix + skimString + " -nJets {0} -nbJets {1}".format(nJets,nbJets)
+	print >> subFile, frameworkDir+executable+" -config "+frameworkDir+configFile+" -inlist "+frameworkDir+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -SelectTrigger " + triggerName + invPostfix + mcPostfix + skimString + " -nJets {0} -nbJets {1}".format(nJets,nbJets)
         #print >> subFile, "root -b -q -l "+rootplizer+"'(\""+input+"\",\""+output+"\")'"
 	subprocess.call("chmod 777 "+shFile, shell=True)
 
@@ -415,7 +415,8 @@ for k in sample:
 		print >> allJobFile, "hep_sub "+ shFileName + " -o "+logFileName+ " -e "+errorFileName
 
 	else:
-		for j in range(nJobs[sampleName]):
+		inputFiles  = [f for f in os.listdir(frameworkDir+fileListDirectory) if sampleName in f]
+		for j in range(len(inputFiles)):
 #			submitFileName = workpath + sampleName + "/scripts/" + sampleName + str(j) + ".submit"
 			shFileName = workpath + sampleName + "/scripts/" + sampleName + str(j) + ".sh"
 			logFileName = workpath + sampleName + "/logs/" + sampleName + str(j) + ".log"
