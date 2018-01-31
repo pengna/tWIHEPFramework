@@ -135,6 +135,23 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
   }
   else setPileUpWgt(false);
 
+  string bTagEfficFileName = conf -> GetValue("Include.bTagEfficFile","null");
+  if (bTagEfficFileName != "null"){
+    setEfficbTag();
+    std::cout << "Doing efficiency based b-tags!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << isEfficbTag() << std::endl;
+    TFile* bTagEfficFile = TFile::Open(bTagEfficFileName.c_str(),"READ");
+    _bFlavEffic = (TH1F*)bTagEfficFile->Get("bFlavEfficiency");
+    _bFlavEffic->SetDirectory(0);
+    _cFlavEffic = (TH1F*)bTagEfficFile->Get("cFlavEfficiency");
+    _cFlavEffic->SetDirectory(0);
+    _lightFlavEffic = (TH1F*)bTagEfficFile->Get("lightFlavEfficiency");
+    _lightFlavEffic->SetDirectory(0);
+    bTagEfficFile->Close();
+    delete bTagEfficFile;
+  }
+  else setEfficbTag(kFALSE);
+  
+
   if (bWeight) setbWeight(true);
   else setbWeight(false);
 
@@ -231,7 +248,11 @@ void EventWeight::BookHistogram()
     // Histogram of bTag shape weight
     _hbTagReshape[bTagSystName] =  DeclareTH1F("bTagReshape_"+bTagSystName,"bTag reshaping "+bTagSystName,100,-5.0,5.);
     _hbTagReshape[bTagSystName] -> SetXAxisTitle("bTag Reshape " + bTagSystName);
+
     _hbTagReshape[bTagSystName] -> SetYAxisTitle("Events");
+    _hMisTagReshape[bTagSystName] =  DeclareTH1F("misTagReshape_"+bTagSystName,"mistag reshaping "+bTagSystName,100,-5.0,5.);
+    _hMisTagReshape[bTagSystName] -> SetXAxisTitle("misTag Reshape " + bTagSystName);
+    _hMisTagReshape[bTagSystName] -> SetYAxisTitle("Events");
   }
 
   //Create the histograms to show the gen weight of the sample.
@@ -296,9 +317,10 @@ void EventWeight::BookHistogram()
   if (_usebTagReshape){
     _bTagCalib = BTagCalibration(conf->GetValue("BTaggerAlgo","CSVv2"),conf->GetValue("Include.BTagCSVFile","null"));
     _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central",_bTagSystNames);
-    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
-    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
     _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"iterativefit");
+    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
+    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
+
   }
 
 } //BookHistogram()
@@ -418,10 +440,17 @@ Bool_t EventWeight::Apply()
   
 
  std::map<std::string,float> bTagReshape;
+ std::map<std::string,float> misTagReshape;
 
  if (_usebTagReshape){
-   for (auto const bSystName: _bTagSystNames) bTagReshape[bSystName] = getBTagReshape(EventContainerObj,bSystName);
+   if (!isEfficbTag()) {
+     for (auto const bSystName: _bTagSystNames) std::tie(bTagReshape[bSystName],misTagReshape[bSystName]) = getBTagReshape(EventContainerObj,bSystName);
+   }
+   else {
+     for (auto const bSystName: _bTagSystNames) std::tie(bTagReshape[bSystName],misTagReshape[bSystName]) = getEfficBTagReshape(EventContainerObj,bSystName);
+   }
    wgt *= bTagReshape["central"];
+   wgt *= misTagReshape["central"];
  }
   
  //PDF weights
@@ -452,7 +481,10 @@ Bool_t EventWeight::Apply()
   EventContainerObj -> SetEventTrigSFWeight(trigSFWeight);
   EventContainerObj -> SetGenWeight(genWeight);
 
-  for (auto const bSystName: _bTagSystNames) EventContainerObj -> SetEventbTagReshape(bTagReshape[bSystName],bSystName);
+  for (auto const bSystName: _bTagSystNames) {
+    EventContainerObj -> SetEventbTagReshape(bTagReshape[bSystName],bSystName);
+    EventContainerObj -> SetEventMisTagReshape(misTagReshape[bSystName],bSystName);
+  }
 
   EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
   EventContainerObj -> SetEventLepSFWeightDown(lepSFWeightDown);
@@ -474,7 +506,10 @@ Bool_t EventWeight::Apply()
   _hLeptonSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventLepSFWeight());
   _hTriggerSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventTrigSFWeight());
   _hGenWeight	   -> FillWithoutWeight(EventContainerObj -> GetGenWeight());
-  for (auto const bSystName: _bTagSystNames) _hbTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventbTagReshape(bSystName));
+  for (auto const bSystName: _bTagSystNames) {
+    _hbTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventbTagReshape(bSystName));
+    _hMisTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventMisTagReshape(bSystName));
+  }
 
   return kTRUE;
   
@@ -615,9 +650,32 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
  * Input:  EventContainer of the event                                        *  
  * Output: Double_t weight to be applied to the event weight                  *  
  ******************************************************************************/ 
-Double_t EventWeight::getBTagReshape(EventContainer * EventContainerObj, std::string syst){
+std::tuple<Double_t,Double_t> EventWeight::getBTagReshape(EventContainer * EventContainerObj, std::string syst){
+
 
   Double_t bTagWeight = 1.0;
+  Double_t mistagWeight = 1.0;
+
+  for (auto const & jet : EventContainerObj->jets){
+    if (jet.GethadronFlavour() == 5){ // If jet is b-jet
+      float jetSF = _bTagCalibReader.eval_auto_bounds(syst, BTagEntry::FLAV_B, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+      if (jetSF == 0) jetSF = _bTagCalibReader.eval_auto_bounds("central", BTagEntry::FLAV_B, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+      bTagWeight *= jetSF;
+    }
+    else if (jet.GethadronFlavour() == 4){
+      float jetSF = _bTagCalibReader.eval_auto_bounds(syst, BTagEntry::FLAV_C, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+      if (jetSF == 0) jetSF = _bTagCalibReader.eval_auto_bounds("central", BTagEntry::FLAV_C, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+      mistagWeight *= jetSF;
+    }
+    else {
+      float jetSF = _bTagCalibReader.eval_auto_bounds(syst, BTagEntry::FLAV_UDSG, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+      if (jetSF == 0) jetSF = _bTagCalibReader.eval_auto_bounds("central", BTagEntry::FLAV_UDSG, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+      mistagWeight *= jetSF;
+    }
+  }
+
+  return std::make_tuple(bTagWeight,mistagWeight);
+  /*
   for (auto const & jet : EventContainerObj->taggedJets){
     float jetSF = _bTagCalibReader.eval_auto_bounds(syst, BTagEntry::FLAV_B, jet.Eta(), jet.Pt(), jet.bDiscriminator());
     if (jetSF == 0) jetSF = _bTagCalibReader.eval_auto_bounds("central", BTagEntry::FLAV_B, jet.Eta(), jet.Pt(), jet.bDiscriminator());
@@ -630,10 +688,81 @@ Double_t EventWeight::getBTagReshape(EventContainer * EventContainerObj, std::st
     bTagWeight *= jetSF;
   }
   return bTagWeight;
+  */
+}
+
+/******************************************************************************  
+ * Double_t EventWeight::getEfficBTagReshape()                                *  
+ *                                                                            *  
+ * Get the reshaped CSV discriminant from the reshaping class using           *
+ * new efficiency based calculation.                                          *
+ *                                                                            *  
+ * Input:  EventContainer of the event                                        *  
+ * Output: Double_t weight to be applied to the event weight                  *  
+ ******************************************************************************/ 
+std::tuple<Double_t,Double_t> EventWeight::getEfficBTagReshape(EventContainer * EventContainerObj, std::string syst){
+
+  
+  Double_t bTagWeight = 1.0;
+  Double_t mistagWeight = 1.0;
+
+  Double_t mcNoTag = 1.;
+  Double_t dataNoTag = 1.;
+
+  float jetSF = 1.;
+  float jetEffic = 1.;
+
+  for (auto const & jet : EventContainerObj->jets){
+    
+    jetSF = getJetSF(jet,syst);
+    jetEffic = getJetEffic(jet);
+
+    if (jet.IsTagged()){
+      bTagWeight *= jetSF;
+    } else {
+      mcNoTag *= 1 - jetEffic;
+      dataNoTag *= 1 - (jetEffic*jetSF);
+    }
+  }
+  
+  return std::make_tuple(bTagWeight,dataNoTag/mcNoTag);
+
+}
+
+Double_t EventWeight::getJetEffic(Jet jet){
+  TH1F* efficiencyPlot;
+  switch (abs(jet.GethadronFlavour())){
+  case 5:
+    efficiencyPlot = _bFlavEffic;
+    break;
+  case 4:
+    efficiencyPlot = _cFlavEffic;
+    break;
+  default:
+    efficiencyPlot = _lightFlavEffic;
+  }
+
+  int binx = efficiencyPlot->GetXaxis()->FindBin(jet.Pt());
+  int biny = efficiencyPlot->GetYaxis()->FindBin(jet.Eta());
+
+  return efficiencyPlot->GetBinContent(binx,biny);
+}
+
+Double_t EventWeight::getJetSF(Jet jet, std::string syst){
+  BTagEntry::JetFlavor jetFlavour = BTagEntry::FLAV_UDSG;
+
+  if (fabs(jet.GethadronFlavour() == 5)) jetFlavour = BTagEntry::FLAV_B;
+  else if (fabs(jet.GethadronFlavour() == 4)) jetFlavour = BTagEntry::FLAV_C;
+
+  float jetSF = _bTagCalibReader.eval_auto_bounds(syst, jetFlavour, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+  if (jetSF == 0) jetSF = _bTagCalibReader.eval_auto_bounds("central", jetFlavour, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+
+  return jetSF;
 }
 
 Double_t EventWeight::PileupAdjust(int eventNumber, int runnumber)
 {
+
   float frac = 1.0;
 
 if (runnumber == 105200)  frac = 1.02596;

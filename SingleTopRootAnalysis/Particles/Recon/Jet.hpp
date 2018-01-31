@@ -71,7 +71,7 @@ class Jet: public Particle
   void SetCuts(TEnv* config);
 
   // Fill the jet from an EventTree 
-  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met);
+  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met, bool isMC);
   //  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE);
   // Also fill from FastSim tree:
   Bool_t FillFastSim( std::vector<MCJet>& MCBJets, std::vector<MCJet>& MCCJets, std::vector<MCTau>& MCTaus,  std::vector<Electron>& electrons, FastSimTree *tr,Int_t iE,TEnv *config,const TString& tagName="default", Double_t btagCut = 999, Double_t mistagCut = 999, Double_t eshift = 0 );
@@ -132,9 +132,9 @@ class Jet: public Particle
   inline Double_t GetuncorrPt() const {return _uncorrPt;};
   inline Double_t uncorrPt() const {return _uncorrPt;};
 
-  inline void SetTagged(Bool_t isTagged){_tagged = isTagged;};
-  inline Bool_t IsTagged() const {return _tagged;};
-  inline Bool_t tagged() const {return _tagged;};
+  inline void SetTagged(Int_t isTagged){_tagged = isTagged;};
+  inline Int_t IsTagged() const {return _tagged;};
+  inline Int_t tagged() const {return _tagged;};
 
   inline void SetClosestLep(Double_t closestLep){_closestLep = closestLep;};
   inline Double_t GetClosestLep() const {return _closestLep;};
@@ -168,7 +168,7 @@ class Jet: public Particle
   Double_t _electronEnergy;   
   Double_t _photonEnergy;   
   Double_t _uncorrPt;  
-  Bool_t _tagged;
+  Int_t _tagged;
   Double_t _closestLep;
 
   // Cuts applied to the jet objects

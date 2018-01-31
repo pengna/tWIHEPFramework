@@ -200,6 +200,7 @@ int main(int argc, char **argv)
   // Define a Particle class to be the same as the AnalysisMain class
   /////////////////////////////////////////////////////////////////////////////////
   EventContainer *particlesObj = &mystudy;
+  particlesObj->SetIsSimulation(doMC);
   TString BkgdTreeName=mystudy.GetBkgdTreeName();
   bool isee   = (BkgdTreeName == "DiElectronsPreTagTree"||BkgdTreeName=="DiElectronsLooseTree");
   bool ismumu = (BkgdTreeName == "DiMuonsPreTagTree"||BkgdTreeName=="DiMuonsLooseTree");

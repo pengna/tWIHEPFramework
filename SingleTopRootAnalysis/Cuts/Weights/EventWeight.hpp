@@ -62,10 +62,13 @@ public:
   void setPileUpWgt(Bool_t val=true) { _usePileUpWgt=val; };
   void setPileUpSyst(Bool_t val=false) { _doPileupSysts=val; };
   void setbWeight(Bool_t val=true) { _usebWeight=val; };
+  void setEfficbTag(Bool_t val=true) { _runEfficiencyBasedbTag=val; };
   Bool_t isMCatNLO() const { return _useMCatNLO; };
   Bool_t isPileUpWgt() const { return _usePileUpWgt; };
   Bool_t isPileupSysts() const { return _doPileupSysts; };
   Bool_t isbWeight() const { return _usebWeight; };
+  Bool_t isEfficbTag() const { return _runEfficiencyBasedbTag; };
+  
 
     // methods for weighting for MC generatd with NoWeight
   void setNoWeight(Bool_t val=true) { _useNoWeight=val; };
@@ -93,6 +96,7 @@ private:
   myTH1F* _hLeptonSFWeight; //Histogram of the lepton SF claculated for the event
   myTH1F* _hTriggerSFWeight; //Histogram of trigger SF
   std::map<std::string,myTH1F*> _hbTagReshape; //Map of histograms containing the information for b tag reshaping and its associated systematics
+  std::map<std::string,myTH1F*> _hMisTagReshape; //Map of histograms containing the information for b tag reshaping and its associated systematics
   myTH1F* _hGenWeight; //Histogram of the gen weight for the event
   myTH1F* _hOutputWeight; // Histogram of output weights
   Double_t _totalMCatNLOEvents;
@@ -115,6 +119,12 @@ private:
   TH1F* _minBiasUpPV;
   TH1F* _minBiasDownPV;
 
+  //b-tagging efficiency plots
+  Bool_t _runEfficiencyBasedbTag;
+  TH1F* _bFlavEffic;
+  TH1F* _cFlavEffic;
+  TH1F* _lightFlavEffic;
+
   //For debugging
   Bool_t _verbose;
 
@@ -123,7 +133,11 @@ private:
 
   std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
   void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName);
-  Double_t getBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
+  std::tuple<Double_t,Double_t> getBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
+  std::tuple<Double_t,Double_t> getEfficBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
+
+  Double_t getJetSF(Jet jet, std::string syst);
+  Double_t getJetEffic(Jet jet);
 
  //Root::TPileupReweighting* PileupReweighting;
 

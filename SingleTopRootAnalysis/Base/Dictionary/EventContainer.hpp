@@ -366,6 +366,11 @@ class EventContainer
   inline Double_t GetEventbTagReshape(std::string systName = "central") {return _EventbTagReshape[systName];};
   inline Double_t EventbTagReshape() {return GetEventbTagReshape();};
 
+  //set and get btag weights for central and systematics
+  inline void SetEventMisTagReshape(const Double_t& lepSFweight, std::string systName = "central" ) {_EventMisTagReshape[systName] = lepSFweight;};
+  inline Double_t GetEventMisTagReshape(std::string systName = "central") {return _EventMisTagReshape[systName];};
+  inline Double_t EventMisTagReshape() {return GetEventMisTagReshape();};
+
   //Gen weight for event (actually just up or down)
   inline void SetGenWeight(const Double_t& genWeight) {_EventGenWeight = genWeight;};
   inline Double_t GetGenWeight() const {return _EventGenWeight;};
@@ -413,6 +418,11 @@ class EventContainer
   
   inline TString GetChannelName() const {return _channelName;};
 
+  inline void SetIsSimulation(bool isSim){isSimulation = isSim;};
+  inline bool GetIsSimulation(){return isSimulation;};
+  //inline bool isSimulation() { return _isSimulation;};
+
+
    // Get the configuration 
   TEnv * GetConfig() {return &_config; };
 
@@ -438,6 +448,7 @@ class EventContainer
   Float_t _EventTrigSFWeight;
   Float_t _EventGenWeight;
   std::map<std::string,Float_t> _EventbTagReshape;
+  std::map<std::string,Float_t> _EventMisTagReshape;
 
   //Add in the systematic variations to the SFs
   Float_t _EventLepSFWeightUp;

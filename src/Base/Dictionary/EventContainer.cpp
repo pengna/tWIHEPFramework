@@ -269,7 +269,7 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
   actualIntPerXing = 0;
   averageIntPerXing = 0 ;
 //  Pvtxall_n = -999;
-  isSimulation = kTRUE;
+//  isSimulation = kTRUE;
 
   _eventCount = 0;
   electrons.clear();
@@ -442,7 +442,7 @@ Int_t EventContainer::ReadEvent()
     safejeteventup= -999;
     safejeteventdown= -999;
   }
-  isSimulation = kTRUE;
+  //  isSimulation = kTRUE;
   _badJetEvent = kFALSE;
 
   // Reset all of the particle vectors
@@ -488,7 +488,7 @@ Int_t EventContainer::ReadEvent()
   // ***************************************************
   // Reconstructed
   else {
-    isSimulation = kTRUE;//_eventTree->isSimulation;
+    //    isSimulation = _eventTree->isSimulation; // Why is this always set to true?!?
     _badJetEvent = kFALSE;
     //must be done for each event
     // Electrons, Jets, Muons, missingEt
@@ -647,7 +647,7 @@ Int_t EventContainer::ReadEvent()
       ejordr = 999;
       bestjetdr = 999;
       //      missingEt = -888; 
-      useObj = newJet.Fill(1.0,1.0, *muonsToUsePtr, *electronsToUsePtr, _eventTree, io, &missingEtVec);
+      useObj = newJet.Fill(1.0,1.0, *muonsToUsePtr, *electronsToUsePtr, _eventTree, io, &missingEtVec, isSimulation);
       //      useObj = newJet.Fill(1.0,1.0, _eventTree, io);
       
       missingEt = TMath::Sqrt(pow(missingEx,2) + pow(missingEy,2));//so MET gets JES adjustment toogEx=top_met.MET_ExMiss();
