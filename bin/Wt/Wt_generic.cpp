@@ -55,6 +55,7 @@
 #include "SingleTopRootAnalysis/Vars/TestVar.hpp"
 #include "SingleTopRootAnalysis/Vars/BDTVars.hpp"
 #include "SingleTopRootAnalysis/Vars/WeightVars.hpp"
+#include "SingleTopRootAnalysis/Vars/ChannelFlag.hpp"
 
 using std::cout;
 using std::endl;
@@ -273,6 +274,7 @@ int main(int argc, char **argv)
   //if (whichtrig) mystudy.AddVars(new BDTVars(true));
   mystudy.AddVars(new BDTVars(true));
   mystudy.AddVars(new WeightVars());
+  mystudy.AddVars(new ChannelFlag());
 
   TFile *_skimBDTFile;
   TString NNname = mystudy.GetHistogramFileName() + "skimBDT.root" ;

@@ -12,7 +12,7 @@ for i in [""," data"]:
         if k == " inv" and i == "":continue
 #    for k in [""]:
 #        for j in ["", " ttbarReg", " wJetsReg"," wJets2"]:
-        for j in ["", " ttbarReg"," wJets2", " ttbar2"," sig2"]:
+#        for j in ["", " ttbarReg"," wJets2", " ttbar2"," sig2"]:
 #        for j in [" ttbar2"," sig2"]:
 
 #        for j in [" ttbarReg", " wJetsReg"," wJets2"]:
@@ -20,7 +20,7 @@ for i in [""," data"]:
 #        for j in [" ttbarReg", " wJets2"]:
 #        for j in [" wJets2"]:
 #        for j in [" wJetsReg"]:
-#        for j in [""]:
+        for j in [""]:
 #            for l in [""," electron"]:
             for l in [""]:
                 for m in [""," jesUp"," jesDown"," jerUp"," jerDown"]:

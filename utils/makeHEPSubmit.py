@@ -18,7 +18,7 @@ mcPostfix = " -MCatNLO -mc -bTagReshape -lepSFs -PileUpWgt"
 triggerName = "Muon "
 nJets = 3
 nbJets = 1
-fileListDirectory = "config/files/moriond17/"
+fileListDirectory = "config/files/listsUpdated2018/"
 makeSkims = False
 samplesMC76=[
 "qcd1000_1500",
@@ -123,6 +123,11 @@ samplesSyst = [
 "ttbar_hdampdown"
 ]
 jesTestSamples = ["JESTest"]
+bTagSamples = ["tW_top_nfh",
+"tW_antitop_nfh",
+"ttbar",
+"ttbarBU"
+]
 #systSamples = ["ttbar_hdampdown"]
 #mcSamples = []
 #samplesData = []
@@ -185,6 +190,10 @@ if "electron" in sys.argv:
 if "jesTest" in sys.argv:
 	sample = jesTestSamples
 	analysis += "JESTest"
+if "bTag" in sys.argv:
+	sample = bTagSamples
+	analysis += "bTag"
+	executable = "bin/Wt/Wt_efficiencies.x"
 #executable = "Wt_generic.x"
 #for the queue
 workpath    = os.getcwd()+"/"+analysis +"/"
@@ -382,7 +391,7 @@ def prepareCshJob(sample,shFile,frameworkDir,workpath,samplePost=""):
 #	print >> subFile, frameworkDir+"bin/Wt/Wt_generic.x -config "+frameworkDir+"SingleTop.Wt.LP.mm1+j.muonMSSmeardown.config -inlist "+frameworkDir+"config/files/"+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root -mc -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -MCatNLO -mc -SelectTrigger Muon -PileUpWgt -BWgt"
 	skimString = ""
 	if makeSkims: skimString = " -skimfile "+workpath+"/"+sample+"/skims/"+sample+samplePost+"Skim.root "
-	print >> subFile, frameworkDir+executable+" -config "+frameworkDir+configFile+" -inlist "+frameworkDir+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -SelectTrigger " + triggerName + invPostfix + mcPostfix + skimString + " -nJets {0} -nbJets {1}".format(nJets,nbJets)
+	print >> subFile, frameworkDir+executable+" -config "+frameworkDir+configFile+" -inlist "+frameworkDir+fileListDirectory+sample+samplePost+".list -hfile "+workpath+"/"+sample+"/hists/"+sample+samplePost+"hists.root -BkgdTreeName DiElectronPreTagTree  -UseTotalEvtFromFile -SelectTrigger " + triggerName + invPostfix + mcPostfix + skimString #+ " -nJets {0} -nbJets {1}".format(nJets,nbJets) we don't do this anymore.
         #print >> subFile, "root -b -q -l "+rootplizer+"'(\""+input+"\",\""+output+"\")'"
 	subprocess.call("chmod 777 "+shFile, shell=True)
 
