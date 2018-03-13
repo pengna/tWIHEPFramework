@@ -237,7 +237,7 @@ def makeStackPlot(nominal,systHists,region,savePost = ""):
     canvy.cd()
     if includeDataInStack: canvy.SetBottomMargin(0.3)
     dataHist = 0
-    sumHist = nominal["tW"].Clone()
+    sumHist = nominal[nominal.keys()[0]].Clone()
     sumHist.Reset()
     for i in nominal.keys():
         if i == "data":
