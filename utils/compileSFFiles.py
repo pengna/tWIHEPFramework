@@ -14,7 +14,8 @@ def combineSFFiles(inFiles,inDir,lumiFractions,outFile):
             outHist.Add(hist)
 
     out = TFile(outFile,"RECREATE")
-    out.cd()
+    outDir = out.mkdir(inDir)
+    outDir.cd()
     outHist.Write()
     out.Close()
 
