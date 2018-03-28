@@ -44,7 +44,7 @@ class EventWeight : public HistoCut
 public:
 
   // Parameterized Constructor
-  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE, Bool_t verbose = kFALSE);
+  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE, Bool_t doIterFitbTag = kTRUE, Bool_t verbose = kFALSE);
   
   // Default Destructor
   ~EventWeight();
@@ -124,6 +124,9 @@ private:
   TH1F* _bFlavEffic;
   TH1F* _cFlavEffic;
   TH1F* _lightFlavEffic;
+
+  //Toggle between iterative fit or default b-tag SFs
+  Bool_t _doIterFitbTag;
 
   //For debugging
   Bool_t _verbose;

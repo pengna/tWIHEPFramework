@@ -44,10 +44,11 @@ using namespace std;
  * Input:  Particle class                                                     *
  * Output: None                                                               *
  ******************************************************************************/
-EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight, Bool_t useLeptonSFs, Bool_t usebTagReshape, Bool_t verbose):
+EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight, Bool_t useLeptonSFs, Bool_t usebTagReshape, Bool_t doIterFitbTag, Bool_t verbose ):
   _useLeptonSFs(useLeptonSFs),
   _usebTagReshape(usebTagReshape),
-  _verbose(verbose)
+  _verbose(verbose),
+  _doIterFitbTag(doIterFitbTag)
 {
   //pileup is NOT applied by default.  Instead it is applied by the user, and stored in the tree for later application
 
@@ -176,7 +177,8 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
   //else  cout<<"EventContainer:: Initialization of TPileupReweighting NOT successful!"<<endl;
 
   //Default list of b tagging systematics. This could possibly become customisable, but it probably doesn't need to be.
-  _bTagSystNames = {"central","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2","up_jes"};
+  if (_doIterFitbTag) _bTagSystNames = {"central","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2","up_jes"};
+  else _bTagSystNames = {"central","up","down"};
   
   
 } // EventWeight
@@ -316,11 +318,18 @@ void EventWeight::BookHistogram()
 
   if (_usebTagReshape){
     _bTagCalib = BTagCalibration(conf->GetValue("BTaggerAlgo","CSVv2"),conf->GetValue("Include.BTagCSVFile","null"));
-    _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central",_bTagSystNames);
-    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"iterativefit");
-    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
-    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
-
+    if (_doIterFitbTag){
+      _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central",_bTagSystNames);
+      _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"iterativefit");
+      _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
+      _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
+    }
+    else {
+      _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",_bTagSystNames);
+      _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"incl");
+      _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"comb");
+      _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"comb");
+    }
   }
 
 } //BookHistogram()
@@ -712,6 +721,8 @@ std::tuple<Double_t,Double_t> EventWeight::getEfficBTagReshape(EventContainer * 
   float jetSF = 1.;
   float jetEffic = 1.;
 
+  //  if (syst == "central") std::cout << syst << " j/t/u: " << EventContainerObj->jets.size() << " " << EventContainerObj->taggedJets.size() << " " << EventContainerObj->unTaggedJets.size() << std::endl;
+
   for (auto const & jet : EventContainerObj->jets){
     
     jetSF = getJetSF(jet,syst);
@@ -723,7 +734,10 @@ std::tuple<Double_t,Double_t> EventWeight::getEfficBTagReshape(EventContainer * 
       mcNoTag *= 1 - jetEffic;
       dataNoTag *= 1 - (jetEffic*jetSF);
     }
+    //if (syst == "central") std::cout << "Jet pt: " << jet.Pt() << " flavour: " << jet.GethadronFlavour() << " tag: " << jet.IsTagged() << " " << jet.bDiscriminator() << " eta: " << jet.Eta() << " " << jetSF << " " << jetEffic << " current b/mis-tag: " << bTagWeight << " " << (dataNoTag/mcNoTag)  << std::endl;
   }
+
+  //  if (syst == "central") std::cout <<  " After: " << bTagWeight << " " << dataNoTag/mcNoTag << std::endl;
   
   return std::make_tuple(bTagWeight,dataNoTag/mcNoTag);
 
@@ -743,7 +757,7 @@ Double_t EventWeight::getJetEffic(Jet jet){
   }
 
   int binx = efficiencyPlot->GetXaxis()->FindBin(jet.Pt());
-  int biny = efficiencyPlot->GetYaxis()->FindBin(jet.Eta());
+  int biny = efficiencyPlot->GetYaxis()->FindBin(fabs(jet.Eta()));
 
   return efficiencyPlot->GetBinContent(binx,biny);
 }
@@ -756,6 +770,8 @@ Double_t EventWeight::getJetSF(Jet jet, std::string syst){
 
   float jetSF = _bTagCalibReader.eval_auto_bounds(syst, jetFlavour, jet.Eta(), jet.Pt(), jet.bDiscriminator());
   if (jetSF == 0) jetSF = _bTagCalibReader.eval_auto_bounds("central", jetFlavour, jet.Eta(), jet.Pt(), jet.bDiscriminator());
+
+  
 
   return jetSF;
 }
