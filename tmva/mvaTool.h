@@ -44,7 +44,10 @@
 
 class mvaTool {
  public :
-  mvaTool(Int_t channel = 0);
+ mvaTool() : mvaTool(0,true) {}
+ mvaTool(Int_t channel) :  mvaTool(channel,true) {}
+ mvaTool(Bool_t useIterFit ) : mvaTool(0,useIterFit) {}
+  mvaTool(Int_t channel, Bool_t useIterFit);
   //  ~mvaTool();
 
   void doBothTraining(TString inDir);
@@ -54,8 +57,11 @@ class mvaTool {
 
   void setChannel(Int_t channel){_channel = channel;};
   //  void doReading();
+  void printVarList();
+  void initialiseVarList();
 
  private:
+
 
   Int_t _channel; //The channel we want to read
   std::vector<TString> regionNames;
@@ -70,6 +76,7 @@ class mvaTool {
 
   void makeStatVariationHists(TString sampleName,std::vector<TFile*> outputFile);
 
+
   std::tuple<float,float> calculatebTagSyst(float,std::vector<float>);
   std::tuple<float,float> calculatebMistagSyst(float,std::vector<float>);
 
@@ -82,6 +89,8 @@ class mvaTool {
   std::vector<TString > systlist;
   TString baseName;
   std::vector<float> bTagSysts;
+
+  Bool_t _useIterFit;
 
   TMVA::Reader *reader;
 

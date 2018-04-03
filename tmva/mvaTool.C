@@ -1,17 +1,19 @@
 #define mvaTool_cxx
 #include "mvaTool.h"
 
-mvaTool::mvaTool(Int_t channel){
+mvaTool::mvaTool(Int_t channel, Bool_t useIterFit){
   
+  _useIterFit = useIterFit;
+
   _channel = channel;
 
-  //  regionNames = {"3j1t","3j2t","2j1t","4j1t","4j2t"};
-  regionNames = {""};
+  regionNames = {"3j1t","3j2t","2j1t","4j1t","4j2t"};
+  //  regionNames = {""};
   //Start by initialising the list of variables we will base the MVA on
 
     //varList.push_back("M_Pt_Jet1_2040e24");
 
-    //    varList.push_back("largestCSV");varList.push_back("M_nJet2040");
+   //    varList.push_back("largestCSV");varList.push_back("M_nJet2040");
     //  varList.push_back("M_firstJetPt");
   //I don't understand these guys' implementations, so I'm ignoring them for now.
   //  varList.push_back("likelihood_BJet2040");
@@ -20,8 +22,13 @@ mvaTool::mvaTool(Int_t channel){
     //  varList.push_back("M_nJet2040e24");
     //    varList.push_back("M_hadronicWPt");
     //    varList.push_back("M_hadronicWPhi");
-  
+  initialiseVarList();
   baseName = "";
+}
+
+void mvaTool::initialiseVarList(){
+
+
 
   varList.push_back("M_nJet2040");
   //    varList.push_back("M_HT");
@@ -38,6 +45,8 @@ mvaTool::mvaTool(Int_t channel){
     //    varList.push_back("M_TMass_Jet1Jet2Jet3"); 
     varList.push_back("lightJet1CSV");
 
+
+    std::cout << varList.size() << std::endl;
     //varList.push_back("M_nJet3040e24");
     //    varList.push_back("M_E_Jet1MET");
     //varList.push_back("M_Jet1Jet2Jet3_Centrality");
@@ -74,7 +83,13 @@ mvaTool::mvaTool(Int_t channel){
   systlist.push_back("_mistag_down");
   systlist.push_back("_PDF_up");
   systlist.push_back("_PDF_down");
+
+  //    printVarList();
+
+
 }
+
+
 
 void mvaTool::doBothTraining(TString inDir){
   doTraining(inDir,true);
@@ -177,7 +192,7 @@ void mvaTool::doReading(TString sampleName, TString inDir, TString outDir, bool 
   unsigned int varsize = varList.size();
   float treevars[varsize];
 
-  std::cout << "Entering variable adding" << std::endl;
+  std::cout << "Entering variable adding with " << varList.size() << " variables" <<  std::endl;
   for (unsigned int i=0; i<varsize;i++){
     treevars[i] = 0;
     std::cout << "[Variable loop] Adding variable: " << varList[i].Data() << std::endl;
@@ -281,8 +296,8 @@ void mvaTool::loopInSample(TString dirWithTrees, TString sampleName, float* tree
   float puWeight=0., puWeightUp = 0., puWeightDown = 0.;
   float lepSFWeight=0., lepSFWeightUp = 0., lepSFWeightDown = 0.;
   float trigSFWeight=0., trigSFWeightUp = 0., trigSFWeightDown = 0.;
-  float bWeight=0., bWeighthfs1Up = 0., bWeighthfs1Down = 0., bWeighthfs2Up = 0., bWeighthfs2Down = 0., bWeightcferr1Up = 0., bWeightcferr1Down = 0., bWeightcferr2Up = 0., bWeightcferr2Down = 0., bWeightjerUp = 0., bWeightjerDown = 0., bWeightlfUp = 0., bWeightlfDown = 0.;
-  float mistagWeight=0., mistagWeighthfs1Up = 0., mistagWeighthfs1Down = 0., mistagWeighthfs2Up = 0., mistagWeighthfs2Down = 0., mistagWeightcferr1Up = 0., mistagWeightcferr1Down = 0., mistagWeightcferr2Up = 0., mistagWeightcferr2Down = 0., mistagWeightjerUp = 0., mistagWeightjerDown = 0., mistagWeightlfUp = 0., mistagWeightlfDown = 0.;
+  float bWeight=0., bWeighthfs1Up = 0., bWeighthfs1Down = 0., bWeighthfs2Up = 0., bWeighthfs2Down = 0., bWeightcferr1Up = 0., bWeightcferr1Down = 0., bWeightcferr2Up = 0., bWeightcferr2Down = 0., bWeightjerUp = 0., bWeightjerDown = 0., bWeightlfUp = 0., bWeightlfDown = 0., bWeightUp = 0., bWeightDown = 0.;
+  float mistagWeight=0., mistagWeighthfs1Up = 0., mistagWeighthfs1Down = 0., mistagWeighthfs2Up = 0., mistagWeighthfs2Down = 0., mistagWeightcferr1Up = 0., mistagWeightcferr1Down = 0., mistagWeightcferr2Up = 0., mistagWeightcferr2Down = 0., mistagWeightjerUp = 0., mistagWeightjerDown = 0., mistagWeightlfUp = 0., mistagWeightlfDown = 0., mistagWeightDown = 0., mistagWeightUp = 0.;
   double pdfUp = 0., pdfDown = 0.;
   
   int nbJets3040 = 0., nbJets4000 = 0.;
@@ -318,33 +333,46 @@ void mvaTool::loopInSample(TString dirWithTrees, TString sampleName, float* tree
     theTree->SetBranchAddress( "trigSF_SysUp", &trigSFWeightUp );
     theTree->SetBranchAddress( "trigSF_SysDown", &trigSFWeightDown );
     
-    theTree->SetBranchAddress( "bWeight_central", &bWeight );
-    theTree->SetBranchAddress( "bWeight_up_hfstats1", &bWeighthfs1Up );
-    theTree->SetBranchAddress( "bWeight_down_hfstats1", &bWeighthfs1Down );
-    theTree->SetBranchAddress( "bWeight_up_hfstats2", &bWeighthfs2Up );
-    theTree->SetBranchAddress( "bWeight_down_hfstats2", &bWeighthfs2Down );
-    theTree->SetBranchAddress( "bWeight_up_cferr1", &bWeightcferr1Up );
-    theTree->SetBranchAddress( "bWeight_down_cferr1", &bWeightcferr1Down );
-    theTree->SetBranchAddress( "bWeight_up_cferr2", &bWeightcferr2Up );
-    theTree->SetBranchAddress( "bWeight_down_cferr2", &bWeightcferr2Down );
-    theTree->SetBranchAddress( "bWeight_up_jes", &bWeightjerUp );
-    theTree->SetBranchAddress( "bWeight_down_jes", &bWeightjerDown );
-    theTree->SetBranchAddress( "bWeight_up_lf", &bWeightlfUp );
-    theTree->SetBranchAddress( "bWeight_down_lf", &bWeightlfDown );
+    if (_useIterFit){
 
-    theTree->SetBranchAddress( "misTagWeight_central", &mistagWeight );
-    theTree->SetBranchAddress( "misTagWeight_up_hfstats1", &mistagWeighthfs1Up );
-    theTree->SetBranchAddress( "misTagWeight_down_hfstats1", &mistagWeighthfs1Down );
-    theTree->SetBranchAddress( "misTagWeight_up_hfstats2", &mistagWeighthfs2Up );
-    theTree->SetBranchAddress( "misTagWeight_down_hfstats2", &mistagWeighthfs2Down );
-    theTree->SetBranchAddress( "misTagWeight_up_cferr1", &mistagWeightcferr1Up );
-    theTree->SetBranchAddress( "misTagWeight_down_cferr1", &mistagWeightcferr1Down );
-    theTree->SetBranchAddress( "misTagWeight_up_cferr2", &mistagWeightcferr2Up );
-    theTree->SetBranchAddress( "misTagWeight_down_cferr2", &mistagWeightcferr2Down );
-    theTree->SetBranchAddress( "misTagWeight_up_jes", &mistagWeightjerUp );
-    theTree->SetBranchAddress( "misTagWeight_down_jes", &mistagWeightjerDown );
-    theTree->SetBranchAddress( "misTagWeight_up_lf", &mistagWeightlfUp );
-    theTree->SetBranchAddress( "misTagWeight_down_lf", &mistagWeightlfDown );
+      theTree->SetBranchAddress( "bWeight_central", &bWeight );
+      theTree->SetBranchAddress( "bWeight_up_hfstats1", &bWeighthfs1Up );
+      theTree->SetBranchAddress( "bWeight_down_hfstats1", &bWeighthfs1Down );
+      theTree->SetBranchAddress( "bWeight_up_hfstats2", &bWeighthfs2Up );
+      theTree->SetBranchAddress( "bWeight_down_hfstats2", &bWeighthfs2Down );
+      theTree->SetBranchAddress( "bWeight_up_cferr1", &bWeightcferr1Up );
+      theTree->SetBranchAddress( "bWeight_down_cferr1", &bWeightcferr1Down );
+      theTree->SetBranchAddress( "bWeight_up_cferr2", &bWeightcferr2Up );
+      theTree->SetBranchAddress( "bWeight_down_cferr2", &bWeightcferr2Down );
+      theTree->SetBranchAddress( "bWeight_up_jes", &bWeightjerUp );
+      theTree->SetBranchAddress( "bWeight_down_jes", &bWeightjerDown );
+      theTree->SetBranchAddress( "bWeight_up_lf", &bWeightlfUp );
+      theTree->SetBranchAddress( "bWeight_down_lf", &bWeightlfDown );
+
+      theTree->SetBranchAddress( "misTagWeight_central", &mistagWeight );
+      theTree->SetBranchAddress( "misTagWeight_up_hfstats1", &mistagWeighthfs1Up );
+      theTree->SetBranchAddress( "misTagWeight_down_hfstats1", &mistagWeighthfs1Down );
+      theTree->SetBranchAddress( "misTagWeight_up_hfstats2", &mistagWeighthfs2Up );
+      theTree->SetBranchAddress( "misTagWeight_down_hfstats2", &mistagWeighthfs2Down );
+      theTree->SetBranchAddress( "misTagWeight_up_cferr1", &mistagWeightcferr1Up );
+      theTree->SetBranchAddress( "misTagWeight_down_cferr1", &mistagWeightcferr1Down );
+      theTree->SetBranchAddress( "misTagWeight_up_cferr2", &mistagWeightcferr2Up );
+      theTree->SetBranchAddress( "misTagWeight_down_cferr2", &mistagWeightcferr2Down );
+      theTree->SetBranchAddress( "misTagWeight_up_jes", &mistagWeightjerUp );
+      theTree->SetBranchAddress( "misTagWeight_down_jes", &mistagWeightjerDown );
+      theTree->SetBranchAddress( "misTagWeight_up_lf", &mistagWeightlfUp );
+      theTree->SetBranchAddress( "misTagWeight_down_lf", &mistagWeightlfDown );
+    }
+    else {
+      theTree->SetBranchAddress( "bWeight_central", &bWeight );
+      theTree->SetBranchAddress( "bWeight_up", &bWeightUp );
+      theTree->SetBranchAddress( "bWeight_down", &bWeightDown );
+
+      theTree->SetBranchAddress( "misTagWeight_central", &mistagWeight );
+      theTree->SetBranchAddress( "misTagWeight_up", &mistagWeightUp );
+      theTree->SetBranchAddress( "misTagWeight_down", &mistagWeightDown );
+
+    }
     
     theTree->SetBranchAddress( "EVENT_PDFtthbbWeightUp",&pdfUp );
     theTree->SetBranchAddress( "EVENT_PDFtthbbWeightDown",&pdfDown );
@@ -401,14 +429,22 @@ void mvaTool::loopInSample(TString dirWithTrees, TString sampleName, float* tree
       fillHists(sampleName+"_LSF_down",treevars,mvaValue,mvawJetsValue,theweight * (lepSFWeightDown/lepSFWeight),met,mtw,theChannel);
       fillHists(sampleName+"_Trig_up",treevars,mvaValue,mvawJetsValue,theweight * (trigSFWeightUp/trigSFWeight),met,mtw,theChannel);
       fillHists(sampleName+"_Trig_down",treevars,mvaValue,mvawJetsValue,theweight * (trigSFWeightDown/trigSFWeight),met,mtw,theChannel);
-      bSysts = calculatebTagSyst(bWeight,{bWeighthfs1Up,bWeighthfs1Down,bWeighthfs2Up,bWeighthfs2Down,bWeightcferr1Up,bWeightcferr1Down,bWeightcferr2Up,bWeightcferr2Down,bWeightjerUp,bWeightjerDown,bWeightlfUp,bWeightlfDown});
-      //      std::cout << "btag systs: " << std::get<0>(bSysts) << " " << std::get<1>(bSysts) << std::endl;
-      fillHists(sampleName+"_bTag_up",treevars,mvaValue,mvawJetsValue,theweight * std::get<0>(bSysts),met,mtw,theChannel);
-      fillHists(sampleName+"_bTag_down",treevars,mvaValue,mvawJetsValue,theweight * std::get<1>(bSysts),met,mtw,theChannel);
-      mistagSysts = calculatebTagSyst(mistagWeight,{mistagWeighthfs1Up,mistagWeighthfs1Down,mistagWeighthfs2Up,mistagWeighthfs2Down,mistagWeightcferr1Up,mistagWeightcferr1Down,mistagWeightcferr2Up,mistagWeightcferr2Down,mistagWeightjerUp,mistagWeightjerDown,mistagWeightlfUp,mistagWeightlfDown});
-      //      std::cout << "mistag systs: " << std::get<0>(mistagSysts) << " " << std::get<1>(mistagSysts) << std::endl;
-      fillHists(sampleName+"_mistag_up",treevars,mvaValue,mvawJetsValue,theweight * std::get<0>(mistagSysts),met,mtw,theChannel);
-      fillHists(sampleName+"_mistag_down",treevars,mvaValue,mvawJetsValue,theweight * std::get<1>(mistagSysts),met,mtw,theChannel);
+      if (_useIterFit){
+	bSysts = calculatebTagSyst(bWeight,{bWeighthfs1Up,bWeighthfs1Down,bWeighthfs2Up,bWeighthfs2Down,bWeightcferr1Up,bWeightcferr1Down,bWeightcferr2Up,bWeightcferr2Down,bWeightjerUp,bWeightjerDown,bWeightlfUp,bWeightlfDown});
+	//      std::cout << "btag systs: " << std::get<0>(bSysts) << " " << std::get<1>(bSysts) << std::endl;
+	fillHists(sampleName+"_bTag_up",treevars,mvaValue,mvawJetsValue,theweight * std::get<0>(bSysts),met,mtw,theChannel);
+	fillHists(sampleName+"_bTag_down",treevars,mvaValue,mvawJetsValue,theweight * std::get<1>(bSysts),met,mtw,theChannel);
+	mistagSysts = calculatebTagSyst(mistagWeight,{mistagWeighthfs1Up,mistagWeighthfs1Down,mistagWeighthfs2Up,mistagWeighthfs2Down,mistagWeightcferr1Up,mistagWeightcferr1Down,mistagWeightcferr2Up,mistagWeightcferr2Down,mistagWeightjerUp,mistagWeightjerDown,mistagWeightlfUp,mistagWeightlfDown});
+	//      std::cout << "mistag systs: " << std::get<0>(mistagSysts) << " " << std::get<1>(mistagSysts) << std::endl;
+	fillHists(sampleName+"_mistag_up",treevars,mvaValue,mvawJetsValue,theweight * std::get<0>(mistagSysts),met,mtw,theChannel);
+	fillHists(sampleName+"_mistag_down",treevars,mvaValue,mvawJetsValue,theweight * std::get<1>(mistagSysts),met,mtw,theChannel);
+      }
+      else{
+	fillHists(sampleName+"_bTag_up",treevars,mvaValue,mvawJetsValue,theweight * (bWeightUp/bWeight),met,mtw,theChannel);
+	fillHists(sampleName+"_bTag_down",treevars,mvaValue,mvawJetsValue,theweight * (bWeightDown/bWeight),met,mtw,theChannel);
+	fillHists(sampleName+"_mistag_up",treevars,mvaValue,mvawJetsValue,theweight * ( mistagWeightUp/mistagWeight),met,mtw,theChannel);
+	fillHists(sampleName+"_mistag_down",treevars,mvaValue,mvawJetsValue,theweight * (mistagWeightDown/mistagWeight),met,mtw,theChannel);
+      }
       fillHists(sampleName+"_PDF_up",treevars,mvaValue,mvawJetsValue,theweight*pdfUp,met,mtw,theChannel);
       fillHists(sampleName+"_PDF_down",treevars,mvaValue,mvawJetsValue,theweight*pdfDown,met,mtw,theChannel);
     }
@@ -602,3 +638,19 @@ void mvaTool::makeStatVariationHists(TString sampleName, std::vector<TFile *> ou
     }
   }
 }
+
+void mvaTool::printVarList(){
+  std::cout << "Var list is " << varList.size() << " variables long" << std::endl;
+  for (unsigned int i = 0; i < varList.size() ; i++){
+    std::cout << varList[i] << std::endl;
+  }
+  std::cout << "Sys list is " << systlist.size() << " variables long" << std::endl;
+  for (unsigned int i = 0; i < systlist.size() ; i++){
+    std::cout << systlist[i] << std::endl;
+  }
+  std::cout << _useIterFit << " " << _channel  << " " << std::endl;
+  for (unsigned int i = 0; i < regionNames.size() ; i++){
+    std::cout << regionNames[i] << std::endl;
+  }
+}
+
