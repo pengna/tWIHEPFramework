@@ -155,7 +155,8 @@ Bool_t CutTriggerSelection::Apply()
     triggerBit = EventContainerObj->HLT_IsoMu24 || EventContainerObj->HLT_IsoTkMu24;
   }
   
-  if (_whichtrigger == 0) passesTrigger = electronTrigger != 0. and muonTrigger == 0;
+  //  if (_whichtrigger == 0) passesTrigger = electronTrigger != 0. and muonTrigger == 0;
+  if (_whichtrigger == 0) passesTrigger = muonTrigger == 0;
   if (_whichtrigger == 1) passesTrigger = electronTrigger == 0. and muonTrigger != 0;
   
   //if (triggerBit != 0.) passesTrigger = kTRUE;
