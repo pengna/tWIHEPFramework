@@ -36,7 +36,7 @@ class HistogrammingElectron : public HistoCut
 public:
 
   // Parameterized Constructor
-  HistogrammingElectron(EventContainer *obj, TString electronTypePassed);
+  HistogrammingElectron(EventContainer *obj, TString electronTypePassed, Bool_t unisolated = kFALSE);
   
   // Destructor
   ~HistogrammingElectron();
@@ -85,6 +85,8 @@ private:
  myTH1F *_hJetDeltaR;
 
   TString electronType; // Type of electron being plotted
+
+  Bool_t _unisolated;
 
 };
 

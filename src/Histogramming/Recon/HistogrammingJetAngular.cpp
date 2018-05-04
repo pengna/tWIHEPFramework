@@ -195,6 +195,10 @@ Bool_t HistogrammingJetAngular::Apply()
   
   EventContainer *evc = GetEventContainer();
   
+  if (evc->taggedJets.size() < 1 || evc->unTaggedJets.size() < 2) return kTRUE;
+
+  EventTree * tree = evc->GetEventTree();
+
   bJet = evc->taggedJets[0];
   int jetCount = 0;
   leadingJet = evc->unTaggedJets[0];

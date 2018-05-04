@@ -35,14 +35,14 @@ Cut.Muon.Veto.Number.Min:  1
 Cut.Muon.Veto.Number.Max:  1
 # ############## Jet Cuts ##############################
 # Jet multiplicity cuts
-Cut.Jet.Number.Min:  3
-Cut.Jet.Number.Max:  3
+Cut.Jet.Number.Min:  2
+Cut.Jet.Number.Max:  4
 Cut.Jet.Pt.1.Min:  30
 Cut.Jet.Pt.1.Max: 999
 # ############## Tagged Jet Cuts #################
 # Tagged Jet multiplicity cuts
 Cut.Tagged.Jet.Number.Min: 1
-Cut.Tagged.Jet.Number.Max: 1
+Cut.Tagged.Jet.Number.Max: 2
 
 ################ Global Event Cuts #####################
 # Missing ET

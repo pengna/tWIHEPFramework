@@ -12,14 +12,15 @@
 #include <iostream>
 
 //Test out a couple of variables, one int and one float I guess
-WeightVars::WeightVars(){
+WeightVars::WeightVars(Bool_t useIterFit){
   _floatVars["EventWeight"] = 0.;
   _floatVars["bWeight"] = 0.;
   _floatVars["puWeight"] = 0.;
   _floatVars["lepSF"] = 0.;
   _floatVars["trigSF"] = 0.;
 
-  _bTagSystNames = {"central","up_jes","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2"};
+  if (useIterFit) _bTagSystNames = {"central","up_jes","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2"};
+  else _bTagSystNames = {"central","up","down"};
 
   //Systematic variations
   for (auto const bSystName: _bTagSystNames) {

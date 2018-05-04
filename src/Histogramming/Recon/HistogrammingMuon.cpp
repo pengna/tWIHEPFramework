@@ -35,8 +35,9 @@ using namespace std;
  * Input:  Event container                                                    *
  * Output: None                                                               *
  ******************************************************************************/
-HistogrammingMuon::HistogrammingMuon(EventContainer *obj, TString muonTypePassed)
+HistogrammingMuon::HistogrammingMuon(EventContainer *obj, TString muonTypePassed, Bool_t unIsolated)
 {
+  _unisolated = unIsolated;
   // Check muonType parameter
   if( muonTypePassed.CompareTo("All")   && muonTypePassed.CompareTo("UnIsolated") && 
       muonTypePassed.CompareTo("Tight") && muonTypePassed.CompareTo("Veto") &&
@@ -262,6 +263,8 @@ Bool_t HistogrammingMuon::Apply()
     exit(8);
   } //else
     
+  if ("Tight" == muonType && _unisolated) muonVector = evc->unIsolatedMuons;
+
   // Fill Histograms
   _hNObj -> Fill(muonVector.size());
 
