@@ -16,7 +16,7 @@
 class WeightVars: public VarBase {
   
 public:
-  WeightVars();
+  WeightVars(Bool_t useIterFit = kTRUE);
   
   //void BookBranches(TTree * skimTree);
   void FillBranches(EventContainer * evtObj);
