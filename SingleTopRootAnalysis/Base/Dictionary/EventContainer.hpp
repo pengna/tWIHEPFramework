@@ -518,6 +518,7 @@ class EventContainer
   std::vector<Jet>        jetms;//overlap removal vector for muons
   std::vector<Jet>        taggedJets;
   std::vector<Jet>        unTaggedJets;
+  std::vector<std::vector<Jet> > jesShiftedJets;
   std::vector<Jet>        bLabeledJets;
   std::vector<Jet>        cLabeledJets;
   std::vector<Jet>        tauLabeledJets;
@@ -544,6 +545,9 @@ class EventContainer
   Double_t missingEy_xy;
   Double_t missingPhi_xy;
   TLorentzVector missingEtVec_xy;
+  
+  //A vector of JES shifted METs
+  std::vector<TLorentzVector> metVecsJESShifted;
 
   //Track whterh it passes the MET filters
   Int_t passesMETFilters;

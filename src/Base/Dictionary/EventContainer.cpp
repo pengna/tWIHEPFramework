@@ -652,14 +652,27 @@ Int_t EventContainer::ReadEvent()
       
       missingEt = TMath::Sqrt(pow(missingEx,2) + pow(missingEy,2));//so MET gets JES adjustment toogEx=top_met.MET_ExMiss();
       /////////////////////////////////////
-      
+     
+      //On the first jet in the event fill up the JES corrected met and jet lists
+      if (io == 0) {
+	metVecsJESShifted.clear();
+	jesShiftedJets.clear();
+	for (int jesSyst = 0; jesSyst < newJet.GetNumberOfJESCorrections(); jesSyst++){
+	  metVecsJESShifted.push_back(missingEtVec);
+	  std::vector<Jet> tempVec;
+	  jesShiftedJets.push_back(tempVec);
+	}
+      }
+ 
       alljets.push_back(newJet);
+     
       if(useObj) {
 	jets.push_back(newJet);
  
 	if(newJet.IsTagged()) taggedJets.push_back(newJet);
 	else unTaggedJets.push_back(newJet);
    
+	
         //NOTE: PdgId of +/-1 is used for light quark jets when charge information is available and 
 	//uncharged particles that are not labeled as b, c, or tau are given an ID of 0
 	//Currently no charge information is available so all particles in this catagory have an
@@ -673,7 +686,28 @@ Int_t EventContainer::ReadEvent()
 	//if(newJet.GetAbsPdgId() == 15)   tauLabeledJets.push_back(newJet);
 	//if((newJet.GetAbsPdgId() == 1) || (newJet.GetAbsPdgId() == 0) )  lightQuarkLabeledJets.push_back(newJet);
       } // if useObj
+      //Now for each jet shift it by all of the JES corrections and append it to the shifted jet collections if it passes selections now
+      for (int jesSyst = 0; jesSyst < newJet.GetNumberOfJESCorrections(); jesSyst++){
+	if (newJet.ShiftPtWithJESCorr(jesSyst,&(metVecsJESShifted[jesSyst]))) jesShiftedJets[jesSyst].push_back(newJet);
+	
+      }
+	  
+
     } //jets
+    //Debugging for new JES corrections
+    /*    Int_t printNums = -1;
+    Int_t numberOfDiffs = 0;
+    if (jets.size() > 0){
+      for (int jesSyst = 0; jesSyst < jets[0].GetNumberOfJESCorrections() ; jesSyst++){
+	if (jesShiftedJets[jesSyst].size() != jets.size()) {
+	  printNums = jesSyst;
+	  numberOfDiffs++;
+	}
+      }
+    }
+    if (printNums > -1){
+      std::cout << "#Jets in event: " << jets.size() << " but " << printNums << " has " << jesShiftedJets[printNums].size() << "(" << numberOfDiffs << ")" << std::endl;
+      }*/
     
 /*
     missingEx = _eventTree -> MissingEt_etx / 1000.0;
