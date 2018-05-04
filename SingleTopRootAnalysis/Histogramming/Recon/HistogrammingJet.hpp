@@ -55,16 +55,19 @@ private:
   myTH1F* _hEtaObj1;  // Jet 1 Eta
   myTH1F* _hPhiObj1;  // Jet 1 Phi
   myTH1F* _hTagObj1;  // Jet 1 Tag
+  myTH2F* _hFlavVTag1;// Jet 1 Tag vs flavour 
 
   myTH1F* _hEtaObj2;  // Jet 2 Eta
   myTH1F* _hPtObj2;   // Jet 2 PT
   myTH1F* _hPhiObj2;  // Jet 2 Phi
   myTH1F* _hTagObj2;  // Jet 2 Tag
+  myTH2F* _hFlavVTag2;// Jet 2 Tag vs flavour 
 
   myTH1F* _hPtObj3;   // Jet 3 PT
   myTH1F* _hEtaObj3;  // Jet 3 Eta
   myTH1F* _hPhiObj3;  // Jet 3 Phi
   myTH1F* _hTagObj3;  // Jet 3 Tag
+  myTH2F* _hFlavVTag3;// Jet 3 Tag vs flavour 
 
   myTH1F* _hPtObj4;   // Jet 4 PT
   myTH1F* _hEtaObj4;  // Jet 4 Eta
@@ -91,6 +94,7 @@ private:
   myTH1F *_hPhi;      // Phi of all jets
   myTH1F *_hCharge;   // Charge of all jets 
   myTH1F *_hEtEM0;    // ET in EM layer 0 for all jets
+  myTH2F* _hFlavVTag; // Tag vs flavour of all jets
   myTH1F *_hTruthLabel;  
 
  

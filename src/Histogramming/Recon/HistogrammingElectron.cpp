@@ -36,8 +36,9 @@ using namespace std;
  * Input:  Event container                                                    *
  * Output: None                                                               *
  ******************************************************************************/
-HistogrammingElectron::HistogrammingElectron(EventContainer *obj, TString electronTypePassed)
+HistogrammingElectron::HistogrammingElectron(EventContainer *obj, TString electronTypePassed, Bool_t unisolated)
 {
+  _unisolated = unisolated;
   // Check electronType parameter
   if( electronTypePassed.CompareTo("All") && electronTypePassed.CompareTo("Isolated") && electronTypePassed.CompareTo("UnIsolated") &&
       electronTypePassed.CompareTo("Tight") && electronTypePassed.CompareTo("Veto") && electronTypePassed.CompareTo("PtEtaCut") ){
@@ -241,6 +242,8 @@ Bool_t HistogrammingElectron::Apply()
 	      << "electronType must be All, Tight, Isolated, UnIsolated, or Veto, PtEtaCut" << std::endl;
     exit(8);
   } //else
+
+  if ("Tight" == electronType && _unisolated) electronVector = evc->unIsolatedElectrons;
 
   // Fill Histograms
   _hNObj -> Fill(electronVector.size());
