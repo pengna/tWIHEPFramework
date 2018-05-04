@@ -642,11 +642,16 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
     if (ele.Pt() > 500) xAxisBin = _eleIDSF->GetYaxis()->FindBin(499.);
     Float_t idSF = _eleIDSF->GetBinContent(xAxisBin,yAxisBin);
     Float_t idUnc = _eleIDSF->GetBinError(xAxisBin,yAxisBin);
-    if (_verbose) std::cout << "Reco: " << recoSF << " ID: " << idSF << " x: " << xAxisBin << " y: " << yAxisBin <<std::endl;
     leptonWeight *= recoSF * idSF;
     leptonWeightUp *= (recoSF + recoUnc) * (idSF + idUnc);
     leptonWeightDown *= (recoSF - recoUnc) * (idSF - idUnc);
+    if (_verbose && leptonWeight == 0.){
+      std::cout << "Reco: " << recoSF << " ID: " << idSF << " pt: " <<ele.Pt() << " scEta: " << ele.scEta()  << " x: " << xAxisBin << " y: " << yAxisBin <<std::endl;
+    }
+
   }
+
+  if (_verbose and leptonWeight == 0.) std::cout << "FinalWeight: " <<  leptonWeight << " up: " << leptonWeightUp << " down: " << leptonWeightDown << std::endl;
 
   return std::make_tuple(leptonWeight,leptonWeightUp,leptonWeightDown,triggerWeight,triggerWeightUp,triggerWeightDown);
 }
@@ -712,6 +717,8 @@ std::tuple<Double_t,Double_t> EventWeight::getBTagReshape(EventContainer * Event
 std::tuple<Double_t,Double_t> EventWeight::getEfficBTagReshape(EventContainer * EventContainerObj, std::string syst){
 
   
+  //if (syst == "central") std::cout << "Starting event b-tag measurement..." << std::endl;
+
   Double_t bTagWeight = 1.0;
   Double_t mistagWeight = 1.0;
 
@@ -734,7 +741,7 @@ std::tuple<Double_t,Double_t> EventWeight::getEfficBTagReshape(EventContainer * 
       mcNoTag *= 1 - jetEffic;
       dataNoTag *= 1 - (jetEffic*jetSF);
     }
-    //if (syst == "central") std::cout << "Jet pt: " << jet.Pt() << " flavour: " << jet.GethadronFlavour() << " tag: " << jet.IsTagged() << " " << jet.bDiscriminator() << " eta: " << jet.Eta() << " " << jetSF << " " << jetEffic << " current b/mis-tag: " << bTagWeight << " " << (dataNoTag/mcNoTag)  << std::endl;
+    //    if (syst == "central") std::cout << "Jet pt: " << jet.Pt() << " flavour: " << jet.GethadronFlavour() << " tag: " << jet.IsTagged() << " " << jet.bDiscriminator() << " eta: " << jet.Eta() << " " << jetSF << " " << jetEffic << " current b/mis-tag: " << bTagWeight << " " << (dataNoTag/mcNoTag)  << std::endl;
   }
 
   //  if (syst == "central") std::cout <<  " After: " << bTagWeight << " " << dataNoTag/mcNoTag << std::endl;
