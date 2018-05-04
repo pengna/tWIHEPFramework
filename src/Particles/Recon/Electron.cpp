@@ -322,7 +322,8 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   SetpatElectron_d0	( evtr -> patElectron_d0		       -> operator[](iE) );
   SetpatElectron_dz	( evtr -> patElectron_gsfTrack_dz_pv	       -> operator[](iE) );
   SetSigmaEtaEta	( evtr -> patElectron_full5x5_sigmaIetaIeta    -> operator[](iE) );
-  SetDEtaInSeed		( evtr -> patElectron_dEtaIn		       -> operator[](iE) );
+  if (NULL != evtr -> patElectron_dEtaInSeed)  SetDEtaInSeed		( evtr -> patElectron_dEtaInSeed               -> operator[](iE) ); //This is the actual definition, but it on;y exists in re-processed samples.
+  else SetDEtaInSeed	( evtr -> patElectron_dEtaIn                   -> operator[](iE) ); //Fallback option if the dataset hasn't been reprocessed yet.
   SetDPhiIn		( evtr -> patElectron_dPhiIn		       -> operator[](iE) );
   SetHOverE		( evtr -> patElectron_hOverE		       -> operator[](iE) );
   SetOoEmooP		( evtr -> patElectron_ooEmooP		       -> operator[](iE) );
@@ -394,7 +395,7 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
 	TMath::Abs(dEtaInSeed()) >= 0.00308 ||
 	TMath::Abs(dPhiIn()) >= 0.0816 ||
 	hOverE() >= 0.0414 ||
-	ooEmooP() >= 0.0129 ||
+	TMath::Abs(ooEmooP()) >= 0.0129 ||
 	missingHits() > 1 ||
 	!passConversionVeto())
       passIDnoIso = kFALSE;
@@ -407,7 +408,7 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
 	TMath::Abs(dEtaInSeed()) >= 0.00605 ||
 	TMath::Abs(dPhiIn()) >= 0.0394 ||
 	hOverE() >= 0.0641 ||
-	ooEmooP() >= 0.0129 ||
+	TMath::Abs(ooEmooP()) >= 0.0129 ||
 	missingHits() > 1 ||
 	!passConversionVeto())
       passIDnoIso = kFALSE;
@@ -423,6 +424,8 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   if(TMath::Abs(elEta) < 1.4442) passd0dZ = ((GetpatElectron_d0() < _d0CutBarrel[electronType]) && (GetpatElectron_dz() < _dZCutBarrel[electronType])); //barrel
   else passd0dZ = ((GetpatElectron_d0() < _d0CutEndcap[electronType]) && (GetpatElectron_dz() < _dZCutEndcap[electronType])); //endcap
 
+
+
   // **************************************************************
   // Gap Electrons
   // **************************************************************
@@ -432,6 +435,11 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   // Test requirements and set variable
   if( (TMath::Abs(scEta()) >= _minEtaGapCuts[electronType]) && (TMath::Abs(scEta()) <= _maxEtaGapCuts[electronType]) ) passNoGapElectron = kFALSE;
   //SetNoGapElectron(passNoGapElectron);
+
+  //  if ( (     "Tight"      == electronType) && TMath::Abs(scEta()) <= 1.479 && ( passTight ^ (passIso && passIDnoIso))){
+  // std::cout << "Electron passing one form if ID: " << passTight << " " << (passIso && passIDnoIso) << " is selected: " << (passMinPt && passMaxEta && passNoGapElectron && passd0dZ) <<  " pt: " << elPt << " eta: " << TMath::Abs(scEta()) << " " << sigmaEtaEta() << " (>= 0.00998) " << (dEtaInSeed()) << " (abs>= 0.00308) " << (dPhiIn()) << "  (abs>= 0.0816) " << hOverE() << " (>= 0.0414) " <<  (ooEmooP()) << " (abs>= 0.0129) "  << missingHits() << " (> 1) " << passConversionVeto() << " (kTrue) " << relIsoPFRhoEA() << " (> 0.0588) "<< std::endl;
+  //}
+
   
   
   // **************************************************************
@@ -441,6 +449,7 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   //if  ( passMinPt && passMaxEta && passIDnoIso && !passIso && passNoGapElectron && passd0dZ) std::cout << "This should return an unisolated lepton" << std::endl;
   //if(     "Tight"      == electronType) return(GetIsRobusterTight() && passMinPt && passMaxEta && GetNoGapElectron() && Isolation());
   if(     "Tight"      == electronType) return( passMinPt && passMaxEta && passIDnoIso && passIso && passNoGapElectron && passd0dZ);
+  //if(     "Tight"      == electronType) return( passMinPt && passMaxEta && passTight && passNoGapElectron && passd0dZ);
   //if(     "PtEtaCut"   == electronType) return(passMinPt && passMaxEta && IsRobusterTight());
   else if("Veto"       == electronType) return( passMinPt && passMaxEta);//no tight or isolation req.
   //else if("Isolated"   == electronType) return(GetIsolation()  && GetNoGapElectron()&& OverlapUse());
