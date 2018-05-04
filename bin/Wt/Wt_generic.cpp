@@ -54,6 +54,7 @@
 //Include the additional variables that we would want in the skim tree
 #include "SingleTopRootAnalysis/Vars/TestVar.hpp"
 #include "SingleTopRootAnalysis/Vars/BDTVars.hpp"
+#include "SingleTopRootAnalysis/Vars/JESBDTVars.hpp"
 #include "SingleTopRootAnalysis/Vars/WeightVars.hpp"
 #include "SingleTopRootAnalysis/Vars/ChannelFlag.hpp"
 #include "SingleTopRootAnalysis/Vars/Bootstrap.hpp"
@@ -284,6 +285,7 @@ int main(int argc, char **argv)
   //  mystudy.AddVars(new TestVar());
   //if (whichtrig) mystudy.AddVars(new BDTVars(true));
   mystudy.AddVars(new BDTVars(true));
+  mystudy.AddVars(new JESBDTVars());
   mystudy.AddVars(new WeightVars(useIterFitbTag));
   mystudy.AddVars(new ChannelFlag());
   mystudy.AddVars(new Bootstrap());
