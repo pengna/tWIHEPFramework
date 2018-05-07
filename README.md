@@ -1,6 +1,4 @@
 # tWIHEPFramework
-stupid test
-
 tW code based on IHEP framework
 
 The newTest.sh bash script is enough to run the code on a single file of the tW MC as it stands.

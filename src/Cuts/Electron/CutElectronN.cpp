@@ -218,7 +218,7 @@ Bool_t CutElectronN::Apply()
 
   // Fill the histograms before the cuts
   _hElectronNumberBefore    -> Fill(ElectronNumber);
-  
+  //  std::cout << electronType << " " << ElectronNumber << std::endl;
   // ***********************************************
   // Fill cut flow table
   // ***********************************************

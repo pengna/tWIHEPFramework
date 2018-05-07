@@ -73,10 +73,35 @@ void HistogrammingMET::BookHistogram(){
   _hMEX->SetXAxisTitle("MEX [GeV]");
   _hMEX->SetYAxisTitle("Events");
 
-  // Histogram of MET
+  // Histogram of MEY
   _hMEY = DeclareTH1F("MEY","Y component of missing transverse energy",400,-200.,200.);
   _hMEY->SetXAxisTitle("MEY [GeV]");
   _hMEY->SetYAxisTitle("Events");
+
+  // Histogram of MET phi
+  _hMETPhi = DeclareTH1F("METPhi","Phi of missing transverse energy",50,-3.3,3.3);
+  _hMETPhi->SetXAxisTitle("#Phi_{MET} [GeV]");
+  _hMETPhi->SetYAxisTitle("Events");
+
+  // Histogram of MET corrected for xy
+  _hMET_xy = DeclareTH1F("MET_xy","Missing transverse energy xy corrected",200,0.,200.);
+  _hMET_xy->SetXAxisTitle("MET [GeV]");
+  _hMET_xy->SetYAxisTitle("Events");
+
+  // Histogram of MEX  corrected for xy
+  _hMEX_xy = DeclareTH1F("MEX_xy","X component of missing transverse energy xy corrected",400,-200.,200.);
+  _hMEX_xy->SetXAxisTitle("MEX [GeV]");
+  _hMEX_xy->SetYAxisTitle("Events");
+
+  // Histogram of MEY corrected for xy
+  _hMEY_xy = DeclareTH1F("MEY_xy","Y component of missing transverse energy xy corrected",400,-200.,200.);
+  _hMEY_xy->SetXAxisTitle("MEY [GeV]");
+  _hMEY_xy->SetYAxisTitle("Events");
+
+  // Histogram of MET phi corrected for xy
+  _hMETPhi_xy = DeclareTH1F("METPhi_xy","Phi of missing transverse energy xy corrected",50,-3.3,3.3);
+  _hMETPhi_xy->SetXAxisTitle("#Phi_{MET} [GeV]");
+  _hMETPhi_xy->SetYAxisTitle("Events");
 
   // Histogram of SUM ET
   _hSumEt = DeclareTH1F("SumEt","Summed transverse energy",200,0.,2000.);
@@ -107,11 +132,17 @@ Bool_t HistogrammingMET::Apply()
 
   // Fill Histograms
   //  if((evc->tightElectrons.size() >0)||(evc->tightMuons.size() >0)){
-  _hMET -> Fill(evc->missingEt);
-  _hMEX -> Fill(evc->missingEx);
-  _hMEY -> Fill(evc->missingEy);
+  _hMET    -> Fill(evc->missingEt);
+  _hMEX    -> Fill(evc->missingEx);
+  _hMEY    -> Fill(evc->missingEy);
+  _hMETPhi -> Fill(evc->missingPhi);
 
-  _hSumEt -> Fill(evc -> sumEt);
+  _hMET_xy    -> Fill(evc->missingEt_xy);
+  _hMEX_xy    -> Fill(evc->missingEx_xy);
+  _hMEY_xy    -> Fill(evc->missingEy_xy);
+  _hMETPhi_xy -> Fill(evc->missingPhi_xy);
+
+  _hSumEt  -> Fill(evc -> sumEt);
   //  }
   //cout<<"End of HistogrammingMET::Apply()"<<endl;
   return kTRUE;  

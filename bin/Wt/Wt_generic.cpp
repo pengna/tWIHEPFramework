@@ -26,6 +26,9 @@
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingElectron.hpp"
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingMET.hpp"
 #include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingMtW.hpp"
+#include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingJetAngular.hpp"
+#include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingJet.hpp"
+#include "SingleTopRootAnalysis/Histogramming/Recon/HistogrammingNPvtx.hpp"
 // Include cuts classes
 //#include "SingleTopRootAnalysis/Cuts/Other/CutTriangularSumDeltaPhiLepMET.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutEMuOverlap.hpp"
@@ -47,6 +50,12 @@
 #include "SingleTopRootAnalysis/Cuts/Other/CutTriggerSelection.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutHFOR.hpp"
 //#include "SingleTopRootAnalysis/Cuts/Other/CutBadPileupEvent.hpp"
+
+//Include the additional variables that we would want in the skim tree
+#include "SingleTopRootAnalysis/Vars/TestVar.hpp"
+#include "SingleTopRootAnalysis/Vars/BDTVars.hpp"
+#include "SingleTopRootAnalysis/Vars/WeightVars.hpp"
+#include "SingleTopRootAnalysis/Vars/ChannelFlag.hpp"
 
 using std::cout;
 using std::endl;
@@ -72,6 +81,7 @@ int main(int argc, char **argv)
   /////////////////////////////////////////////////////////////////////////////////
   // Instantiate the analysis class
   AnalysisMain mystudy;
+
   TChain *chainReco       = new TChain("TNT/BOOM");
   TChain *chainTruth      = new TChain("TruthTree");
   TChain *chainTrigger    = new TChain("TriggerTree");
@@ -87,9 +97,17 @@ int main(int argc, char **argv)
   Bool_t doMC = kFALSE;
   Bool_t doPileup = kFALSE;
   Bool_t dobWeight = kFALSE;
+  Bool_t useInvertedIsolation = kFALSE;
+  Bool_t useLeptonSFs = kFALSE;
+  Bool_t usebTagReweight = kFALSE;
+  TString leptonTypeToSelect = "Tight"; //This variable is altered to unisolated when running QCD estimation.
   string evtListFileName="";
   int whichtrig = -1;
-  
+  // A couple of jet selection overrides to limit the number of config faces.  
+  // -1 means use the value from the config file
+  Int_t nJets = -1;
+  Int_t nbJets = -1;
+
   //  cout << "<Driver> Reading arguments" << end;
   for (int i = 1; i < argc; ++i) {
     cout<<"Command line parameter "<<i<<" is "<<argv[i]<<endl;
@@ -98,6 +116,14 @@ int main(int argc, char **argv)
 	int b = ListName.find("SingleTop.");
 	//	evtListFileName="WtDiElectron_"+ListName.substr(b)+".lst.root";
 	//cout << "evtListFileName : " << evtListFileName << endl;
+    }
+    if (!strcmp(argv[i], "-lepSFs")){
+      useLeptonSFs = kTRUE;
+      cout << "Driver: Using lepton ID/iso SFs" << endl;
+    }
+    if (!strcmp(argv[i], "-bTagReshape")){
+      usebTagReweight = kTRUE;
+      cout << "Driver: Enable b-tag discriminant reshaping" << endl;
     }
     if (!strcmp(argv[i], "-fast")) {
       doFast = kTRUE;
@@ -126,6 +152,11 @@ int main(int argc, char **argv)
       mcStr=mcStr+"UseTotalEvtFromFile";
       cout << "Driver: UseTotalEvtFromFile " << endl;
     }//if UseTotalEvtFromFile
+    if(!strcmp(argv[i],"-InvertIsolation")) {
+      useInvertedIsolation = kTRUE;
+      leptonTypeToSelect = "UnIsolated";
+      cout << "Driver: useInvertedIsolation " << endl;
+    }
     if(!strcmp(argv[i],"-SelectTrigger")) {
       if (argc < i+1) {
 	cout << "<AnalysisMain::ParseCmdLine> " << "ERROR: Missing Value for SelectTrigger - must choose either Electron or Muon" << endl;
@@ -148,6 +179,12 @@ int main(int argc, char **argv)
       } //if
       mystudy.SetBkgdTreeName(argv[i+1]);
     }// if BkgdTreeName
+    if (!strcmp(argv[i],"-nJets")){
+      nJets = atoi(argv[i+1]);
+    }// if nJets
+    if (!strcmp(argv[i],"-nbJets")){
+      nbJets = atoi(argv[i+1]);
+    }// if nbJets
   } // for
 
   TChain *chainBkgd = new TChain(mystudy.GetBkgdTreeName());//if nothing specified on commandline, this is just a "" string, which is ok if you don't want to use this chain (don't want a tree of multivariate variables).
@@ -164,17 +201,19 @@ int main(int argc, char **argv)
   // Define a Particle class to be the same as the AnalysisMain class
   /////////////////////////////////////////////////////////////////////////////////
   EventContainer *particlesObj = &mystudy;
+  particlesObj->SetIsSimulation(doMC);
   TString BkgdTreeName=mystudy.GetBkgdTreeName();
   bool isee   = (BkgdTreeName == "DiElectronsPreTagTree"||BkgdTreeName=="DiElectronsLooseTree");
   bool ismumu = (BkgdTreeName == "DiMuonsPreTagTree"||BkgdTreeName=="DiMuonsLooseTree");
   bool isemu  = (BkgdTreeName == "ElectronMuonPreTagTree" ||  BkgdTreeName == "ElectronMuonLooseTree");
+  particlesObj->SetUseUnisolatedLeptons(useInvertedIsolation,whichtrig);
 
   /////////////////////////////////////////////////////////////////////////////////
   // Add Cuts and Histograms applicable to Fast and Full Analyses
   /////////////////////////////////////////////////////////////////////////////////
   // ******** Cuts and Histograms applied to all studies ********
 
-  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight));
+  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight, useLeptonSFs, usebTagReweight));
 
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"All"));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"Tight"));  // make the muon plots, hopefully.
@@ -182,31 +221,44 @@ int main(int argc, char **argv)
   mystudy.AddCut(new HistogrammingMuon(particlesObj,"UnIsolated"));  // make the muon plots, hopefully.
   mystudy.AddCut(new CutPrimaryVertex(particlesObj));
   mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
-  //mystudy.AddCut(new CutElectronTighterPt(particlesObj, "Tight")); 
-  mystudy.AddCut(new CutMuonN(particlesObj, "Tight"));     //require that lepton to be isolated, central, high pt
 
   mystudy.AddCut(new HistogrammingMET(particlesObj));
-  mystudy.AddCut(new HistogrammingMtW(particlesObj));
+  //mystudy.AddCut(new CutElectronTighterPt(particlesObj, "Tight")); 
+  mystudy.AddCut(new CutMuonN(particlesObj, leptonTypeToSelect));     //require that lepton to be isolated, central, high pt
 
-  mystudy.AddCut(new HistogrammingMuon(particlesObj,"Tight"));  // make the muon plots, hopefully.
   mystudy.AddCut(new CutMuonN(particlesObj, "Veto"));     //require that lepton to be isolated, central, high pt
-  
-  mystudy.AddCut(new HistogrammingElectron(particlesObj,"Tight"));  // make the muon plots, hopefully.
+ 
+
+
+  mystudy.AddCut(new CutElectronN(particlesObj, leptonTypeToSelect)); //require that lepton to be isolated, central, high pt
+  mystudy.AddCut(new CutElectronN(particlesObj, "Veto")); //require that lepton to be isolated, central, high pt
+
+  mystudy.AddCut(new HistogrammingElectron(particlesObj,leptonTypeToSelect));  // make the muon plots, hopefully.
   mystudy.AddCut(new HistogrammingElectron(particlesObj,"Veto"));  // make the muon plots, hopefully.
 
+  mystudy.AddCut(new HistogrammingMET(particlesObj));
+  mystudy.AddCut(new HistogrammingMtW(particlesObj,useInvertedIsolation));
 
-  mystudy.AddCut(new CutElectronN(particlesObj, "Veto")); //require that lepton to be isolated, central, high pt
+  mystudy.AddCut(new HistogrammingMuon(particlesObj,leptonTypeToSelect));  // make the muon plots, hopefully.
+
   //mystudy.AddCut(new CutMuonTighterPt(particlesObj, "Tight")); //require that new Pt cut for leading and subleading muon  
   //if (isemu){
   //  mystudy.AddCut(new CutEMuOverlap(particlesObj));
   //}
   //mystudy.AddCut(new CutJetPt1(particlesObj));
-  mystudy.AddCut(new CutJetN(particlesObj));
+  mystudy.AddCut(new CutJetN(particlesObj,nJets));
   
-  mystudy.AddCut(new CutTaggedJetN(particlesObj));
+  mystudy.AddCut(new CutTaggedJetN(particlesObj,nbJets));
+
+  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight, useLeptonSFs, usebTagReweight));
+
+  mystudy.AddCut(new HistogrammingMuon(particlesObj,"Tight"));  // make the muon plots, hopefully.
 
   mystudy.AddCut(new HistogrammingMET(particlesObj));
-  mystudy.AddCut(new HistogrammingMtW(particlesObj));
+  mystudy.AddCut(new HistogrammingMtW(particlesObj,useInvertedIsolation));
+  mystudy.AddCut(new HistogrammingJetAngular(particlesObj,useInvertedIsolation));
+  mystudy.AddCut(new HistogrammingJet(particlesObj));
+  mystudy.AddCut(new HistogrammingNPvtx(particlesObj));
   //mystudy.AddCut(new CutTriangularSumDeltaPhiLepMET(particlesObj));  
   //if (isemu){
   //  mystudy.AddCut(new CutHTJET1(particlesObj));
@@ -216,6 +268,14 @@ int main(int argc, char **argv)
   //if (isee || ismumu){
   //  mystudy.AddCut(new CutZveto(particlesObj, "Tight"));
   //}
+
+  //Add in any variables to the skim tree that you want here
+  //  mystudy.AddVars(new TestVar());
+  //if (whichtrig) mystudy.AddVars(new BDTVars(true));
+  mystudy.AddVars(new BDTVars(true));
+  mystudy.AddVars(new WeightVars());
+  mystudy.AddVars(new ChannelFlag());
+
   TFile *_skimBDTFile;
   TString NNname = mystudy.GetHistogramFileName() + "skimBDT.root" ;
   _skimBDTFile = new TFile(NNname,"RECREATE"); 

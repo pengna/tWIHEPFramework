@@ -34,13 +34,15 @@
 #define AnalysisMain_h
 
 #include <string>
+#include <sstream>
 
 #include "TFile.h"
 
 #include "SingleTopRootAnalysis/Base/Dictionary/EventContainer.hpp"
 #include "SingleTopRootAnalysis/Base/CutFlow/CutListProcessor.hpp"
+#include "SingleTopRootAnalysis/Base/Dictionary/AdditionalVarsProcessor.hpp"
 
-class AnalysisMain: public EventContainer, public CutListProcessor
+class AnalysisMain: public EventContainer, public CutListProcessor, public AdditionalVarsProcessor
 {
  public:
   // Default Constructor
@@ -158,43 +160,9 @@ class AnalysisMain: public EventContainer, public CutListProcessor
   TFile *_histogramFile;            // Output histogram file
   std::string _histogramFileName;   // Output histogram file name
   Int_t _eventLimit;                 // Number of events to loop over from cmd line (set to 0 to loop over all events)
-  TBranch *_newBranchb;
-  TBranch *_newBranchb2;
-  Float_t  _EventWeightb;
-  Float_t  _EventWeightb2;
   Float_t  _EventNBeforePreselb;
-  TBranch *_newBranchNBPb;
   TBranch *_newBranchHFORb;
-  TBranch *_newBranchHFORb2;
-  TBranch *_newBranchEventTagWeight;
-  TBranch *_newBranchEventTagWeightBup;
-  TBranch *_newBranchEventTagWeightBdown;
-  TBranch *_newBranchEventTagWeightLqup;
-  TBranch *_newBranchEventTagWeightLqdown;
-
- TBranch *_newBranchEventPileupWeight;
- TBranch *_newBranchEventPileupWeight2;
-
-  TBranch *_newBranchEventTagWeight2;
-  TBranch *_newBranchEventTagWeightBup2;
-  TBranch *_newBranchEventTagWeightBdown2;
-  TBranch *_newBranchEventTagWeightLqup2;
-  TBranch *_newBranchEventTagWeightLqdown2;
-
-  Float_t _EventTagWeightb;
-  Float_t _EventTagWeightBupb;
-  Float_t _EventTagWeightBdownb;
-  Float_t _EventTagWeightLqupb;
-  Float_t _EventTagWeightLqdownb;
-
-Float_t _EventPileupWeightb;
-Float_t _EventPileupWeightb2;
-
-  Float_t _EventTagWeightb2;
-  Float_t _EventTagWeightBupb2;
-  Float_t _EventTagWeightBdownb2;
-  Float_t _EventTagWeightLqupb2;
-  Float_t _EventTagWeightLqdownb2;
+  TBranch *_newBranchNBPb;
 
   TChain *chainConfig;
 
@@ -211,6 +179,8 @@ Float_t _EventPileupWeightb2;
   TTree* _skimBkgdTree;             // bkgd tree in the skim file (for use with any trees hard coded into Analysis Main if statement)
   TTree* _skimConfigTreeMeta;  // ConfigMeta tree in skim file
   TTree* metaTree; 
+
+  std::vector<int> _eventsToRunOn; //A vector of interesting event numbers. Mostly used for synch.
 
   Double_t _totalEvents;
   Double_t _totalMCatNLOEvents;

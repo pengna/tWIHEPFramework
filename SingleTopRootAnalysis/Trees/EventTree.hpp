@@ -56,6 +56,7 @@ public :
    Double_t        EVENT_fixedGridRhoFastjetCentralNeutral;
    Int_t           Flag_HBHENoiseFilter;
    Int_t           Flag_HBHENoiseIsoFilter;
+   Int_t	   Flag_globalTightHalo2016Filter;
    Int_t           Flag_CSCTightHaloFilter;
    Int_t           Flag_CSCTightHaloTrkMuUnvetoFilter;
    Int_t           Flag_CSCTightHalo2015Filter;
@@ -83,6 +84,8 @@ public :
    Int_t           HLT_Ele27_eta2p1_WP75_Gsf;
    Int_t           HLT_Ele27_WP85_Gsf;
    Int_t           HLT_Ele27_eta2p1_WPLoose_Gsf;
+   Int_t           HLT_Ele32_eta2p1_WPTight_Gsf;
+   Int_t	   HLT_Ele27_WPTight_Gsf;
    Int_t           HLT_Mu45_eta2p1;
    Int_t           HLT_Mu50;
    Int_t           HLT_IsoMu17_eta2p1;
@@ -91,6 +94,10 @@ public :
    Int_t           HLT_Ele23_WPLoose_Gsf;
    Int_t           HLT_Ele23_CaloIdL_TrackIdL_IsoVL;
    Int_t           HLT_IsoTkMu20;
+   Int_t           HLT_IsoTkMu22;
+   Int_t           HLT_IsoMu22;
+   Int_t           HLT_IsoTkMu24;
+   Int_t           HLT_IsoMu24;
    Int_t           HLT_DiMu9_Ele9_CaloIdL_TrackIdL;
    Int_t           HLT_Mu8_DiEle12_CaloIdL_TrackIdL;
    Int_t           HLT_TripleMu_12_10_5;
@@ -708,6 +715,10 @@ public :
    Double_t        Met_type1PF_py;
    Double_t        Met_type1PF_pz;
    Double_t        Met_type1PF_phi;
+   Double_t        Met_type1PFxy_pt;
+   Double_t        Met_type1PFxy_px;
+   Double_t        Met_type1PFxy_py;
+   Double_t        Met_type1PFxy_phi;
    Double_t        Met_type1PF_sumEt;
    Double_t        Met_type1PF_shiftedPtUp;
    Double_t        Met_type1PF_shiftedPtDown;
@@ -759,6 +770,7 @@ public :
    TBranch        *b_EVENT_fixedGridRhoFastjetCentralNeutral;   //!
    TBranch        *b_Flag_HBHENoiseFilter;   //!
    TBranch        *b_Flag_HBHENoiseIsoFilter;   //!
+   TBranch 	  *b_Flag_globalTightHalo2016Filter; //!
    TBranch        *b_Flag_CSCTightHaloFilter;   //!
    TBranch        *b_Flag_CSCTightHaloTrkMuUnvetoFilter;   //!
    TBranch        *b_Flag_CSCTightHalo2015Filter;   //!
@@ -786,6 +798,7 @@ public :
    TBranch        *b_HLT_Ele27_eta2p1_WP75_Gsf;   //!
    TBranch        *b_HLT_Ele27_WP85_Gsf;   //!
    TBranch        *b_HLT_Ele27_eta2p1_WPLoose_Gsf;   //!
+   TBranch        *b_HLT_Ele32_eta2p1_WPTight_Gsf;   //!
    TBranch        *b_HLT_Mu45_eta2p1;   //!
    TBranch        *b_HLT_Mu50;   //!
    TBranch        *b_HLT_IsoMu17_eta2p1;   //!
@@ -793,7 +806,12 @@ public :
    TBranch        *b_HLT_IsoMu18;   //!
    TBranch        *b_HLT_Ele23_WPLoose_Gsf;   //!
    TBranch        *b_HLT_Ele23_CaloIdL_TrackIdL_IsoVL;   //!
+   TBranch        *b_HLT_Ele27_WPTight_Gsf;  //!
    TBranch        *b_HLT_IsoTkMu20;   //!
+   TBranch        *b_HLT_IsoTkMu22;   //!
+   TBranch        *b_HLT_IsoMu22;   //!
+   TBranch        *b_HLT_IsoTkMu24;   //!
+   TBranch        *b_HLT_IsoMu24;   //!
    TBranch        *b_HLT_DiMu9_Ele9_CaloIdL_TrackIdL;   //!
    TBranch        *b_HLT_Mu8_DiEle12_CaloIdL_TrackIdL;   //!
    TBranch        *b_HLT_TripleMu_12_10_5;   //!
@@ -1411,6 +1429,10 @@ public :
    TBranch        *b_Met_type1PF_py;   //!
    TBranch        *b_Met_type1PF_pz;   //!
    TBranch        *b_Met_type1PF_phi;   //!
+   TBranch        *b_Met_type1PFxy_pt;   //!
+   TBranch        *b_Met_type1PFxy_px;   //!
+   TBranch        *b_Met_type1PFxy_py;   //!
+   TBranch        *b_Met_type1PFxy_phi;   //!
    TBranch        *b_Met_type1PF_sumEt;   //!
    TBranch        *b_Met_type1PF_shiftedPtUp;   //!
    TBranch        *b_Met_type1PF_shiftedPtDown;   //!
@@ -2122,6 +2144,7 @@ void EventTree::Init(TTree *tree)
    fChain->SetBranchAddress("EVENT_fixedGridRhoFastjetCentralNeutral", &EVENT_fixedGridRhoFastjetCentralNeutral, &b_EVENT_fixedGridRhoFastjetCentralNeutral);
    fChain->SetBranchAddress("Flag_HBHENoiseFilter", &Flag_HBHENoiseFilter, &b_Flag_HBHENoiseFilter);
    fChain->SetBranchAddress("Flag_HBHENoiseIsoFilter", &Flag_HBHENoiseIsoFilter, &b_Flag_HBHENoiseIsoFilter);
+   fChain->SetBranchAddress("Flag_globalTightHalo2016Filter", &Flag_globalTightHalo2016Filter, & b_Flag_globalTightHalo2016Filter);
    fChain->SetBranchAddress("Flag_CSCTightHaloFilter", &Flag_CSCTightHaloFilter, &b_Flag_CSCTightHaloFilter);
    fChain->SetBranchAddress("Flag_CSCTightHaloTrkMuUnvetoFilter", &Flag_CSCTightHaloTrkMuUnvetoFilter, &b_Flag_CSCTightHaloTrkMuUnvetoFilter);
    fChain->SetBranchAddress("Flag_CSCTightHalo2015Filter", &Flag_CSCTightHalo2015Filter, &b_Flag_CSCTightHalo2015Filter);
@@ -2149,6 +2172,8 @@ void EventTree::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_Ele27_eta2p1_WP75_Gsf", &HLT_Ele27_eta2p1_WP75_Gsf, &b_HLT_Ele27_eta2p1_WP75_Gsf);
    fChain->SetBranchAddress("HLT_Ele27_WP85_Gsf", &HLT_Ele27_WP85_Gsf, &b_HLT_Ele27_WP85_Gsf);
    fChain->SetBranchAddress("HLT_Ele27_eta2p1_WPLoose_Gsf", &HLT_Ele27_eta2p1_WPLoose_Gsf, &b_HLT_Ele27_eta2p1_WPLoose_Gsf);
+   fChain->SetBranchAddress("HLT_Ele32_eta2p1_WPTight_Gsf", &HLT_Ele32_eta2p1_WPTight_Gsf, &b_HLT_Ele32_eta2p1_WPTight_Gsf);
+   fChain->SetBranchAddress("HLT_Ele27_WPTight_Gsf", &HLT_Ele27_WPTight_Gsf, &b_HLT_Ele27_WPTight_Gsf);
    fChain->SetBranchAddress("HLT_Mu45_eta2p1", &HLT_Mu45_eta2p1, &b_HLT_Mu45_eta2p1);
    fChain->SetBranchAddress("HLT_Mu50", &HLT_Mu50, &b_HLT_Mu50);
    fChain->SetBranchAddress("HLT_IsoMu17_eta2p1", &HLT_IsoMu17_eta2p1, &b_HLT_IsoMu17_eta2p1);
@@ -2157,6 +2182,10 @@ void EventTree::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_Ele23_WPLoose_Gsf", &HLT_Ele23_WPLoose_Gsf, &b_HLT_Ele23_WPLoose_Gsf);
    fChain->SetBranchAddress("HLT_Ele23_CaloIdL_TrackIdL_IsoVL", &HLT_Ele23_CaloIdL_TrackIdL_IsoVL, &b_HLT_Ele23_CaloIdL_TrackIdL_IsoVL);
    fChain->SetBranchAddress("HLT_IsoTkMu20", &HLT_IsoTkMu20, &b_HLT_IsoTkMu20);
+   fChain->SetBranchAddress("HLT_IsoTkMu22", &HLT_IsoTkMu22, &b_HLT_IsoTkMu22);
+   fChain->SetBranchAddress("HLT_IsoMu22", &HLT_IsoMu22, &b_HLT_IsoMu22);
+   fChain->SetBranchAddress("HLT_IsoTkMu24", &HLT_IsoTkMu24, &b_HLT_IsoTkMu24);
+   fChain->SetBranchAddress("HLT_IsoMu24", &HLT_IsoMu24, &b_HLT_IsoMu24);
    fChain->SetBranchAddress("HLT_DiMu9_Ele9_CaloIdL_TrackIdL", &HLT_DiMu9_Ele9_CaloIdL_TrackIdL, &b_HLT_DiMu9_Ele9_CaloIdL_TrackIdL);
    fChain->SetBranchAddress("HLT_Mu8_DiEle12_CaloIdL_TrackIdL", &HLT_Mu8_DiEle12_CaloIdL_TrackIdL, &b_HLT_Mu8_DiEle12_CaloIdL_TrackIdL);
    fChain->SetBranchAddress("HLT_TripleMu_12_10_5", &HLT_TripleMu_12_10_5, &b_HLT_TripleMu_12_10_5);
@@ -2775,6 +2804,10 @@ void EventTree::Init(TTree *tree)
    fChain->SetBranchAddress("Met_type1PF_py", &Met_type1PF_py, &b_Met_type1PF_py);
    fChain->SetBranchAddress("Met_type1PF_pz", &Met_type1PF_pz, &b_Met_type1PF_pz);
    fChain->SetBranchAddress("Met_type1PF_phi", &Met_type1PF_phi, &b_Met_type1PF_phi);
+   fChain->SetBranchAddress("Met_type1PFxy_pt", &Met_type1PFxy_pt, &b_Met_type1PFxy_pt);
+   fChain->SetBranchAddress("Met_type1PFxy_px", &Met_type1PFxy_px, &b_Met_type1PFxy_px);
+   fChain->SetBranchAddress("Met_type1PFxy_py", &Met_type1PFxy_py, &b_Met_type1PFxy_py);
+   fChain->SetBranchAddress("Met_type1PFxy_phi", &Met_type1PFxy_phi, &b_Met_type1PFxy_phi);
    fChain->SetBranchAddress("Met_type1PF_sumEt", &Met_type1PF_sumEt, &b_Met_type1PF_sumEt);
    fChain->SetBranchAddress("Met_type1PF_shiftedPtUp", &Met_type1PF_shiftedPtUp, &b_Met_type1PF_shiftedPtUp);
    fChain->SetBranchAddress("Met_type1PF_shiftedPtDown", &Met_type1PF_shiftedPtDown, &b_Met_type1PF_shiftedPtDown);

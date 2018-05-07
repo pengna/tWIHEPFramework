@@ -78,6 +78,11 @@ void HistogrammingJet::BookHistogram(){
   _hPhiObj1 = DeclareTH1F("Jet1Phi","Jet 1 phi",50,-1.*TMath::Pi(),TMath::Pi());
   _hPhiObj1->SetXAxisTitle("#phi^{Jet 1}");
   _hPhiObj1->SetYAxisTitle("Events");
+  // Jet 1 Tag
+  _hTagObj1 = DeclareTH1F("Jet1Tag","Jet 1 tag",50,-1.,1.);
+  _hTagObj1->SetXAxisTitle("Tag^{Jet 1}");
+  _hTagObj1->SetYAxisTitle("Events");
+  
 
   // Jet 2 Pt
   _hPtObj2 = DeclareTH1F("Jet2Pt","Jet 2 p_{T}",100,0.,400.);
@@ -91,6 +96,10 @@ void HistogrammingJet::BookHistogram(){
   _hPhiObj2 = DeclareTH1F("Jet2Phi","Jet 2 phi",50,-1.*TMath::Pi(),TMath::Pi());
   _hPhiObj2->SetXAxisTitle("#phi^{Jet 2}");
   _hPhiObj2->SetYAxisTitle("Events");
+  // Jet 2 Tag
+  _hTagObj2 = DeclareTH1F("Jet2Tag","Jet 2 tag",50,-1.,1.);
+  _hTagObj2->SetXAxisTitle("Tag^{Jet 2}");
+  _hTagObj2->SetYAxisTitle("Events");
 
   // Jet 3 Pt
   _hPtObj3 = DeclareTH1F("Jet3Pt","Jet 3 p_{T}",100,0.,400.);
@@ -104,6 +113,10 @@ void HistogrammingJet::BookHistogram(){
   _hPhiObj3 = DeclareTH1F("Jet3Phi","Jet 3 phi",50,-1.*TMath::Pi(),TMath::Pi());
   _hPhiObj3->SetXAxisTitle("#phi^{Jet 3}");
   _hPhiObj3->SetYAxisTitle("Events");
+  // Jet 3 Tag
+  _hTagObj3 = DeclareTH1F("Jet3Tag","Jet 3 tag",50,-1.,1.);
+  _hTagObj3->SetXAxisTitle("Tag^{Jet 3}");
+  _hTagObj3->SetYAxisTitle("Events");
   
   // Jet 4 Pt
   _hPtObj4 = DeclareTH1F("Jet4Pt","Jet 4 p_{T}",100,0.,400.);
@@ -117,6 +130,10 @@ void HistogrammingJet::BookHistogram(){
   _hPhiObj4 = DeclareTH1F("Jet4Phi","Jet 4 phi",50,-1.*TMath::Pi(),TMath::Pi());
   _hPhiObj4->SetXAxisTitle("#phi^{Jet 4}");
   _hPhiObj4->SetYAxisTitle("Events");
+  // Jet 4 Tag
+  _hTagObj4 = DeclareTH1F("Jet4Tag","Jet 4 tag",50,-1.,1.);
+  _hTagObj4->SetXAxisTitle("Tag^{Jet 4}");
+  _hTagObj4->SetYAxisTitle("Events");
 
   // Jet 5 Pt
   _hPtObj5 = DeclareTH1F("Jet5Pt","Jet 5 p_{T}",100,0.,400.);
@@ -130,6 +147,10 @@ void HistogrammingJet::BookHistogram(){
   _hPhiObj5 = DeclareTH1F("Jet5Phi","Jet 5 phi",50,-1.*TMath::Pi(),TMath::Pi());
   _hPhiObj5->SetXAxisTitle("#phi^{Jet 5}");
   _hPhiObj5->SetYAxisTitle("Events");
+  // Jet 5 Tag
+  _hTagObj5 = DeclareTH1F("Jet5Tag","Jet 5 tag",50,-1.,1.);
+  _hTagObj5->SetXAxisTitle("Tag^{Jet 5}");
+  _hTagObj5->SetYAxisTitle("Events");
 
   // Jet 6 Pt
   _hPtObj6 = DeclareTH1F("Jet6Pt","Jet 6 p_{T}",100,0.,400.);
@@ -143,6 +164,10 @@ void HistogrammingJet::BookHistogram(){
   _hPhiObj6 = DeclareTH1F("Jet6Phi","Jet 6 phi",50,-1.*TMath::Pi(),TMath::Pi());
   _hPhiObj6->SetXAxisTitle("#phi^{Jet 6}");
   _hPhiObj6->SetYAxisTitle("Events");
+  // Jet 6 Tag
+  _hTagObj6 = DeclareTH1F("Jet6Tag","Jet 6 tag",50,-1.,1.);
+  _hTagObj6->SetXAxisTitle("Tag^{Jet 6}");
+  _hTagObj6->SetYAxisTitle("Events");
 
   // Jet 7 Pt
   _hPtObj7 = DeclareTH1F("Jet7Pt","Jet 7 p_{T}",100,0.,400.);
@@ -156,6 +181,10 @@ void HistogrammingJet::BookHistogram(){
   _hPhiObj7 = DeclareTH1F("Jet7Phi","Jet 7 phi",50,-1.*TMath::Pi(),TMath::Pi());
   _hPhiObj7->SetXAxisTitle("#phi^{Jet 7}");
   _hPhiObj7->SetYAxisTitle("Events");
+  // Jet 7 Tag
+  _hTagObj7 = DeclareTH1F("Jet7Tag","Jet 7 tag",50,-1.,1.);
+  _hTagObj7->SetXAxisTitle("Tag^{Jet 7}");
+  _hTagObj7->SetYAxisTitle("Events");
 
   // any Jet Pt
   _hPt = DeclareTH1F("JetPt","All Jet p_{T}",100,0.,400.);
@@ -208,6 +237,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj1  -> Fill(evc->jets[0].Pt());
     _hEtaObj1 -> Fill(evc->jets[0].Eta());
     _hPhiObj1 -> Fill(evc->jets[0].Phi());
+    _hTagObj1 -> Fill(evc->jets[0].bDiscriminator());
   } //if
 
   // Jet 2
@@ -215,6 +245,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj2  -> Fill(evc->jets[1].Pt());
     _hEtaObj2 -> Fill(evc->jets[1].Eta());
     _hPhiObj2 -> Fill(evc->jets[1].Phi());
+    _hTagObj2 -> Fill(evc->jets[1].bDiscriminator());
   } //if
   
   // Jet 3
@@ -222,6 +253,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj3  -> Fill(evc->jets[2].Pt());
     _hEtaObj3 -> Fill(evc->jets[2].Eta());
     _hPhiObj3 -> Fill(evc->jets[2].Phi());
+    _hTagObj3 -> Fill(evc->jets[2].bDiscriminator());
   } //if
 
   // Jet 4
@@ -229,6 +261,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj4  -> Fill(evc->jets[3].Pt());
     _hEtaObj4 -> Fill(evc->jets[3].Eta());
     _hPhiObj4 -> Fill(evc->jets[3].Phi());
+    _hTagObj4 -> Fill(evc->jets[3].bDiscriminator());
   } //if
 
   // Jet 5
@@ -236,6 +269,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj5  -> Fill(evc->jets[4].Pt());
     _hEtaObj5 -> Fill(evc->jets[4].Eta());
     _hPhiObj5 -> Fill(evc->jets[4].Phi());
+    _hTagObj5 -> Fill(evc->jets[4].bDiscriminator());
   } //if
 
   // Jet 6
@@ -243,6 +277,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj6  -> Fill(evc->jets[5].Pt());
     _hEtaObj6 -> Fill(evc->jets[5].Eta());
     _hPhiObj6 -> Fill(evc->jets[5].Phi());
+    _hTagObj6 -> Fill(evc->jets[5].bDiscriminator());
   } //if
 
   // Jet 7
@@ -250,6 +285,7 @@ Bool_t HistogrammingJet::Apply()
     _hPtObj7  -> Fill(evc->jets[6].Pt());
     _hEtaObj7 -> Fill(evc->jets[6].Eta());
     _hPhiObj7 -> Fill(evc->jets[6].Phi());
+    _hTagObj7 -> Fill(evc->jets[6].bDiscriminator());
   } //if
 
   // Loop over all jets and histogram their properties

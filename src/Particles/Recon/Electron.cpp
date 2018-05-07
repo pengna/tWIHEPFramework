@@ -41,7 +41,7 @@ ClassImp(Electron)
  * Input:  None                                                               *
  * Output: None                                                               *
  ******************************************************************************/
-  Electron::Electron() : Particle::Particle(),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0)
+Electron::Electron() : Particle::Particle(),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0), _charge(0.0), _scEta(0.0), _inCrack(0), _sigmaEtaEta(0.), _dEtaInSeed(0.), _dPhiIn(0.), _hOverE(0.), _ooEmooP(0.), _relIsoPFRhoEA(0.), _missingHits(0.)
 {
 } //Electron()
 
@@ -80,7 +80,17 @@ _patElectron_dz(other.GetpatElectron_dz()),
 _isoChargedHadrons(other.GetisoChargedHadrons()), 
 _isoNeutralHadrons(other.GetisoNeutralHadrons()), 
 _isoPhotons(other.GetisoPhotons()), 
-_isoPU(other.GetisoPU())
+					   _isoPU(other.GetisoPU()),
+					   _charge(other.GetCharge()),
+					   _scEta(other.scEta()),
+					   _inCrack(other.inCrack()),
+					   _sigmaEtaEta(other.sigmaEtaEta()), 
+					   _dEtaInSeed(other.dEtaInSeed()), 
+					   _dPhiIn(other.dPhiIn()), 
+					   _hOverE(other.hOverE()), 
+					   _ooEmooP(other.ooEmooP()), 
+					   _relIsoPFRhoEA(other.relIsoPFRhoEA()), 
+					   _missingHits(other.missingHits())
 {
 } //Electron()
 
@@ -92,7 +102,7 @@ _isoPU(other.GetisoPU())
  * Input:  Particle                                                           *
  * Output: None                                                               *
  ******************************************************************************/
-  Electron::Electron(const Particle& other) : Particle(other),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0)
+Electron::Electron(const Particle& other) : Particle(other),_passVetoId(0), _passLooseId(0), _passMediumId(0), _passTightId(0), _passHEEPId(0), _passConversionVeto(0), _expectedMissingInnerHits(0), _patElectron_d0(0.0),  _patElectron_dz(0.0),  _isoChargedHadrons(0.0),  _isoNeutralHadrons(0.0), _isoPhotons(0.0),  _isoPU(0.0), _charge(0.0), _scEta(0.0), _inCrack(0), _sigmaEtaEta(0.), _dEtaInSeed(0.), _dPhiIn(0.), _hOverE(0.), _ooEmooP(0.), _relIsoPFRhoEA(0.), _missingHits(0.)
 { 
 } //Electron()
 
@@ -154,6 +164,16 @@ Electron& Electron::operator=(const Particle& other)
   SetisoNeutralHadrons(0.0);
   SetisoPhotons(0.0);
   SetisoPU(0.0);
+  SetCharge(0.0);
+  SetSCeta(0.0);
+  SetInCrack(0);
+  SetSigmaEtaEta(0.);
+  SetDEtaInSeed(0.);
+  SetDPhiIn(0.);
+  SetHOverE(0.);
+  SetOoEmooP(0.);
+  SetRelIsoPFRhoEA(0.);
+  SetMissingHits(0);
 
   return *this;
 } // = Particle
@@ -183,6 +203,16 @@ Electron& Electron::operator=(const Electron& other)
   SetisoNeutralHadrons(other.GetisoNeutralHadrons());
   SetisoPhotons(other.GetisoPhotons());
   SetisoPU(other.GetisoPU());
+  SetCharge(other.GetCharge());
+  SetSCeta(other.GetSCEta());
+  SetInCrack(other.GetInCrack());
+  SetSigmaEtaEta(other.sigmaEtaEta());
+  SetDEtaInSeed(other.dEtaInSeed());
+  SetDPhiIn(other.dPhiIn());
+  SetHOverE(other.hOverE());
+  SetOoEmooP(other.ooEmooP());
+  SetRelIsoPFRhoEA(other.relIsoPFRhoEA());
+  SetMissingHits(other.missingHits());
   return *this;
 } //= const Electron
 
@@ -211,6 +241,16 @@ Electron& Electron::operator=(Electron& other)
   SetisoNeutralHadrons(other.GetisoNeutralHadrons());
   SetisoPhotons(other.GetisoPhotons());
   SetisoPU(other.GetisoPU());
+  SetCharge(other.GetCharge());
+  SetSCeta(other.GetSCEta());
+  SetInCrack(other.GetInCrack());
+  SetSigmaEtaEta(other.sigmaEtaEta());
+  SetDEtaInSeed(other.dEtaInSeed());
+  SetDPhiIn(other.dPhiIn());
+  SetHOverE(other.hOverE());
+  SetOoEmooP(other.ooEmooP());
+  SetRelIsoPFRhoEA(other.relIsoPFRhoEA());
+  SetMissingHits(other.missingHits());
   return *this;
 } //= non-const Electron
 
@@ -229,7 +269,10 @@ void Electron::SetCuts(TEnv* config, TString electronType)
   _minPtCuts[electronType] =   	 config -> GetValue("ObjectID.Electron." + electronType + ".MinPt", 0.);
   _minEtaGapCuts[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".MinEtaGap", 100.);
   _maxEtaGapCuts[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".MaxEtaGap", -100.);
-
+  _dZCutEndcap[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".dZEndcap", 100.);
+  _dZCutBarrel[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".dZBarrel", 100.);
+  _d0CutEndcap[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".d0Endcap", 100.);
+  _d0CutBarrel[electronType] = config -> GetValue("ObjectID.Electron." + electronType + ".d0Barrel", 100.);
 
 } // End SetCuts
 
@@ -262,18 +305,29 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   SetPtEtaPhiE(elPt, elEta, elPhi, elE);
 
-  SetCharge             ( evtr -> patElectron_charge              -> operator[](iE) );
-  SetpassVetoId         ( evtr -> patElectron_isPassVeto          -> operator[](iE) );
-  SetpassLooseId        ( evtr -> patElectron_isPassLoose         -> operator[](iE) );
-  SetpassMediumId       ( evtr -> patElectron_isPassMedium        -> operator[](iE) );
-  SetpassTightId        ( evtr -> patElectron_isPassTight         -> operator[](iE) );
-  SetpassHEEPId         ( evtr -> patElectron_isPassHEEPId        -> operator[](iE) );
-  SetpassConversionVeto ( evtr -> patElectron_passConversionVeto  -> operator[](iE) );
-  SetisoChargedHadrons  ( evtr -> patElectron_isoChargedHadrons   -> operator[](iE) );
-  SetisoNeutralHadrons  ( evtr -> patElectron_isoNeutralHadrons   -> operator[](iE) );
-  SetisoPhotons         ( evtr -> patElectron_isoPhotons          -> operator[](iE) );
-  SetisoPU              ( evtr -> patElectron_isoPU               -> operator[](iE) );
-
+  SetCharge             ( evtr -> patElectron_charge                   -> operator[](iE) );
+  SetpassVetoId         ( evtr -> patElectron_isPassVeto               -> operator[](iE) );
+  SetpassLooseId        ( evtr -> patElectron_isPassLoose              -> operator[](iE) );
+  SetpassMediumId       ( evtr -> patElectron_isPassMedium             -> operator[](iE) );
+  SetpassTightId        ( evtr -> patElectron_isPassTight              -> operator[](iE) );
+  SetpassHEEPId         ( evtr -> patElectron_isPassHEEPId             -> operator[](iE) );
+  SetpassConversionVeto ( evtr -> patElectron_passConversionVeto       -> operator[](iE) );
+  SetisoChargedHadrons  ( evtr -> patElectron_isoChargedHadrons        -> operator[](iE) );
+  SetisoNeutralHadrons  ( evtr -> patElectron_isoNeutralHadrons        -> operator[](iE) );
+  SetisoPhotons         ( evtr -> patElectron_isoPhotons               -> operator[](iE) );
+  SetisoPU              ( evtr -> patElectron_isoPU                    -> operator[](iE) );
+  SetCharge		( evtr -> patElectron_charge		       -> operator[](iE) );
+  SetSCeta		( evtr -> patElectron_SCeta		       -> operator[](iE) );
+  SetInCrack		( evtr -> patElectron_inCrack		       -> operator[](iE) );
+  SetpatElectron_d0	( evtr -> patElectron_d0		       -> operator[](iE) );
+  SetpatElectron_dz	( evtr -> patElectron_gsfTrack_dz_pv	       -> operator[](iE) );
+  SetSigmaEtaEta	( evtr -> patElectron_full5x5_sigmaIetaIeta    -> operator[](iE) );
+  SetDEtaInSeed		( evtr -> patElectron_dEtaIn		       -> operator[](iE) );
+  SetDPhiIn		( evtr -> patElectron_dPhiIn		       -> operator[](iE) );
+  SetHOverE		( evtr -> patElectron_hOverE		       -> operator[](iE) );
+  SetOoEmooP		( evtr -> patElectron_ooEmooP		       -> operator[](iE) );
+  SetRelIsoPFRhoEA	( evtr -> patElectron_relIsoRhoEA	       -> operator[](iE) );
+  SetMissingHits	( evtr -> patElectron_expectedMissingInnerHits -> operator[](iE) );
   // **************************************************************
   // **************************************************************
   // **************************************************************
@@ -322,13 +376,53 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   // Pt and Eta Cuts
   // **************************************************************
   // If event passes or fails requirements
-  Bool_t passMinPt  = kTRUE;
-  Bool_t passMaxEta = kTRUE;
-  
+  Bool_t passMinPt   = kTRUE;
+  Bool_t passMaxEta  = kTRUE;
+  Bool_t passTight   = kTRUE;
+  Bool_t passIDnoIso = kTRUE;
+  Bool_t passd0dZ    = kTRUE;
+  Bool_t passIso     = kTRUE;
+
   // Test requirements
   if(elPt <= _minPtCuts[electronType])               passMinPt  = kFALSE;
   if(TMath::Abs(elEta) >= _maxEtaCuts[electronType]) passMaxEta = kFALSE;
+  if(!passTightId())				     passTight  = kFALSE;
   
+  // Apply the ID requirements individually so that we can invert the isolation for QCD electrons
+  if (TMath::Abs(scEta()) <= 1.479){ //Electron in barrel
+    if (sigmaEtaEta() >= 0.00998 ||
+	TMath::Abs(dEtaInSeed()) >= 0.00308 ||
+	TMath::Abs(dPhiIn()) >= 0.0816 ||
+	hOverE() >= 0.0414 ||
+	ooEmooP() >= 0.0129 ||
+	missingHits() > 1 ||
+	!passConversionVeto())
+      passIDnoIso = kFALSE;
+    if (relIsoPFRhoEA() > 0.0588){
+      passIso = kFALSE;
+    }
+  }
+  else { // Electron in endcap
+    if (sigmaEtaEta() >= 0.0292 ||
+	TMath::Abs(dEtaInSeed()) >= 0.00605 ||
+	TMath::Abs(dPhiIn()) >= 0.0394 ||
+	hOverE() >= 0.0641 ||
+	ooEmooP() >= 0.0129 ||
+	missingHits() > 1 ||
+	!passConversionVeto())
+      passIDnoIso = kFALSE;
+    if (relIsoPFRhoEA() > 0.0571) {
+      passIso = kFALSE;
+    }
+  }
+
+  //Isolation requirement
+  
+
+  // Checking that the d0 and dz cuts pass
+  if(TMath::Abs(elEta) < 1.4442) passd0dZ = ((GetpatElectron_d0() < _d0CutBarrel[electronType]) && (GetpatElectron_dz() < _dZCutBarrel[electronType])); //barrel
+  else passd0dZ = ((GetpatElectron_d0() < _d0CutEndcap[electronType]) && (GetpatElectron_dz() < _dZCutEndcap[electronType])); //endcap
+
   // **************************************************************
   // Gap Electrons
   // **************************************************************
@@ -336,18 +430,22 @@ Bool_t Electron::Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t is
   Bool_t passNoGapElectron  = kTRUE;
   
   // Test requirements and set variable
-  if( (TMath::Abs(elEta) >= _minEtaGapCuts[electronType]) && (TMath::Abs(elEta) <= _maxEtaGapCuts[electronType]) ) passNoGapElectron = kFALSE;
+  if( (TMath::Abs(scEta()) >= _minEtaGapCuts[electronType]) && (TMath::Abs(scEta()) <= _maxEtaGapCuts[electronType]) ) passNoGapElectron = kFALSE;
   //SetNoGapElectron(passNoGapElectron);
+  
   
   // **************************************************************
   // Return value according to electron type passed to Fill
   // **************************************************************
+    //  std::cout << (passMinPt && passMaxEta && passIDnoIso && passIso && passNoGapElectron && passd0dZ) << " " << ( passMinPt && passMaxEta) << " " << ( passMinPt && passMaxEta && passIDnoIso && !passIso && passNoGapElectron && passd0dZ) << " bools: " << passMinPt << " " << passMaxEta << " " << passIDnoIso << " " << passIso << " " << passNoGapElectron << " " << passd0dZ << std::endl;
+  //if  ( passMinPt && passMaxEta && passIDnoIso && !passIso && passNoGapElectron && passd0dZ) std::cout << "This should return an unisolated lepton" << std::endl;
   //if(     "Tight"      == electronType) return(GetIsRobusterTight() && passMinPt && passMaxEta && GetNoGapElectron() && Isolation());
-  if(     "Tight"      == electronType) return( passMinPt && passMaxEta);
+  if(     "Tight"      == electronType) return( passMinPt && passMaxEta && passIDnoIso && passIso && passNoGapElectron && passd0dZ);
   //if(     "PtEtaCut"   == electronType) return(passMinPt && passMaxEta && IsRobusterTight());
   else if("Veto"       == electronType) return( passMinPt && passMaxEta);//no tight or isolation req.
   //else if("Isolated"   == electronType) return(GetIsolation()  && GetNoGapElectron()&& OverlapUse());
-  //else if("UnIsolated" == electronType) return(!GetIsolation() && GetIsRobusterTight() && passMinPt && passMaxEta && GetNoGapElectron());
+  else if(     "UnIsolated" == electronType) return( passMinPt && passMaxEta && passIDnoIso && !passIso && passNoGapElectron && passd0dZ);
+  //  else if("UnIsolated" == electronType) return(!GetIsolation() && GetIsRobusterTight() && passMinPt && passMaxEta && GetNoGapElectron());
   //else if("All"        == electronType) return(kTRUE);
   //else return kTRUE;
   return kTRUE;

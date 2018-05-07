@@ -65,13 +65,13 @@ class Jet: public Particle
   ~Jet();
 
   // Set all contents to their defaults
-  inline void Clear() { Particle::Clear(); _numberOfConstituents=0; _chargedMultiplicity=0;  _bDiscriminator = -999.0; _pileupId = 0.0; _mass = 0.0; _uncorrPt = 0.0; _neutralHadEnergyFraction=0.0; _neutralEmEmEnergyFraction = 0.0; _chargedHadronEnergyFraction =0.0; _chargedEmEnergyFraction=0.0; _muonEnergyFraction=0.0; _electronEnergy=0.0; _photonEnergy=0.0; _tagged = kFALSE;
+  inline void Clear() { Particle::Clear(); _numberOfConstituents=0; _chargedMultiplicity=0;  _bDiscriminator = -999.0; _pileupId = 0.0; _mass = 0.0; _uncorrPt = 0.0; _neutralHadEnergyFraction=0.0; _neutralEmEmEnergyFraction = 0.0; _chargedHadronEnergyFraction =0.0; _chargedEmEnergyFraction=0.0; _muonEnergyFraction=0.0; _electronEnergy=0.0; _photonEnergy=0.0; _tagged = kFALSE; _hadronFlavour=-1;
 }
 
   void SetCuts(TEnv* config);
 
   // Fill the jet from an EventTree 
-  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE);
+  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met, bool isMC);
   //  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE);
   // Also fill from FastSim tree:
   Bool_t FillFastSim( std::vector<MCJet>& MCBJets, std::vector<MCJet>& MCCJets, std::vector<MCTau>& MCTaus,  std::vector<Electron>& electrons, FastSimTree *tr,Int_t iE,TEnv *config,const TString& tagName="default", Double_t btagCut = 999, Double_t mistagCut = 999, Double_t eshift = 0 );
@@ -79,6 +79,10 @@ class Jet: public Particle
   inline void SetnumberOfConstituents(Int_t numberOfConstituents){_numberOfConstituents = numberOfConstituents;};
   inline Int_t GetnumberOfConstituents() const {return _numberOfConstituents;};
   inline Int_t numberOfConstituents() const {return _numberOfConstituents;};
+
+  inline void SethadronFlavour(Int_t hadronFlavour){_hadronFlavour = hadronFlavour;};
+  inline Int_t GethadronFlavour() const {return _hadronFlavour;};
+  inline Int_t hadronFlavour() const {return _hadronFlavour;};
 
   inline void SetchargedMultiplicity(Int_t chargedMultiplicity){_chargedMultiplicity = chargedMultiplicity;};
   inline Int_t GetchargedMultiplicity() const {return _chargedMultiplicity;};
@@ -128,9 +132,13 @@ class Jet: public Particle
   inline Double_t GetuncorrPt() const {return _uncorrPt;};
   inline Double_t uncorrPt() const {return _uncorrPt;};
 
-  inline void SetTagged(Bool_t isTagged){_tagged = isTagged;};
-  inline Bool_t IsTagged() const {return _tagged;};
-  inline Bool_t tagged() const {return _tagged;};
+  inline void SetTagged(Int_t isTagged){_tagged = isTagged;};
+  inline Int_t IsTagged() const {return _tagged;};
+  inline Int_t tagged() const {return _tagged;};
+
+  inline void SetClosestLep(Double_t closestLep){_closestLep = closestLep;};
+  inline Double_t GetClosestLep() const {return _closestLep;};
+  inline Double_t closestLep() const {return _closestLep;};
 
   // Overloaded Operators
   // +=
@@ -148,6 +156,7 @@ class Jet: public Particle
  private:
   Int_t _numberOfConstituents;   
   Int_t _chargedMultiplicity;   
+  Int_t _hadronFlavour;
   Double_t _bDiscriminator;   
   Double_t _pileupId;   
   Double_t _mass;   
@@ -158,8 +167,9 @@ class Jet: public Particle
   Double_t _muonEnergyFraction;   
   Double_t _electronEnergy;   
   Double_t _photonEnergy;   
-  Double_t _uncorrPt; 
-  Bool_t _tagged;
+  Double_t _uncorrPt;  
+  Int_t _tagged;
+  Double_t _closestLep;
 
   // Cuts applied to the jet objects
   Double_t _maxEtaCut;
@@ -168,7 +178,15 @@ class Jet: public Particle
   Double_t _bMinPtCut;
   Double_t _bTagCut;
   Double_t _closestLeptonCut;
-  
+
+  // Are we running systematic variations?
+  Int_t _jesUp;
+  Int_t _jesDown;
+  Int_t _jerUp;
+  Int_t _jerDown;
+
+  // Apply the jet correction systematics
+  void SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met);
  
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system

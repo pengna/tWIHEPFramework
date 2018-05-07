@@ -35,7 +35,7 @@ class CutTaggedJetN : public HistoCut
 public:
 
   // Parameterized Constructor
-  CutTaggedJetN(EventContainer *EventContainerObj);
+  CutTaggedJetN(EventContainer *EventContainerObj, Int_t nbJetsDefault);
   
   // Destructor
   ~CutTaggedJetN();

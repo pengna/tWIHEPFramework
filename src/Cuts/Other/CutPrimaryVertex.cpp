@@ -91,14 +91,23 @@ void CutPrimaryVertex::BookHistogram(){
   // ***********************************************  
 
   // Histogram before cut
-  _hPrimaryVertexBefore =  DeclareTH1F(histNameBefore.Data(), histTitleBefore.Data(), 20, 0.0, 20.);
+  _hPrimaryVertexBefore =  DeclareTH1F(histNameBefore.Data(), histTitleBefore.Data(), 100, 0.0, 100.);
   _hPrimaryVertexBefore -> SetXAxisTitle("Primary Vertex");
   _hPrimaryVertexBefore -> SetYAxisTitle("Events");
 
   // Histogram after cut
-  _hPrimaryVertexAfter =  DeclareTH1F(histNameAfter.Data(), histTitleAfter.Data(), 20, 0.0, 20.);
+  _hPrimaryVertexAfter =  DeclareTH1F(histNameAfter.Data(), histTitleAfter.Data(), 100, 0.0, 100.);
   _hPrimaryVertexAfter -> SetXAxisTitle("Primary Vertex");
   _hPrimaryVertexAfter -> SetYAxisTitle("Events");
+
+  //Additional histogram containing the number of true interactions
+  _hNTrueInteractions = DeclareTH1F("nTrueInteractions","Number of true interactions",100,0.0,100.);
+  _hNTrueInteractions -> SetXAxisTitle("N True Interactions");
+  _hNTrueInteractions -> SetYAxisTitle("Events");
+
+  _hNTrueIntsUnweighted = DeclareTH1F("nTrueIntsUnweighted","Number of true interactions unweighted",100,0.0,100.);
+  _hNTrueIntsUnweighted -> SetXAxisTitle("N True Interactions");
+  _hNTrueIntsUnweighted -> SetYAxisTitle("Events");
 
   // ***********************************************
   // Add these cuts to the cut flow table
@@ -152,6 +161,13 @@ Bool_t CutPrimaryVertex::Apply()
 
   Bool_t hasPV = kFALSE;
 
+  Bool_t passesMETFilterFlags = kTRUE;
+
+  //  if ( !EventContainerObj->Flag_goodVertices || !EventContainerObj->Flag_HBHENoiseFilter || !EventContainerObj->Flag_HBHENoiseIsoFilter || !EventContainerObj->Flag_EcalDeadCellTriggerPrimitiveFilter || !EventContainerObj->Flag_globalTightHalo2016Filter) passesMETFilterFlags = kFALSE; //2016 version. 2016 halo filter not currently in full production, will be added next crab round.
+  if ( !EventContainerObj->Flag_goodVertices || !EventContainerObj->Flag_HBHENoiseFilter || !EventContainerObj->Flag_HBHENoiseIsoFilter || !EventContainerObj->Flag_EcalDeadCellTriggerPrimitiveFilter || !EventContainerObj->Flag_CSCTightHaloFilter) passesMETFilterFlags = kFALSE; //old halo filter. Will be changed after re-crab.
+
+  //  if (!EventContainerObj->Flag_METFilters) passesMETFilterFlags = kFALSE;
+
   tmpCounter = 0;
 
   for (unsigned int  i = 0; i < EventContainerObj->pvertex_ndof->size() ; i++){
@@ -163,7 +179,7 @@ Bool_t CutPrimaryVertex::Apply()
     hasPV = kTRUE;
   }
   //cout << endl;
-
+  GetEventContainer()->SetnPvt(tmpCounter);
 
   // Fill the histograms before the cuts
   _hPrimaryVertexBefore->Fill(tmpCounter);
@@ -181,7 +197,10 @@ Bool_t CutPrimaryVertex::Apply()
   cutFlowNameStream << "PV";
   cutFlowName = cutFlowNameStream.str().c_str();
 
-  if (hasPV) {
+  _hNTrueInteractions->Fill(EventContainerObj->trueInteractions);
+  _hNTrueIntsUnweighted->FillWithoutWeight(EventContainerObj->trueInteractions);
+
+  if (hasPV && passesMETFilterFlags) {
     _hPrimaryVertexAfter->Fill(tmpCounter);
     GetCutFlowTable()->PassCut(cutFlowName);
     return kTRUE;

@@ -66,7 +66,9 @@ ClassImp(Muon)
   _validHitsInner	(0.0),
   _matchedStat		(0.0),
   _TLayers		(0.0),
-  _relIsoR04		(0.0)
+  _relIsoR04		(0.0),
+  _ndof			(0.0),
+  _charge		(0.0)
 {
 
 } //Muon
@@ -111,7 +113,9 @@ Muon::Muon(const Muon& other): Particle(other),
   _validHitsInner(other.GetvalidHitsInner()),
   _matchedStat(other.GetmatchedStat()),
   _TLayers(other.GetTLayers()),
-  _relIsoR04(other.GetrelIsoR04())
+  _relIsoR04(other.GetrelIsoR04()),
+			       _ndof(other.Getndof()),
+			       _charge(other.GetCharge())			       
 			       
 {
 } //Muon()
@@ -143,7 +147,9 @@ Muon::Muon(const Particle& other): Particle(other),
   _validHitsInner	(0.0),
   _matchedStat		(0.0),
   _TLayers		(0.0),
-  _relIsoR04            (0.0)
+				   _relIsoR04            (0.0),
+				   _ndof (0.0),
+				   _charge(0.0)
 {
 } //Muon
 
@@ -207,6 +213,8 @@ Muon& Muon::operator=(const Particle& other)
   SetmatchedStat	(0.0);
   SetTLayers		(0.0);
   SetrelIsoR04		(0.0);
+  Setndof		(0.0);
+  SetCharge		(0.0);
   return *this;
 } //= Particle
 
@@ -240,6 +248,8 @@ Muon& Muon::operator=(const Muon& other)
   SetmatchedStat(other.GetmatchedStat());
   SetTLayers(other.GetTLayers());
   SetrelIsoR04(other.GetrelIsoR04());
+  Setndof(other.Getndof());
+  SetCharge(other.GetCharge());
   return *this;
 } //= const muon
 
@@ -273,6 +283,8 @@ Muon& Muon::operator=(Muon& other)
   SetmatchedStat(other.GetmatchedStat());
   SetTLayers(other.GetTLayers());
   SetrelIsoR04(other.GetrelIsoR04());
+  Setndof(other.Getndof());
+  SetCharge(other.GetCharge());
   return *this;
 } //= non-const muon
 
@@ -339,6 +351,8 @@ Bool_t Muon::Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation)
   SetmatchedStat	(evtr -> Muon_matchedStat   	-> operator[](iE));
   SetTLayers		(evtr -> Muon_TLayers   	-> operator[](iE));
   SetrelIsoR04		(evtr -> Muon_relIsoDeltaBetaR04-> operator[](iE));
+  Setndof		(evtr -> Muon_ndof		-> operator[](iE));
+  SetCharge		(evtr -> Muon_charge		-> operator[](iE));
  
   // **************************************************************
   // Isolation Cuts
@@ -385,7 +399,14 @@ Bool_t Muon::Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation)
   // **************************************************************
   Bool_t passRelIso = kTRUE;
 
-  if (relIsoR04() > _maxRelIsoCuts[muonType]) passRelIso = kFALSE;
+  //  std::cout << relIsoR04() << " " << _maxRelIsoCuts[muonType] << " " << muonType << " ";
+
+  if (relIsoR04() > _maxRelIsoCuts[muonType]) {passRelIso = kFALSE;
+    //    std::cout << "false";
+  }
+  //  else std::cout << "true";
+
+  //  std::cout << " " << passRelIso << std::endl;
   
   // **************************************************************
   // Pt and Eta Cuts
@@ -393,15 +414,27 @@ Bool_t Muon::Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation)
   // If event passes or fails requirements
   Bool_t passMinPt  = kTRUE;
   Bool_t passMaxEta = kTRUE;
+
+  Bool_t passCustomID = kTRUE;
+  
+  //I don't know if the tight ID is the same as these custom ID variables, so I'm checking both.
+  if (chi2()/ndof() 	>= 10  ||
+      TLayers()		<= 5   ||
+      validHits()	<  1   ||
+      dxy()		>= 0.2 ||
+      dz()		>= 0.5 ||
+      validHitsInner()	<  1   ||
+      matchedStat()	<  2)
+    passCustomID = kFALSE;
   
   // Test Requirements
   if(muPt <= _minPtCuts[muonType])               passMinPt  = kFALSE;
   if(TMath::Abs(muEta) >= _maxEtaCuts[muonType]) passMaxEta = kFALSE;
 
   //  if(     "Tight"      == muonType) return( passMinPt && passMaxEta  && IsTight() && Isolation() && !GetOverlapWithJet() && IsCombinedMuon());
-  if(     "Tight"      == muonType) return (passMinPt && passMaxEta  && passTightId() && passRelIso);
+  if(     "Tight"      == muonType) return (passMinPt && passMaxEta  && passTightId() && passCustomID && passRelIso);
   else if("Veto"       == muonType) return (passMinPt && passMaxEta);//no isolation req. or inner det or jet overlap.
-  else if("UnIsolated" == muonType) return (passMinPt && passMaxEta  && passTightId() && ! passRelIso); //The same as tight muons, but with an inverted isolation requirement
+  else if("UnIsolated" == muonType) return (passMinPt && passMaxEta  && passTightId() && passCustomID && ! passRelIso); //The same as tight muons, but with an inverted isolation requirement
     //    std::cout << muPt << " " << minPt << " " << muEta << " " << maxEta << std::end;
   //else if("Isolated"   == muonType) return( GetIsolation()  && !GetOverlapWithJet() && IsCombinedMuon() && OverlapUse());
   //else if("UnIsolated" == muonType) return( !GetIsolation()  && passMinPt && passMaxEta && IsTight() && !GetOverlapWithJet()&& IsCombinedMuon());

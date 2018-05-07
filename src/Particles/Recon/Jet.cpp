@@ -66,7 +66,7 @@ ClassImp(Jet)
  * Output: None                                                               *
  ******************************************************************************/
   Jet::Jet() : Particle::Particle(),
-_numberOfConstituents(0), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0)
+  _numberOfConstituents(0), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0), _jesUp(false), _jesDown(false), _jerUp(false), _jerDown(false), _hadronFlavour(-1), _tagged(0)
 {
 } //Jet()
 
@@ -92,6 +92,8 @@ Jet::~Jet()
  ******************************************************************************/
 Jet::Jet(const Jet& other): Particle(other),
 _numberOfConstituents		(other.GetnumberOfConstituents()), 
+_hadronFlavour		        (other.GethadronFlavour()), 
+_tagged				(other.IsTagged()),
 _chargedMultiplicity		(other.GetchargedMultiplicity()),  
 _bDiscriminator 		(other.GetbDiscriminator()), 
 _pileupId 			(other.GetpileupId()), 
@@ -116,7 +118,7 @@ _photonEnergy			(other.GetphotonEnergy())
  * Output: None                                                               *
  ******************************************************************************/
 Jet::Jet(const Particle& other): Particle(other),
-_numberOfConstituents(0), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0)
+				 _numberOfConstituents(0), _hadronFlavour(-1), _chargedMultiplicity(0),  _bDiscriminator ( -999.0), _pileupId ( 0.0), _mass ( 0.0), _uncorrPt ( 0.0), _neutralHadEnergyFraction(0.0), _neutralEmEmEnergyFraction ( 0.0), _chargedHadronEnergyFraction (0.0), _chargedEmEnergyFraction(0.0), _muonEnergyFraction(0.0), _electronEnergy(0.0), _photonEnergy(0.0), _tagged(0)
 {
  
 } //Jet()
@@ -166,6 +168,8 @@ Jet& Jet::operator=(const Particle& other)
   
   Particle::operator=(other);
   SetnumberOfConstituents(0), 
+  SethadronFlavour(-1),
+  SetTagged(0),
   SetchargedMultiplicity(0),  
   SetbDiscriminator ( -999.0), 
   SetpileupId ( 0.0), 
@@ -195,6 +199,8 @@ Jet& Jet::operator=(const Jet& other)
   
   Particle::operator=(other);
   SetnumberOfConstituents		(other.GetnumberOfConstituents());
+  SethadronFlavour	         	(other.GethadronFlavour());
+  SetTagged				(other.IsTagged());
   SetchargedMultiplicity		(other.GetchargedMultiplicity()); 
   SetbDiscriminator 			(other.GetbDiscriminator());
   SetpileupId 				(other.GetpileupId());
@@ -222,6 +228,8 @@ Jet& Jet::operator=(Jet& other)
 {
   Particle::operator=(other);
   SetnumberOfConstituents		(other.GetnumberOfConstituents());
+  SethadronFlavour	         	(other.GethadronFlavour());
+  SetTagged			        (other.IsTagged());
   SetchargedMultiplicity		(other.GetchargedMultiplicity()); 
   SetbDiscriminator 			(other.GetbDiscriminator());
   SetpileupId 				(other.GetpileupId());
@@ -255,6 +263,10 @@ void Jet::SetCuts(TEnv * config)
   _bMinPtCut = 		config -> GetValue("ObjectID.BJet.MinPt",0.);
   _bTagCut = 		config -> GetValue("ObjectID.BJet.BTagCut",0.0);
   _closestLeptonCut = 	config -> GetValue("ObjectID.Jet.LepCleanR",0.0);
+  _jesUp = 		config -> GetValue("Systs.doJESUp",0);
+  _jesDown = 		config -> GetValue("Systs.doJESDown",0);
+  _jerUp = 		config -> GetValue("Systs.doJERUp",0);
+  _jerDown = 		config -> GetValue("Systs.doJERDown",0);
 }
 
 /******************************************************************************         
@@ -267,7 +279,7 @@ void Jet::SetCuts(TEnv * config)
  * Output: True if this jet passes jet ID cuts                                *         
  ******************************************************************************/
 
-Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE)
+Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met, bool isMC)
 {
 
   Double_t jetPt, jetEta,jetPhi,jetE, jetCharge, jetM;
@@ -295,6 +307,10 @@ Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selecte
   SetmuonEnergyFraction			(evtr -> Jet_muonEnergyFraction     	-> operator[](iE));
   SetelectronEnergy			(evtr -> Jet_electronEnergy     	-> operator[](iE));
   SetphotonEnergy			(evtr -> Jet_photonEnergy     		-> operator[](iE));
+  if (isMC)  SethadronFlavour           (evtr -> Jet_hadronFlavour              -> operator[](iE));
+
+  // Now we want to do the JER and JES systematic adjustments to the jet. This also requires correcting the MET.
+  if (_jesUp || _jesDown || _jerUp || _jerDown) SystematicPtShift(evtr, iE, met);  
 /*
   SetPdgId      ( evtr -> Jet_flavor_truth_trueflav -> operator[](iE));
   SetIsBadLoose ( evtr -> Jet_isBadLoose            -> operator[](iE));
@@ -343,17 +359,17 @@ Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selecte
   // Jet Pt and Eta Cuts
   /////////////////////////////////////////////////////////////////////////////
 
-  Bool_t passPt = jetPt > _minPtCut;
-  Bool_t passEta = TMath::Abs(jetEta) < _maxEtaCut;
+  Bool_t passPt = Pt() > _minPtCut;
+  Bool_t passEta = TMath::Abs(Eta()) < _maxEtaCut;
 
   /////////////////////////////////////////////////////////////////////////
   // Jet ID
   /////////////////////////////////////////////////////////////////////////
   
   
-  Bool_t neutralID = (TMath::Abs(jetEta) > 3. || (neutralHadEnergyFraction() < 0.99 &&  neutralEmEmEnergyFraction() < 0.99 && numberOfConstituents() > 1));
-  Bool_t chargedID = (TMath::Abs(jetEta) > 2.4 || (chargedHadronEnergyFraction() > 0. && chargedMultiplicity() > 0. && chargedEmEnergyFraction() < 0.99));
-  Bool_t neutralHighEtaID = (TMath::Abs(jetEta) < 3. || (neutralEmEmEnergyFraction() < 0.9 && (numberOfConstituents() - chargedMultiplicity()) > 10));
+  Bool_t neutralID = (TMath::Abs(Eta()) > 3. || (neutralHadEnergyFraction() < 0.99 &&  neutralEmEmEnergyFraction() < 0.99 && numberOfConstituents() > 1));
+  Bool_t chargedID = (TMath::Abs(Eta()) > 2.4 || (chargedHadronEnergyFraction() > 0. && chargedMultiplicity() > 0. && chargedEmEnergyFraction() < 0.99));
+  Bool_t neutralHighEtaID = (TMath::Abs(Eta()) < 3. || (neutralEmEmEnergyFraction() < 0.9 && (numberOfConstituents() - chargedMultiplicity()) > 10));
 
   Bool_t passesJetID = neutralID && chargedID && neutralHighEtaID;
 
@@ -373,16 +389,18 @@ Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selecte
   }
   if (closestLepton < _closestLeptonCut) passesCleaning = kFALSE;
 
+  SetClosestLep(closestLepton);
+
   /////////////////////////////////////////////////////////////////////////
   // B-tag related cuts
   /////////////////////////////////////////////////////////////////////////
 
-  Bool_t passbPt = jetPt > _bMinPtCut;
-  Bool_t passbEta = TMath::Abs(jetEta) < _bMaxEtaCut;
+  Bool_t passbPt = Pt() > _bMinPtCut;
+  Bool_t passbEta = TMath::Abs(Eta()) < _bMaxEtaCut;
   Bool_t passTagCut = bDiscriminator() > _bTagCut;
 
-  if (passbPt && passbEta && passTagCut) SetTagged(kTRUE);
-  else SetTagged(kFALSE);
+  if (passbPt && passbEta && passTagCut) SetTagged(1);
+  else SetTagged(0);
 
   if (passPt && passEta && passesJetID && passesCleaning) return kTRUE;
   
@@ -505,3 +523,56 @@ Bool_t Jet::FillFastSim( std::vector<MCJet>& MCBJets, std::vector<MCJet>& MCCJet
   
 } //FillFastSim()
 
+/******************************************************************************         
+ * void Jet::SystematicPtShift(EventTree * evtr)                         *
+ *                                                                            *         
+ * Apply systematic shifts in jet pt                                          *
+ *                                                                            *         
+ * Input:  - the event tree (to access systematic SFs and MET info)      *
+ * Output: -                                                                  *
+ ******************************************************************************/
+void Jet::SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met){
+
+
+  //  std::cout << "syst correct" << std::endl;
+  float ptSF = 1.0;
+  if (_jesUp){
+    ptSF = evtr->Jet_JesSFup->operator[](iE)/evtr->Jet_JesSF->operator[](iE);
+  }
+  if (_jesDown){
+    ptSF = evtr->Jet_JesSFdown->operator[](iE)/evtr->Jet_JesSF->operator[](iE);
+  }
+  if (_jerUp){
+    ptSF = evtr->Jet_JerSFup->operator[](iE)/evtr->Jet_JerSF->operator[](iE);
+  }
+  if (_jerDown){
+    ptSF = evtr->Jet_JerSFdown->operator[](iE)/evtr->Jet_JerSF->operator[](iE);
+  }
+  //  float ptBefore = Pt();
+  //Remove jet from MET
+  met->SetPx(met->Px() + Px());
+  met->SetPy(met->Py() + Py());
+  //Apply the correction
+  //  std::cout << Px() << " " << Py() << " " << Pt() << std::endl;
+  SetPx(Px()*ptSF);
+  SetPy(Py()*ptSF);
+  SetPz(Pz()*ptSF);
+  //std::cout << Px() << " " << Py() << " " << Pt() << std::endl << std::endl;
+  
+  //Propagate to MET
+  met->SetPx(met->Px() - Px());
+  met->SetPy(met->Py() - Py());
+
+  //  float ptAfter = Pt();
+  //  if (ptBefore < 30 && ptAfter > 30) {
+  //  std::cout << "Now selected: Jet #" << iE << "Jet Pt: " << ptBefore << " JER SF: " << evtr->Jet_JerSF->operator[](iE) << " up: " << evtr->Jet_JerSFup->operator[](iE) << " down: " << evtr->Jet_JerSFdown->operator[](iE) << " JES SF: " << evtr->Jet_JesSF->operator[](iE) << " up: " << evtr->Jet_JesSFup->operator[](iE) << " down: " << evtr->Jet_JesSFdown->operator[](iE);
+  //  std::cout << " Pt SF: " << ptSF << " Jet pt after: " << Pt() << std::endl;
+  //}
+  //if (ptBefore > 30 && ptAfter < 30) {
+  //  std::cout << "No longer selected: Jet #" << iE << "Jet Pt: " << ptBefore << " JER SF: " << evtr->Jet_JerSF->operator[](iE) << " up: " << evtr->Jet_JerSFup->operator[](iE) << " down: " << evtr->Jet_JerSFdown->operator[](iE) << " JES SF: " << evtr->Jet_JesSF->operator[](iE) << " up: " << evtr->Jet_JesSFup->operator[](iE) << " down: " << evtr->Jet_JesSFdown->operator[](iE);
+  //  std::cout << " Pt SF: " << ptSF << " Jet pt after: " << Pt() << std::endl;
+  //}
+
+
+
+}

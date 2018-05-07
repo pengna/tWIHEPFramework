@@ -149,6 +149,14 @@ public:
   inline Double_t GetrelIsoR04() const {return _relIsoR04;};
   inline Double_t relIsoR04() const {return _relIsoR04;};
 
+  inline void Setndof(Double_t ndof){_ndof = ndof;};
+  inline Double_t Getndof() const {return _ndof;};
+  inline Double_t ndof() const {return _ndof;};
+
+  inline void SetCharge(Double_t charge){_charge = charge;};
+  inline Double_t GetCharge() const {return _charge;};
+  inline Double_t charge() const {return _charge;};
+
 private:
 
   Bool_t _passTightId;
@@ -170,6 +178,8 @@ private:
   Double_t _dz;
   Double_t _TLayers;
   Double_t _relIsoR04;
+  Double_t _ndof;
+  Double_t _charge;
 
   //////////////////////////////////
   // Definitions of the objects go here. This way we don't need to access the configuration file for every particle
