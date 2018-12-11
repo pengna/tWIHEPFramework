@@ -116,6 +116,7 @@
 #include "SingleTopRootAnalysis/Particles/Recon/Muon.hpp"
 #include "SingleTopRootAnalysis/Particles/Recon/Tau.hpp"
 #include "SingleTopRootAnalysis/Particles/Recon/Jet.hpp"
+#include "SingleTopRootAnalysis/Particles/Recon/BoostedJet.hpp"
 #include "SingleTopRootAnalysis/Particles/Recon/Neutrino.hpp"
 
 // MC particles
@@ -330,6 +331,11 @@ class EventContainer
   inline Double_t GetEventbWeight() const {return _EventbWeight;}; 
   inline Double_t EventbWeight() const {return GetEventbWeight();}; 
   
+ //W_tagging weight per event
+  inline void SetEventWSF(const Double_t& w_WJet_) {_EventWSF = w_WJet_;}; //tagging prob per event
+  inline Double_t GetEventWSF() const {return _EventWSF;};
+  inline Double_t EventWSF() const {return GetEventWSF();};
+ 
   //lepton SF weight per event
   inline void SetEventLepSFWeight(const Double_t& lepSFweight) {_EventLepSFWeight = lepSFweight;};
   inline Double_t GetEventLepSFWeight() const {return _EventLepSFWeight;};
@@ -444,6 +450,7 @@ class EventContainer
   Float_t _EventPileupMinBiasUpWeight;
   Float_t _EventPileupMinBiasDownWeight;
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
+  Float_t _EventWSF; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventLepSFWeight;
   Float_t _EventTrigSFWeight;
   Float_t _EventGenWeight;
@@ -512,6 +519,7 @@ class EventContainer
   std::vector<Muon>       unIsolatedMuons;
   std::vector<Tau>        taus;
   std::vector<Jet>        jets;
+  std::vector<BoostedJet> boostedjets;
   std::vector<Jet>        alljets;//no jet checks
   std::vector<Jet>        jetors;//overlap removal vector for electron/jets
   std::vector<Jet>        jetjetors;//overlap removal vector for jet/jets
@@ -527,6 +535,8 @@ class EventContainer
   //Pointers to collections
   std::vector<Electron> * electronsToUsePtr;
   std::vector<Muon>     * muonsToUsePtr;
+  std::vector<BoostedJet> * boostedjetsToUsePtr;
+  std::vector<Jet> * jetsToUsePtr;
 
   std::vector<TLorentzVector>      jetmsSpecial;//MET tool
   
@@ -711,6 +721,7 @@ private:
   Muon newMuon;
   Electron newElectron;
   Jet newJet;
+  BoostedJet newBoostedJet;
 
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system
