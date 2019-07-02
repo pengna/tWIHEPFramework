@@ -14,5 +14,3 @@ Arguments in newTest.sh are as follows:
 	  -PileUpWgt		 - Read the pileup weight from the event tree
 	  -BWgt			 - Read the b-weight fro the event tree
 
-TODO:
-	 - Is there a way to make one plot class plots every step? Ask Huaqiao.
