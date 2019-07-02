@@ -280,12 +280,15 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
   unIsolatedElectrons.clear();
   muons.clear();
   tightMuons.clear();
+  tightwoIsoMuons.clear();
   vetoMuons.clear();
   ptetaMuons.clear();
   isolatedMuons.clear();
   unIsolatedMuons.clear();
   taus.clear();
   jets.clear();
+  boostedjets.clear();
+  allboostedjets.clear();
   alljets.clear();
   taggedJets.clear();
   unTaggedJets.clear();
@@ -294,43 +297,6 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
   tauLabeledJets.clear();
   lightQuarkLabeledJets.clear();
   neutrinos.clear();
-//  MCParticles.clear();
-//  MCMuons.clear();
-//  MCElectrons.clear();
-//  MCTaus.clear();
-//  MCJets.clear();
-//  MCBJets.clear();
-//  MCCJets.clear();
-//  MCLightQuarkJets.clear();
-//  MCTops.clear();
-//  MCWs.clear();
-//  MCNeutrinos.clear();
-//  MCBQuarks.clear();
-//  MCCQuarks.clear();
-//
-//  JER tool  
-//  myJER = new JERProvider("AntiKt4TopoJES", "Truth", "config/JER/JERProviderPlots.root");
-//  myJER->init();//for JER if not flat shift
-
-//  electron energy scale and resolution
-//  int elecEnergyScale = _config.GetValue("ObjectID.ElecEnergyScale.shift",0);
-//  int elecEnergySmear = _config.GetValue("ObjectID.ElecEnergySmear.shift",0);
-//  string mcWithConstantTerm = _config.GetValue("ObjectID.ElecEnergySmear.mcWithConstantTerm","True");
-//  useElecEnergyScale = elecEnergyScale;
-//  useElecEnergySmear = elecEnergySmear;
-
-//  if(mcWithConstantTerm=="True") {
-//    useMCWithConstantTerm = true;
-//  } else {
-//    useMCWithConstantTerm = false;
-//  }
-//
-//  //taggername = "SV0";
-//  taggername = "Jet1FitterCOMBNN";
-//  CalibROOT = new CalibrationDataInterfaceROOT(taggername, "config/btag/BTagCalibration.env", ""); 
-//  CalibVar.jetAuthor = "AntiKt4Topo";
-//  uncertainty = Total;
-//
   
   // Check for any systematic uncertainties we may be calculating
   _metShift = _config.GetValue("Systs.metShift",0);
@@ -349,6 +315,7 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
  ******************************************************************************/
 void EventContainer::SetupObjectDefinitions(){
   newMuon.SetCuts(GetConfig(),"Tight");
+  newMuon.SetCuts(GetConfig(),"PtEtaCut");
   newMuon.SetCuts(GetConfig(),"All");
   newMuon.SetCuts(GetConfig(),"UnIsolated");
   newMuon.SetCuts(GetConfig(),"Veto");
@@ -359,6 +326,7 @@ void EventContainer::SetupObjectDefinitions(){
   newElectron.SetCuts(GetConfig(),"UnIsolated");
 
   newJet.SetCuts(GetConfig());
+  newBoostedJet.SetCuts(GetConfig());
 
 }
 
@@ -377,7 +345,15 @@ void EventContainer::SetUseUnisolatedLeptons(const Bool_t& useUnisolatedLeptons,
   _useUnisolatedLeptons = useUnisolatedLeptons;
   _trigID = whichtrig;
   electronsToUsePtr = &tightElectrons;
+  electronsToUsePtr2D = &unIsolatedElectrons;
   muonsToUsePtr = &tightMuons;
+  muonsToUsePtr2D = &unIsolatedMuons;
+  //electronsToUsePtr = &electrons;
+ // muonsToUsePtr = &muons;
+  boostedjetsToUsePtr = &boostedjets;
+  jetsToUsePtr = &alljets;
+  //jetsToUsePtr = &taggedJets;
+  taggedjetsToUsePtr = &taggedJets;
   if (_trigID == 0 && _useUnisolatedLeptons){
     electronsToUsePtr = &unIsolatedElectrons;
   }
@@ -455,6 +431,7 @@ Int_t EventContainer::ReadEvent()
 
   muons.clear();
   tightMuons.clear();
+  tightwoIsoMuons.clear();
   vetoMuons.clear();
   ptetaMuons.clear();
   isolatedMuons.clear();
@@ -463,6 +440,8 @@ Int_t EventContainer::ReadEvent()
   taus.clear();
 
   jets.clear();
+  boostedjets.clear();
+  allboostedjets.clear();
   alljets.clear();
   taggedJets.clear();
   unTaggedJets.clear();
@@ -509,14 +488,6 @@ Int_t EventContainer::ReadEvent()
     // Number of vertices
     ///////////////////////////////////////////  
     int ncount = 0;
-    //for(int i=0; i<_eventTree->Vertex_n; i++){
-    //  //events will be rejected if this isn't true for i == 0 (cut class applied later) but other vertices still allowed
-    //  if((_eventTree->Vertex_type->at(i) == 1 || _eventTree->Vertex_type->at(i) == 3) && _eventTree->Vertex_track_n->at(i) >= 5) ncount++;
-    //  //  for(int i=0; i<_eventTree->Vertex_n; i++){
-    //  // if(_eventTree->Vertex_track_n->at(i) > 4) ncount++;
-    //}
-    //nPvtx = ncount;
-    //Pvtxall_n = _eventTree->Vertex_n;
 
     ///////////////////////////////////////////
     // Fill MET info 
@@ -556,6 +527,47 @@ Int_t EventContainer::ReadEvent()
     missingEtVec.SetPtEtaPhiE(missingEt,0.,missingPhi,missingEt);
     missingEtVec_xy.SetPtEtaPhiE(missingEt_xy,0.,missingPhi_xy,missingEt_xy);
 
+   //cout << " In EventContainer isSimulation? "<< isSimulation << endl;
+
+    ///////////////////////////////////////////
+    // Muons
+    ///////////////////////////////////////////  
+    //NOTE: although the missingEt is sent into all the muon loops, it is ONLY shifted in the all muons loop
+    // All muon
+    for(Int_t io = 0;io < _eventTree -> Muon_pt->size(); io++) {
+      newMuon.Clear();
+      useObj = newMuon.Fill(_eventTree,*jetsToUsePtr, io,"All", isSimulation);
+      if(useObj) {
+	muons.push_back(newMuon);
+      } // if useObj
+      
+      newMuon.Clear();
+      useObj = newMuon.Fill(_eventTree,*jetsToUsePtr, io,"PtEtaCut", isSimulation);
+	if(useObj) {
+	 tightwoIsoMuons.push_back(newMuon);
+		} // if useObj
+    
+    //  newMuon.Clear();
+    //  useObj = newMuon.Fill(_eventTree,*jetsToUsePtr, io,"Tight", isSimulation);
+    //  if(useObj) {
+      //  tightMuons.push_back(newMuon);
+     // } // if useObj
+
+      newMuon.Clear();
+      useObj = newMuon.Fill(_eventTree,*jetsToUsePtr,  io,"Veto", isSimulation);
+      if(useObj) {
+        vetoMuons.push_back(newMuon);
+      } // if useObj
+
+      newMuon.Clear();
+      useObj = newMuon.Fill(_eventTree,*jetsToUsePtr,  io,"UnIsolated", isSimulation);
+      if(useObj) {
+	unIsolatedMuons.push_back(newMuon);
+      } // if useObj
+
+    } //for muon loop
+
+
 
     ///////////////////////////////////////////
     // Electrons-->refilled and sorted later in method!!
@@ -564,71 +576,50 @@ Int_t EventContainer::ReadEvent()
     // All electrons
     for(Int_t io = 0; io < _eventTree->patElectron_pt->size(); io++) {
       newElectron.Clear();
-      useObj=newElectron.Fill(_eventTree, io,"All",isSimulation);
+      useObj=newElectron.Fill(_eventTree, io,"All",isSimulation,*muonsToUsePtr2D,*jetsToUsePtr);
+      //useObj=newElectron.Fill(_eventTree,  io,"Tight",isSimulation);
       if(useObj) { 
 	electrons.push_back(newElectron);
       }  
-      //if(_eventTree->Electron_tight->at(io) == 1 && _eventTree->Electron_pt->at(io)>10000){
-      //  TLorentzVector a(0,0,0,0);
-      //  a.SetPtEtaPhiE(_eventTree->Electron_pt->at(io), _eventTree->Electron_eta->at(io), _eventTree->Electron_phi->at(io), 0);
-      //  Electrons_tlv.push_back(a);
-      //  a.SetPtEtaPhiE(_eventTree->Electron_pt->at(io)*newElectron.E()*1000/_eventTree->Electron_cluster_E->at(io),newElectron.Eta(), newElectron.Phi(),newElectron.E()*1000); 
-      //  Electrons_tlv_scaled.push_back(a);
-      //} else{
-      //  TLorentzVector a(0,0,0,0);
-      //  Electrons_tlv.push_back(a);
-      //  Electrons_tlv_scaled.push_back(a);
-      //}
+
+     // newElectron.Clear();
+    // useObj=newElectron.Fill(_eventTree,  io,"Tight",isSimulation,*muonsToUsePtr2D,*jetsToUsePtr);
+     // if(useObj) {
+      //  tightElectrons.push_back(newElectron);
+     // }
 
       newElectron.Clear();
-      useObj=newElectron.Fill(_eventTree,  io,"Tight",isSimulation);
-      if(useObj) {
-        tightElectrons.push_back(newElectron);
-      }
-
-      newElectron.Clear();
-      useObj=newElectron.Fill(_eventTree,  io,"Veto",isSimulation);
+    useObj=newElectron.Fill(_eventTree,  io,"Veto",isSimulation,*muonsToUsePtr2D,*jetsToUsePtr);
+      //useObj=newElectron.Fill(_eventTree,  io,"Tight",isSimulation);
       if(useObj) {
         vetoElectrons.push_back(newElectron);
       }
 
       newElectron.Clear();
-      useObj=newElectron.Fill(_eventTree,  io,"UnIsolated",isSimulation);
+      useObj=newElectron.Fill(_eventTree,  io,"UnIsolated",isSimulation,*muonsToUsePtr2D,*jetsToUsePtr);
+    //  useObj=newElectron.Fill(_eventTree,  io,"Tight",isSimulation);
       if(useObj) {
         unIsolatedElectrons.push_back(newElectron);
       }
     } //for
-    ///////////////////////////////////////////
-    // Muons
-    ///////////////////////////////////////////  
-    //NOTE: although the missingEt is sent into all the muon loops, it is ONLY shifted in the all muons loop
-    // All muon
-    for(Int_t io = 0;io < _eventTree -> Muon_pt->size(); io++) {
-      newMuon.Clear();
-      useObj = newMuon.Fill(_eventTree, io,"All", isSimulation);
-      if(useObj) {
-	muons.push_back(newMuon);
-      } // if useObj
 
-      newMuon.Clear();
-      useObj = newMuon.Fill(_eventTree, io,"Tight", isSimulation);
-      if(useObj) {
-        tightMuons.push_back(newMuon);
-      } // if useObj
 
-      newMuon.Clear();
-      useObj = newMuon.Fill(_eventTree, io,"Veto", isSimulation);
-      if(useObj) {
-        vetoMuons.push_back(newMuon);
-      } // if useObj
 
-      newMuon.Clear();
-      useObj = newMuon.Fill(_eventTree, io,"UnIsolated", isSimulation);
-      if(useObj) {
-	unIsolatedMuons.push_back(newMuon);
-      } // if useObj
 
-    } //for muon loop
+ ///////////////////////////////////////////
+ // //  BoostedJets
+ ///////////////////////////////////////////////
+    // std::cout << "Before newBoostedJet Loop" << std::endl;
+ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
+        newBoostedJet.Clear();
+      //  std::cout << "Before newBoostedJet Fill" << std::endl;
+        useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D, _eventTree, io, &missingEtVec, isSimulation);
+      //  std::cout << "After newBoostedJet Fill" << std::endl;
+      allboostedjets.push_back(newBoostedJet); 
+       if(useObj)boostedjets.push_back(newBoostedJet);
+        
+}
+
 
     ///////////////////////////////////////////
     // Jets
@@ -638,7 +629,8 @@ Int_t EventContainer::ReadEvent()
     bestjetdr = 999;
     jeteoverlap = kFALSE;
     //cout <<"EVENT"<<endl;
-
+	int Nalljets=0;
+	int Njets=0;
     Double_t ejoverlap = GetConfig() -> GetValue("ObjectID.Jet.ElectronDeltaRMin", 0.0);
     for(Int_t io = 0;io < _eventTree -> Jet_pt->size(); io++) {
       newJet.Clear();
@@ -647,122 +639,44 @@ Int_t EventContainer::ReadEvent()
       ejordr = 999;
       bestjetdr = 999;
       //      missingEt = -888; 
-      useObj = newJet.Fill(1.0,1.0, *muonsToUsePtr, *electronsToUsePtr, _eventTree, io, &missingEtVec, isSimulation);
       //      useObj = newJet.Fill(1.0,1.0, _eventTree, io);
       
       missingEt = TMath::Sqrt(pow(missingEx,2) + pow(missingEy,2));//so MET gets JES adjustment toogEx=top_met.MET_ExMiss();
       /////////////////////////////////////
       
-      alljets.push_back(newJet);
+      useObj = newJet.Fill(1.0,1.0, *boostedjetsToUsePtr,*muonsToUsePtr2D, *electronsToUsePtr2D, _eventTree, io, &missingEtVec, isSimulation,"AfterPtCut");
+      if(useObj) {alljets.push_back(newJet);Nalljets++;}
+      newJet.Clear();
+      useObj = newJet.Fill(1.0,1.0, *boostedjetsToUsePtr,*muonsToUsePtr2D, *electronsToUsePtr2D, _eventTree, io, &missingEtVec, isSimulation,"skim");
       if(useObj) {
 	jets.push_back(newJet);
- 
 	if(newJet.IsTagged()) taggedJets.push_back(newJet);
 	else unTaggedJets.push_back(newJet);
    
-        //NOTE: PdgId of +/-1 is used for light quark jets when charge information is available and 
-	//uncharged particles that are not labeled as b, c, or tau are given an ID of 0
-	//Currently no charge information is available so all particles in this catagory have an
-	//PgdId of 0.
-	//NOTE: This PDGId() method returns the flavor of the MC particle associated
-	//with the jet (wrt position).  It is NOT nessesarily the jet's flavor, but
-	//a reasonable assumption BASED ON MC AND RECO INFORMATION
-	
-	//if(newJet.GetAbsPdgId() == 5)    bLabeledJets.push_back(newJet);
-	//if(newJet.GetAbsPdgId() == 4)    cLabeledJets.push_back(newJet);
-	//if(newJet.GetAbsPdgId() == 15)   tauLabeledJets.push_back(newJet);
-	//if((newJet.GetAbsPdgId() == 1) || (newJet.GetAbsPdgId() == 0) )  lightQuarkLabeledJets.push_back(newJet);
       } // if useObj
     } //jets
-    
-/*
-    missingEx = _eventTree -> MissingEt_etx / 1000.0;
-    missingEy = _eventTree -> MissingEt_ety / 1000.0;
-    missingEt = TMath::Sqrt(pow(missingEx,2) + pow(missingEy,2));//so MET gets adjustment by the muon smearing
-    ///////////////////////////////////////////  
-    // Missing ET-->Passed to objects for shifting: MUST BE CALCULATED AFTER ALL OBJECTS ARE SMEARED
-    ///////////////////////////////////////////  
-    top_met.Reset();
+
+for(Int_t io = 0;io < _eventTree -> Muon_pt->size(); io++) {
+
+	newMuon.Clear();
+	useObj = newMuon.Fill(_eventTree,*jetsToUsePtr, io,"Tight", isSimulation);
+	if(useObj) {
+		tightMuons.push_back(newMuon);
+	} // if useObj
+
+
+		}
+for(Int_t io = 0; io < _eventTree->patElectron_pt->size(); io++) {
+	   newElectron.Clear();
+	        useObj=newElectron.Fill(_eventTree,  io,"Tight",isSimulation,*muonsToUsePtr,*jetsToUsePtr);
+	             if(useObj) {
+	                  tightElectrons.push_back(newElectron);
+	                       }
+	                       }
   
-    Float_t mystupidfloat=0;
-    top_met.Set_METComposition(_eventTree->MissingEt_etx, _eventTree->MissingEt_ety, _eventTree->MissingEt_sumet, mystupidfloat, mystupidfloat, mystupidfloat, mystupidfloat, mystupidfloat, mystupidfloat, mystupidfloat, mystupidfloat, mystupidfloat, _eventTree->MissingEt_SoftJets_sumet, _eventTree->MissingEt_SoftJets_etx, _eventTree->MissingEt_SoftJets_ety, _eventTree->MissingEt_CellOut_sumet, _eventTree->MissingEt_CellOut_etx, _eventTree->MissingEt_CellOut_ety, mystupidfloat, mystupidfloat, mystupidfloat);
-
-    top_met.Set_METWeights(_eventTree->Electron_MissingEt_wpx, _eventTree->Electron_MissingEt_wpy, _eventTree->Electron_MissingEt_wet, 0, 0, 0, _eventTree->Jet_MissingEt_wpx, _eventTree->Jet_MissingEt_wpy, _eventTree->Jet_MissingEt_wet, _eventTree->Muon_MissingEt_statusWord, _eventTree->Muon_MissingEt_wpx, _eventTree->Muon_MissingEt_wpy, _eventTree->Muon_MissingEt_wet);
-    double mex=0;
-    double mey=0;
-
-    for (int muo=0;muo!=_eventTree->Muon_pt->size();muo++){
-	TLorentzVector a(0,0,0,0);
-	a.SetPtEtaPhiE(_eventTree->Muon_pt->at(muo), 0, _eventTree->Muon_phi->at(muo), 0);
-	Muons_tlv.push_back(a);
-	a.SetPtEtaPhiE(_eventTree->Muon_ms_pt->at(muo), 0, _eventTree->Muon_ms_phi->at(muo), 0);
-	//cout<<"muo "<<muo<<"  "<<_eventTree->Muon_ms_phi->at(muo)<<endl;
-	Muons_ms_tlv.push_back(a);
-	a.SetPtEtaPhiE(_eventTree->Muon_pt->at(muo), 0, _eventTree->Muon_phi->at(muo), 0);
-	Muons_track_tlv.push_back(a);
-    }
-      // Muon_ms_tlv_scaled = TLorentzVector(Muon_ms_pt*Muon_me_pt_scaled/Muon_me_pt, 0, Muon_ms_phi, 0)
-      // Muon_track_tlv_scaled = TLorentzVector(Muon_track_pt*Muon_id_pt_scaled/Muon_id_pt, 0, Muon_track_phi, 0) 
-    for (int muo =0;muo!=muons.size();muo++){
-	TLorentzVector a(0,0,0,0);
-	a.SetPtEtaPhiE(muons.at(muo).Pt()*1000, 0, muons.at(muo).Phi(), 0);
-	Muons_tlv_scaled.push_back(a);
-	//event tree pts are in MeV, muons.blah are in GeV.  Tool takes MeV
-	a.SetPtEtaPhiE(1000*_eventTree->Muon_ms_pt->at(muo)*muons.at(muo).GetptMS()/_eventTree->Muon_me_pt->at(muo), 0, _eventTree->Muon_ms_phi->at(muo), 0);
-	//	cout<<"muo "<<muo<<"  "<<_eventTree->Muon_ms_pt->at(muo)<<"  "<<muons.at(muo).GetptMS()<<"  "<<_eventTree->Muon_me_pt->at(muo)<<"  "<< _eventTree->Muon_ms_phi->at(muo)<<endl;
-	Muons_ms_tlv_scaled.push_back(a);
-	a.SetPtEtaPhiE(1000*_eventTree->Muon_pt->at(muo)*muons.at(muo).GetptID()/_eventTree->Muon_id_pt->at(muo), 0, _eventTree->Muon_phi->at(muo), 0);
-	Muons_track_tlv_scaled.push_back(a);
-
-    }
-    top_met.Set_Electrons(Electrons_tlv_scaled, Electrons_tlv);
-    top_met.Set_Jets(Jets_tlv_scaled, Jets_tlv, Jets_emscale_tlv);
-    top_met.Set_Muons(Muons_tlv_scaled, Muons_tlv, Muons_ms_tlv_scaled, Muons_ms_tlv, Muons_track_tlv_scaled, Muons_track_tlv);
-    top_met.ApplyCellOutUncertainty(celloutShift(),0);
-    top_met.ApplySoftJetUncertainty(softjetShift(),Jets_JESup_tlv,0);
-    top_met.ApplyPileupUncertainty(pileupShift());
-      
-    missingPhi = top_met.MET_MetPhi();
-    missingE1x=top_met.MET_ExMiss()/1000;
-    missingEy=top_met.MET_EyMiss()/1000;      
-    sumEt=top_met.MET_SumEt()/1000;
- 
-    missingEt = -888;
-    //so 0 jet events also have defined missing Et
-    missingEt = top_met.MET_EtMiss()/1000;
-
-    //sorts moved here because of particle index useage in top met tool.  sorts use scaled/smeared pt's
-    sort(jets.begin(), jets.end());
-    sort(alljets.begin(), alljets.end());
-    sort(jetms.begin(), jetms.end());
-    sort(taggedJets.begin(), taggedJets.end());
-    sort(unTaggedJets.begin(), unTaggedJets.end());
-    
-    sort(electrons.begin(), electrons.end());
-    sort(tightElectrons.begin(), tightElectrons.end());
-    sort(vetoElectrons.begin(), vetoElectrons.end());
-    sort(ptetaElectrons.begin(), ptetaElectrons.end());
-    sort(isolatedElectrons.begin(), isolatedElectrons.end());
-    sort(unIsolatedElectrons.begin(), unIsolatedElectrons.end());
-    
-    sort(muons.begin(), muons.end());
-    sort(tightMuons.begin(), tightMuons.end());
-    sort(vetoMuons.begin(), vetoMuons.end());    
-    sort(ptetaMuons.begin(), ptetaMuons.end());    
-    sort(isolatedMuons.begin(), isolatedMuons.end());
-    sort(unIsolatedMuons.begin(), unIsolatedMuons.end());    
-
-    ///////////////////////////////////////////
-    ////////////////////////////////////////
-    // HT and MTotal not in v13.0.30
-    // Set to -999 for now.
-    ////////////////////////////////////////
-    //particleHT     = _eventTree->HT/1000;
-    //particleMTotal = _eventTree->MTotal;
-    particleHT     = -999.0;
-    particleMTotal = -999.0;
-    // SetIsFirstEvent(kFALSE);//finished reading first event
-    */
+  
+  
+  
   } // end of else: filling from reco tree
   
   //

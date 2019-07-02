@@ -18,7 +18,8 @@ WeightVars::WeightVars(){
   _floatVars["puWeight"] = 0.;
   _floatVars["lepSF"] = 0.;
   _floatVars["trigSF"] = 0.;
-
+   _floatVars["WSF"] = 0.;
+   _floatVars["Topptreweight"] = 0.;
   //_bTagSystNames = {"central","up_jes","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2"};
   _bTagSystNames = {"central","up","down"};
 
@@ -33,7 +34,10 @@ WeightVars::WeightVars(){
   _floatVars["lepSF_SysDown"] = 0.;
   _floatVars["trigSF_SysUp"] = 0.;
   _floatVars["trigSF_SysDown"] = 0.;
-  
+  _floatVars["WSF_SysUp"] = 0.;
+  _floatVars["WSF_SysDown"] = 0.;
+  _floatVars["Topptreweight_SysUp"] = 0.;
+  _floatVars["Topptreweight_SysDown"] = 0.;
 }
 
 void WeightVars::FillBranches(EventContainer * evtObj){
@@ -44,13 +48,17 @@ void WeightVars::FillBranches(EventContainer * evtObj){
   _floatVars["puWeight"] = evtObj->GetEventPileupWeight();
   _floatVars["lepSF"] = evtObj->GetEventLepSFWeight();
   _floatVars["trigSF"] = evtObj->GetEventTrigSFWeight();
-
+   _floatVars["WSF"] = evtObj->GetEventWSF();
+   _floatVars["Topptreweight"] = evtObj->GetEventTopptreweight();
   //Get the systematic variations
   _floatVars["lepSF_SysUp"] = evtObj->GetEventLepSFWeightUp();
   _floatVars["lepSF_SysDown"] = evtObj->GetEventLepSFWeightDown();
   _floatVars["trigSF_SysUp"] = evtObj->GetEventTrigSFWeightUp();
   _floatVars["trigSF_SysDown"] = evtObj->GetEventTrigSFWeightDown();
-
+   _floatVars["WSF_SysUp"] = evtObj->GetEventWSFUp();
+     _floatVars["WSF_SysDown"] = evtObj->GetEventWSFDown();
+   _floatVars["Topptreweight_SysUp"] = evtObj->GetEventTopptreweightUp();
+     _floatVars["Topptreweight_SysDown"] = evtObj->GetEventTopptreweightDown();
   //Pileup variations
   _floatVars["puWeight_SysUp"] = evtObj->GetEventPileupMinBiasUpWeight();
   _floatVars["puWeight_SysDown"] = evtObj->GetEventPileupMinBiasDownWeight();

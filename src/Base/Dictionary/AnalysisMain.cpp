@@ -580,7 +580,8 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
 	// just for informational purposes:
 	else if(fileInChainName.find("Name") != string::npos) {
 	  string::size_type pos = fileInChainName.rfind(":");
-	  string sname = fileInChainName.substr(pos+1);
+	  //string sname = fileInChainName.substr(pos+1);
+	  string sname = fileInChainName.substr(pos+2);
 	  cout<<"<AnalysisMain::ParseCmdLine> Name of this source: "<< fileInChainName<<endl;
 	  SetSourceName(sname.c_str());
 	  continue;

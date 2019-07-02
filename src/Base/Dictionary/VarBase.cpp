@@ -80,6 +80,15 @@ void VarBase::BookBranches(TTree * skimTree){
       _histograms[tempString] = BookTH1FHistogram(tempString,tempString,100,startVar,std::fabs(floatVar.second));
     }
   }
+  for (auto intVecVar : _intVecVars){
+	  string tempString = intVecVar.first;
+	  if (skimTree != NULL) _branchVec[tempString.c_str()] = skimTree->Branch(tempString.c_str(),&(_intVecVars[tempString.c_str()]));
+  }
+
+  for (auto floatVecVar: _floatVecVars){
+	  string tempString = floatVecVar.first;
+	  if (skimTree!= NULL) _branchVec[tempString.c_str()] = skimTree->Branch(tempString.c_str(),&(_floatVecVars[tempString.c_str()]));
+  }
 
 
 }
@@ -93,12 +102,24 @@ void VarBase::BookBranches(TTree * skimTree){
  * Output: None                                                               * 
  ******************************************************************************/
 void VarBase::ResetBranches(){
-  for (auto intVar : _intVars){
-    intVar.second = -999;
-  }
-  for (auto floatVar : _floatVars){
-    floatVar.second = -999.;
-  }
+	for (auto intVar : _intVars){
+		intVar.second = -999;
+	}
+	for (auto floatVar : _floatVars){
+		floatVar.second = -999.;
+	}
+
+	for (auto intVecVar : _intVecVars){
+		for (auto intVecItem : intVecVar.second){
+			intVecItem = -999;
+		}
+	}
+	for (auto floatVecVar : _floatVecVars){
+		for (auto floatVecItem : floatVecVar.second){
+			floatVecItem = -999.;
+		}
+	}
+
 }
 
 /****************************************************************************** 
@@ -110,13 +131,30 @@ void VarBase::ResetBranches(){
  * Output: None                                                               * 
  ******************************************************************************/
 void VarBase::OutputBranches(){
-  for (auto floatVar : _floatVars){
-    std::cout << floatVar.first << " " << floatVar.second << std::endl;
-  }
+	for (auto floatVar : _floatVars){
+		std::cout << floatVar.first << " " << floatVar.second << std::endl;
+	}
 
-  for (auto intVar : _intVars){
-    std::cout << intVar.first << " " << intVar.second << std::endl;
-  }
+	for (auto intVar : _intVars){
+		std::cout << intVar.first << " " << intVar.second << std::endl;
+	}
+
+	for (auto floatVec : _floatVecVars){
+		std::cout << floatVec.first << std::endl;
+		for (int i = 0; i < floatVec.second.size() ; i++) {
+			std::cout << "Index: " << i << " Value: " << floatVec.second[i] << std::endl;
+		}
+	}
+
+	for (auto intVec : _intVecVars){
+		std::cout << intVec.first << std::endl;
+		for (int i = 0; i < intVec.second.size() ; i++) {
+			std::cout << "Index: " << i << " Value: " << intVec.second[i] << std::endl;
+		}
+	}
+
+
+
 }
 
 /****************************************************************************** 
@@ -128,12 +166,12 @@ void VarBase::OutputBranches(){
  * Output: None                                                               * 
  ******************************************************************************/
 void VarBase::TouchBranches(){
-  for (auto floatVar : _floatVars){
-    float temp = floatVar.second;
-  }
-  for (auto intVar : _intVars){
-    int temp = intVar.second;
-  }
+	for (auto floatVar : _floatVars){
+		float temp = floatVar.second;
+	}
+	for (auto intVar : _intVars){
+		int temp = intVar.second;
+	}
 }
 
 /****************************************************************************** 
@@ -145,15 +183,15 @@ void VarBase::TouchBranches(){
  * Output: None                                                               * 
  ******************************************************************************/
 void VarBase::FillHistograms(double weight){
-  double fillWeight = weight;
-  if (weight == -999.) weight = 1.;
-  for (auto intVar : _intVars){
-    //    std::cout << intVar.first << " " << intVar.second << std::endl;
-    _histograms[intVar.first]->Fill(intVar.second,weight);
-  }
-  
-  for (auto floatVar : _floatVars){
-    //std::cout << floatVar.first << " " << floatVar.second << std::endl;
-    _histograms[floatVar.first]->Fill(floatVar.second,weight);
-  }
+	double fillWeight = weight;
+	if (weight == -999.) weight = 1.;
+	for (auto intVar : _intVars){
+		//    std::cout << intVar.first << " " << intVar.second << std::endl;
+		_histograms[intVar.first]->Fill(intVar.second,weight);
+	}
+
+	for (auto floatVar : _floatVars){
+		//std::cout << floatVar.first << " " << floatVar.second << std::endl;
+		_histograms[floatVar.first]->Fill(floatVar.second,weight);
+	}
 }

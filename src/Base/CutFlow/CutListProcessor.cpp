@@ -390,7 +390,7 @@ void CutListProcessor::PrintCutDetails()  {
       }
       passedYield = _cutLines[iCut].second.GetPassYield();
       double eff = passedYield/exposedYield;
-      // cout<<name<<"  "<<exposedYield<<"  "<<passedYield<<"  eff= "<<eff<<endl;
+       cout<<name<<"  "<<exposedYield<<"  "<<passedYield<<"  eff= "<<eff<<endl;
       if(eff != 1){
 	_hCutEff->Fill(name, eff);
       }else{

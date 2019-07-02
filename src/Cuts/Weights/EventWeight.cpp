@@ -44,14 +44,18 @@ using namespace std;
  * Input:  Particle class                                                     *
  * Output: None                                                               *
  ******************************************************************************/
-EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight, Bool_t useLeptonSFs, Bool_t usebTagReshape, Bool_t verbose):
+EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight, Bool_t useLeptonSFs, Bool_t usebTagReshape, Bool_t verbose,Bool_t useWSF,Bool_t useTopPtreweight):
   _useLeptonSFs(useLeptonSFs),
   _usebTagReshape(usebTagReshape),
-  _verbose(verbose)
+  _verbose(verbose),
+  _useWSF(useWSF),
+  _useTopPtreweight(useTopPtreweight)
 {
   //pileup is NOT applied by default.  Instead it is applied by the user, and stored in the tree for later application
 
   TEnv* conf = EventContainerObj -> GetConfig();
+  Int_t  _bstar = conf -> GetValue("ifbstar",0);
+  Int_t  _ele = conf -> GetValue("ifelechannel",0);
   /**
   if(MCtype.find("PileUpWgt")<=MCtype.size()){
     cout<<"EventWeight: This version of pileup weights is based on primary vertex number and no longer used!!!"<<endl;
@@ -134,26 +138,47 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
 
   }
   else setPileUpWgt(false);
-
-  string bTagEfficFileName = conf -> GetValue("Include.bTagEfficFile","null");
+  string bTagEfficFileName ;
+  if (_bstar){
+  	string bTagEfficDir = conf -> GetValue("Include.bTagEfficFile","null");
+	if(bTagEfficDir== "null")bTagEfficFileName="null";
+	if(_usebTagReshape==false)bTagEfficFileName="null";
+	else{
+	TString sourcename =EventContainerObj-> GetSourceName();
+	bTagEfficFileName= bTagEfficDir+sourcename+".root"; 
+	}
+	}
+  else{
+  	bTagEfficFileName = conf -> GetValue("Include.bTagEfficFile","null");
+	}
   if (bTagEfficFileName != "null"){
     setEfficbTag();
     std::cout << "Doing efficiency based b-tags!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << isEfficbTag() << std::endl;
     TFile* bTagEfficFile = TFile::Open(bTagEfficFileName.c_str(),"READ");
     _bFlavEffic = (TH1F*)bTagEfficFile->Get("bFlavEfficiency");
+    //cout<<"Get bTagEfficFile"<<endl;
     _bFlavEffic->SetDirectory(0);
+    //cout<<"bsfore Get cTagEfficFile"<<endl;
     _cFlavEffic = (TH1F*)bTagEfficFile->Get("cFlavEfficiency");
+   // cout<<"Get cTagEfficFile"<<endl;
     _cFlavEffic->SetDirectory(0);
     _lightFlavEffic = (TH1F*)bTagEfficFile->Get("lightFlavEfficiency");
+   // cout<<"Get lightTagEfficFile"<<endl;
     _lightFlavEffic->SetDirectory(0);
     bTagEfficFile->Close();
     delete bTagEfficFile;
   }
   else setEfficbTag(kFALSE);
   
-
+//cout<<"before bweight setting : ok!"<<endl;
   if (bWeight) setbWeight(true);
   else setbWeight(false);
+
+  if (useWSF) setWSF(true);
+  else setWSF(false);
+
+  if (useTopPtreweight) setTopPtreweight(true);
+  else setTopPtreweight(false);
 
   ostringstream strFileData;
   ostringstream strFileMC;
@@ -176,7 +201,8 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
   //else  cout<<"EventContainer:: Initialization of TPileupReweighting NOT successful!"<<endl;
 
   //Default list of b tagging systematics. This could possibly become customisable, but it probably doesn't need to be.
-  _bTagSystNames = {"central","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2","up_jes"};
+  //_bTagSystNames = {"central","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2","up_jes"};
+  _bTagSystNames = {"central","up","down"};
   
   
 } // EventWeight
@@ -232,6 +258,12 @@ void EventWeight::BookHistogram()
   _hbWeight =  DeclareTH1F("bWeight","Event Weight for b tagging",100,0.,10.);
   _hbWeight -> SetXAxisTitle("b Weight");
   _hbWeight -> SetYAxisTitle("Events");
+  
+// Histogram of WSF Weight(vtx). This is one of the global weights
+  _hWSF =  DeclareTH1F("WSFWeight","Event Weight for W tagging",100,0.,10.);
+  _hWSF -> SetXAxisTitle("W_tagging Weight");
+  _hWSF -> SetYAxisTitle("Events");
+
 
   // Histogram of lepton weight
   _hLeptonSFWeight =  DeclareTH1F("leptonSFWeight","Event Weight for lepton SFs",100,0.,2.);
@@ -312,15 +344,19 @@ void EventWeight::BookHistogram()
   } //if
 
   //Set up the lepton efficiency SF histograms
-  if (_useLeptonSFs) setLeptonHistograms(conf->GetValue("Include.MuonIDSFsFile","null"),conf->GetValue("LeptonID.MuonIDSFHistName","null"),conf->GetValue("Include.MuonISOSFsFile","null"),conf->GetValue("LeptonID.MuonIsoSFHistName","null"),conf->GetValue("Include.MuonTrigSFsFile","null"),conf->GetValue("LeptonID.MuonTrigSHHistName","null"),conf->GetValue("Include.MuonTKSFsFile","null"),conf->GetValue("Include.EleRecoFileName","null"),conf->GetValue("LeptonID.EleRecoHistName","null"),conf->GetValue("Include.EleIDFileName","null"),conf->GetValue("LeptonID.EleIDHistName","null"));
+  //if (_useLeptonSFs) setLeptonHistograms(conf->GetValue("Include.MuonIDSFsFile","null"),conf->GetValue("LeptonID.MuonIDSFHistName","null"),conf->GetValue("Include.MuonISOSFsFile","null"),conf->GetValue("LeptonID.MuonIsoSFHistName","null"),conf->GetValue("Include.MuonTrigSFsFile","null"),conf->GetValue("LeptonID.MuonTrigSHHistName","null"),conf->GetValue("Include.MuonTKSFsFile","null"),conf->GetValue("Include.EleRecoFileName","null"),conf->GetValue("LeptonID.EleRecoHistName","null"),conf->GetValue("Include.EleIDFileName","null"),conf->GetValue("LeptonID.EleIDHistName","null"));
+    if (_useLeptonSFs) setLeptonHistograms(conf->GetValue("Include.MuonIDSFsFile","null"),conf->GetValue("LeptonID.MuonIDSFHistName","null"),conf->GetValue("Include.MuonISOSFsFile","null"),conf->GetValue("LeptonID.MuonIsoSFHistName","null"),conf->GetValue("Include.MuonTrigSFsFile","null"),conf->GetValue("LeptonID.MuonTrigSHHistName","null"),conf->GetValue("Include.MuonTKSFsFile","null"),conf->GetValue("Include.EleRecoFileName","null"),conf->GetValue("LeptonID.EleRecoHistName","null"),conf->GetValue("Include.EleIDFileName","null"),conf->GetValue("LeptonID.EleIDHistName","null"),conf->GetValue("Include.EleTrigFileName","null"),conf->GetValue("LeptonID.EleTrigHistName","null"));
 
   if (_usebTagReshape){
     _bTagCalib = BTagCalibration(conf->GetValue("BTaggerAlgo","CSVv2"),conf->GetValue("Include.BTagCSVFile","null"));
-    _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central",_bTagSystNames);
-    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"iterativefit");
-    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
-    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
-
+   // _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central",_bTagSystNames);
+    _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_TIGHT, "central",_bTagSystNames);
+    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"incl");
+    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"comb");
+    _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"comb");
+    //_bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"iterativefit");
+   // _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
+   // _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
   }
 
 } //BookHistogram()
@@ -335,14 +371,16 @@ void EventWeight::BookHistogram()
  ******************************************************************************/
 Bool_t EventWeight::Apply()
 {
+  // cout << " In EventWeight Apply isSimulation? "<< isSimulation << endl;
      EventContainer *EventContainerObj = GetEventContainer();
    // Set output event weight- no difference
 
      EventTree* tree = EventContainerObj->GetEventTree();
-
+    TEnv* config = EventContainerObj -> GetConfig();
+  Int_t  _TT_CR = config -> GetValue("TT_CR",0);
   Double_t wgt = EventContainerObj -> GetGlobalEventWeight();
  Double_t mnwgt = 1;
-  //
+  //EventContainerObj->SeteventReweight(1.); //Reset the reweighting variable
   // multiply by MCatNLO weight if desired.
  //Note that if files like data are flagged as MCatNLO, strange weights might result (negative yields...)
   if(isMCatNLO()) {
@@ -419,26 +457,49 @@ Bool_t EventWeight::Apply()
      pileupMinBiasDownWeight = 1.;
    }
    wgt *= pileupEventWeight;
+   //cout<<"Pile up Weight is :"<<pileupEventWeight<<endl;
  }
 
+//cout<<"print out for check : before b weight everything is fine !"<<endl;
  float bEventWeight(1.0);
  
  if (isbWeight()){
    bEventWeight = tree->bWeight;
    wgt *= bEventWeight;
+   //cout<<"b Event Weight is:"<<bEventWeight<<endl;
  }
   
  
  float lepSFWeight(1.0), lepSFWeightUp(1.0), lepSFWeightDown(1.0);
  float trigSFWeight(1.0), trigSFWeightUp(1.0), trigSFWeightDown(1.0);
-
+//cout<<"print out for check : before lepsf everything is fine !"<<endl;
  if(_useLeptonSFs){
    std::tie(lepSFWeight,lepSFWeightUp,lepSFWeightDown,trigSFWeight,trigSFWeightUp,trigSFWeightDown) = getLeptonWeight(EventContainerObj);
    wgt *= lepSFWeight;
    wgt *= trigSFWeight;
+ //cout<<"lepSF Weight is :"<<lepSFWeight<<"  ;trigSF Weight is :"<<trigSFWeight<<endl;
  }
-  
 
+ Double_t w_WJet_=1.0,w_WJetUp_=1.0, w_WJetDown_=1.0;
+
+  if(_useWSF){
+	  //cout<<"if is ttbar CR :"<<_TT_CR<<endl;
+  //in TT_CR , we used toptagging instead of WSF
+  if(_TT_CR){
+	  std::tie(w_WJet_,w_WJetUp_,w_WJetDown_) = TopSF(EventContainerObj);
+  	  wgt *= w_WJet_;
+	  //cout<<"Top SF is :"<<w_WJet_<<endl;
+  }
+  else{
+   std::tie(w_WJet_,w_WJetUp_,w_WJetDown_) = getWSF(EventContainerObj);
+   // cout<<"W tagging SF is "<<w_WJet_<<endl;
+   wgt *= w_WJet_;}
+ }
+ Double_t w_TopPt_=1.0,w_TopPtUp_=1.0, w_TopPtDown_=1.0;
+if(_useTopPtreweight){
+	std::tie(w_TopPt_,w_TopPtUp_,w_TopPtDown_) = TopPtReweight(EventContainerObj);
+	wgt *= w_TopPt_;
+	}
  std::map<std::string,float> bTagReshape;
  std::map<std::string,float> misTagReshape;
 
@@ -451,6 +512,9 @@ Bool_t EventWeight::Apply()
    }
    wgt *= bTagReshape["central"];
    wgt *= misTagReshape["central"];
+ // cout<<" jet SF is :"<<bTagReshape["central"]<<endl;
+   //cout<<"btag weight is :"<<bTagReshape["central"]<<"  ;mistag weight is :"<<misTagReshape["central"]<<endl;
+   //cout<<"the total btagweight is :"<<wgt<<endl;
  }
   
  //PDF weights
@@ -480,12 +544,19 @@ Bool_t EventWeight::Apply()
   EventContainerObj -> SetEventLepSFWeight(lepSFWeight);
   EventContainerObj -> SetEventTrigSFWeight(trigSFWeight);
   EventContainerObj -> SetGenWeight(genWeight);
-
+  EventContainerObj -> SetEventWSF(w_WJet_);
+  EventContainerObj -> SetEventTopptreweight(w_TopPt_);
+  
   for (auto const bSystName: _bTagSystNames) {
     EventContainerObj -> SetEventbTagReshape(bTagReshape[bSystName],bSystName);
     EventContainerObj -> SetEventMisTagReshape(misTagReshape[bSystName],bSystName);
   }
+    
+    EventContainerObj -> SetEventWSFUp(w_WJetUp_);
+    EventContainerObj -> SetEventWSFDown(w_WJetDown_);
 
+    EventContainerObj -> SetEventTopptreweightUp(w_TopPtUp_);
+    EventContainerObj -> SetEventTopptreweightDown(w_TopPtDown_);
   EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
   EventContainerObj -> SetEventLepSFWeightDown(lepSFWeightDown);
 
@@ -503,6 +574,7 @@ Bool_t EventWeight::Apply()
   _hOutputWeight   -> FillWithoutWeight(EventContainerObj -> GetEventWeight());
   _hPileUpWeight   -> FillWithoutWeight(EventContainerObj -> GetEventPileupWeight());
   _hbWeight	   -> FillWithoutWeight(EventContainerObj -> GetEventbWeight());
+  _hWSF 	   -> FillWithoutWeight(EventContainerObj -> GetEventWSF());
   _hLeptonSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventLepSFWeight());
   _hTriggerSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventTrigSFWeight());
   _hGenWeight	   -> FillWithoutWeight(EventContainerObj -> GetGenWeight());
@@ -524,7 +596,8 @@ Bool_t EventWeight::Apply()
  * Input:  Names of files and histograms that are relevant to the calculation * 
  * Output: none                                                               * 
  ******************************************************************************/
-void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName){
+//void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName){
+void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName, TString eleTrigFileName, TString eleTrigHistName){
 
   if (muonIsoFileName == "null" || muonIDFileName == "null"){
     std::cout << "You want lepton SFs included in the weight but you haven't specified files for this! Fix your config!" << std::endl;
@@ -565,10 +638,120 @@ void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHist
   _eleIDSF = (TH2F*)eleIDFile->Get(eleIDHistName)->Clone();
   _eleIDSF->SetDirectory(0);
   eleIDFile->Close();
-  delete muonIsoFile,muonIDFile,muonTrigFile,muonTkFile,eleRecoFile,eleIDFile;
+  TFile* eleTrigFile = TFile::Open(eleTrigFileName,"READ");
+  if (!eleTrigFile) std::cout << "Electron Trig SF file not found!" << std::endl;
+  _eleTrigSF = (TH2F*)eleTrigFile->Get(eleTrigHistName)->Clone();
+  _eleTrigSF->SetDirectory(0);
+  eleTrigFile->Close();
+
+  delete muonIsoFile,muonIDFile,muonTrigFile,muonTkFile,eleRecoFile,eleIDFile,eleTrigFile;
+
+}
+/****************************************************************************** 
+ *  * Bool_t EventWeight::getWSF()                                      * 
+ * *                                                                            * 
+ * * Get the relevant pt and eta dependent SFs for the leptons in the event     *
+ * * and put them into one weight that is returned                              * 
+ * *                                                                            * 
+ * * Input:  None                                                               * 
+ * * Output: Double_t weight to be applied to the event weight                  * 
+ * ******************************************************************************/
+std::tuple<Double_t,Double_t,Double_t> EventWeight::getWSF(EventContainer* EventContainerObj){
+Double_t WJet_=1.0,WJetUp_=1.0, WJetDown_=1.0,WJet_phi=0.0,WJet_eta=0.0,WJet_pt=0.0;//, WJet2Up_=1.0,WJet2Down_=1.0;
+TEnv* config = EventContainerObj -> GetConfig();
+int _jesUp =        config -> GetValue("Systs.doJESUp",0);
+int _jesDown =      config -> GetValue("Systs.doJESDown",0);
+int _jerUp =        config -> GetValue("Systs.doJERUp",0);
+int _jerDown =      config -> GetValue("Systs.doJERDown",0);
+ EventTree* evtr = EventContainerObj->GetEventTree();
+//  for (auto const & boostedjet : *EventContainerObj->boostedjetsToUsePtr){
+for(int i=0;i<EventContainerObj->boostedjetsToUsePtr->size();i++){
+WJet_phi =  EventContainerObj->boostedjetsToUsePtr->at(i).Phi();//boostedjet.Phi();
+WJet_eta =  EventContainerObj->boostedjetsToUsePtr->at(i).Eta();//boostedjet.Eta(); 
+WJet_pt = EventContainerObj->boostedjetsToUsePtr->at(i).Pt();//boostedjet.Pt(); 
+ bool matched = false;
+ std::tie(matched) = GenWBoson(EventContainerObj,WJet_phi,WJet_eta);
+ if(matched){
+	 WJet_ = 1.0*1.23*1.11;
+	 if(_jesUp) WJet_ = 1.00*1.23*1.11 + sqrt(pow( evtr->Jet_JesSFup->at(i)/evtr->Jet_JesSF->at(i)-1  ,2) + 0.023*0.023);
+	 if(_jesDown) WJet_ = 1.00*1.23*1.11 - sqrt(1-pow(evtr->Jet_JesSFdown->at(i)/evtr->Jet_JesSF->at(i),2) + 0.023*0.023);
+	 if(_jerUp) WJet_ = 1.00*1.23*1.11 + sqrt(pow(evtr->Jet_JerSFup->at(i)/evtr->Jet_JerSF->at(i)-1  ,2) + 0.018*0.018);
+	 if(_jerDown) WJet_ = 1.00*1.23*1.11 - sqrt(pow(1-evtr->Jet_JerSFdown->at(i)/evtr->Jet_JerSF->at(i),2) + 0.018*0.018);
+	 WJetUp_   = 1.00*1.23*1.11 + (0.08);
+	 WJetDown_ = 1.00*1.23*1.11 - (0.08);
+	 if(WJet_pt>200){
+		 WJetUp_   = 1.00*1.23*1.11 + (0.08 + 0.054*log(WJet_pt/200));
+		 WJetDown_ = 1.00*1.23*1.11 - (0.08 + 0.054*log(WJet_pt/200));
+	}
+}else{
+	 WJet_ = 1.0;
+	 WJetUp_   = 1.0;
+	 WJetDown_ = 1.0;
+}
+	//cout<<"in the function we get the wJet is "<<WJet_<<endl;
+	return std::make_tuple(WJet_,WJetUp_,WJetDown_);
+
+}
+}
+std::tuple<bool> EventWeight::GenWBoson(EventContainer* EventContainerObj,Double_t Wjet_phi,Double_t Wjet_eta){
+	bool matched = false;
+	double dr1=99; double dr2=99; double dr3=99; double dr4=99; double dr5=99; double dr6=99;
+	EventTree* tree = EventContainerObj->GetEventTree();
+	std::vector<double>* gen_pt = tree->Gen_pt;
+ 	for (uint j = 0; j < gen_pt->size(); ++j){ 	
+	double rGen_phi = tree->Gen_phi->at(j);
+	double rGen_eta = tree->Gen_eta->at(j);
+	double rGen_pdg_id = tree->Gen_pdg_id->at(j);
+	double rGen_motherpdg_id = tree->Gen_motherpdg_id->at(j);
+		if(abs(rGen_pdg_id)==1 && abs(rGen_motherpdg_id)==24) dr1 = deltaR(deltaPhi(Wjet_phi,rGen_phi),deltaEta(Wjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==2 && abs(rGen_motherpdg_id)==24) dr2 = deltaR(deltaPhi(Wjet_phi,rGen_phi),deltaEta(Wjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==3 && abs(rGen_motherpdg_id)==24) dr3 = deltaR(deltaPhi(Wjet_phi,rGen_phi),deltaEta(Wjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==4 && abs(rGen_motherpdg_id)==24) dr4 = deltaR(deltaPhi(Wjet_phi,rGen_phi),deltaEta(Wjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==5 && abs(rGen_motherpdg_id)==24) dr5 = deltaR(deltaPhi(Wjet_phi,rGen_phi),deltaEta(Wjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==6 && abs(rGen_motherpdg_id)==24) dr6 = deltaR(deltaPhi(Wjet_phi,rGen_phi),deltaEta(Wjet_eta,rGen_eta));
+	}
+	if((dr2<0.8 && dr1<0.8) || (dr2<0.8 && dr3<0.8) || (dr2<0.8 && dr5<0.8)) matched=true; //W -> ud/us/ub
+	if((dr4<0.8 && dr1<0.8) || (dr4<0.8 && dr3<0.8) || (dr4<0.8 && dr5<0.8)) matched=true; //W -> cd/cs/cb
+	return std::make_tuple(matched);
+}
+
+/****************************************************************************** 
+ *  *  * Bool_t EventWeight::TopSF()                                      * 
+ *   * *                                                                            * 
+ *    * * Get the relevant pt and eta dependent SFs for the leptons in the event     *
+ *     * * and put them into one weight that is returned                              * 
+ *      * *                                                                            * 
+ *       * * Input:  None                                                               * 
+ *        * * Output: Double_t weight to be applied to the event weight                  * 
+ *         * ******************************************************************************/
+std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventContainerObj){
+	Double_t w_topJet_=1.0,w_topJetUp_=1.0, w_topJetDown_=1.0;
+	w_topJet_     = 1.06;
+	w_topJetUp_   = 1.06+0.08;
+	w_topJetDown_ = 1.06-0.04;
+	return std::make_tuple(w_topJet_,w_topJetUp_,w_topJetDown_);
 
 }
 
+
+std::tuple<Double_t,Double_t,Double_t> EventWeight::TopPtReweight(EventContainer* EventContainerObj){
+EventTree* tree = EventContainerObj->GetEventTree();
+Double_t topPtWeight = 1.0,topPtWeightUp = 1.0,topPtWeightDown = 1.0,pt1 = -99.9,pt2 = -99.9,SF1=1.0,SF2=1.0,SF=1.0;
+std::vector<double>* gen_pt = tree->Gen_pt;
+        for (uint j = 0; j < gen_pt->size(); ++j){
+	double rGen_pdg_id = tree->Gen_pdg_id->at(j);	
+	if(rGen_pdg_id==6)pt1 =gen_pt->at(j);
+	if(rGen_pdg_id==-6)pt2 = gen_pt->at(j);
+	if(pt1 != -99.9&&pt2 != -99.9)break;
+	}
+	SF1 = exp(0.0615-0.0005*pt1);
+	SF2 = exp(0.0615-0.0005*pt2);
+	topPtWeight     = sqrt(SF1*SF2);
+	 topPtWeightUp   = 1.0 ;
+	 topPtWeightDown = topPtWeight;
+	 //cout<<"Top pt is :"<<pt1<<"Anti Top pt is:"<<pt2<<"topPtWeight ="<<topPtWeight<<"topPtWeightUp="<<topPtWeightUp<<"topPtWeightDown="<<topPtWeightDown<<endl;
+	  return std::make_tuple(topPtWeight,topPtWeightUp,topPtWeightDown);
+}
 /****************************************************************************** 
  * Bool_t EventWeight::getLeptonWeight()                                      * 
  *                                                                            * 
@@ -582,6 +765,9 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
 
   Double_t leptonWeight = 1.0, leptonWeightUp = 1.0, leptonWeightDown = 1.0;
   Double_t triggerWeight = 1.0, triggerWeightUp = 1.0, triggerWeightDown = 1.0;
+  TEnv* config = EventContainerObj -> GetConfig();
+  Int_t  _bstar = config -> GetValue("ifbstar",0);
+  Int_t  _ele = config -> GetValue("ifelechannel",0);
 
   for (auto const & muon : *EventContainerObj->muonsToUsePtr){
     //Get the bin shared by iso and id SFs
@@ -598,6 +784,7 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
     //Get the bin for trigger SF
     Int_t xAxisBinTrig = _muonTrigSF->GetXaxis()->FindBin(muon.Pt());
     if (muon.Pt() > 500.) xAxisBinTrig = _muonTrigSF->GetXaxis()->FindBin(499.);
+    //if (muon.Pt() > 800.) xAxisBinTrig = _muonTrigSF->GetXaxis()->FindBin(799.);
     Int_t yAxisBinTrig = _muonTrigSF->GetYaxis()->FindBin(std::fabs(muon.Eta()));
     if (std::fabs(muon.Eta()) > 2.4) yAxisBinTrig = _muonTrigSF->GetYaxis()->FindBin(2.39);
     //Get the trigSF
@@ -606,10 +793,17 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
 
     //Evaluate muon tk
     Float_t tkSF = _muonTkSF->Eval(std::fabs(muon.Eta()));
-
+    //cout<<"if is bstar :"<<_bstar<<endl;
+    if(_bstar){
+	leptonWeight = idSF* tkSF;
+	leptonWeightUp = (idSF + idUnc)* tkSF;
+	leptonWeightDown = (idSF - idUnc)* tkSF;
+	}
+    else{
     leptonWeight *= isoSF * idSF * tkSF;
     leptonWeightUp *= (isoSF + isoUnc) * (idSF + idUnc) * tkSF;
     leptonWeightDown *= (isoSF - isoUnc) * (idSF - idUnc) * tkSF;
+     }
 
     triggerWeight = trigSF;
     triggerWeightUp = trigSF + trigUnc;
@@ -633,12 +827,44 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
     if (ele.Pt() > 500) xAxisBin = _eleIDSF->GetYaxis()->FindBin(499.);
     Float_t idSF = _eleIDSF->GetBinContent(xAxisBin,yAxisBin);
     Float_t idUnc = _eleIDSF->GetBinError(xAxisBin,yAxisBin);
-    if (_verbose) std::cout << "Reco: " << recoSF << " ID: " << idSF << " x: " << xAxisBin << " y: " << yAxisBin <<std::endl;
-    leptonWeight *= recoSF * idSF;
-    leptonWeightUp *= (recoSF + recoUnc) * (idSF + idUnc);
-    leptonWeightDown *= (recoSF - recoUnc) * (idSF - idUnc);
-  }
+    
+     //And finally trigger
+    yAxisBin = _eleTrigSF->GetYaxis()->FindBin(ele.scEta());
+    if (ele.scEta() > 2.5) yAxisBin = _eleTrigSF->GetYaxis()->FindBin(2.49);
+    if (ele.scEta() < -2.5) yAxisBin = _eleTrigSF->GetYaxis()->FindBin(-2.49);
+    xAxisBin = _eleTrigSF->GetXaxis()->FindBin(ele.Pt());
+    if (ele.Pt() > 200) xAxisBin = _eleTrigSF->GetXaxis()->FindBin(199.);
+    Float_t trigSF = _eleTrigSF->GetBinContent(xAxisBin,yAxisBin);
+    Float_t trigUnc = _eleTrigSF->GetBinError(xAxisBin,yAxisBin);
+    if(_ele){
+ 	   triggerWeight = trigSF;              
+    	   triggerWeightUp = trigSF + trigUnc;  
+    	   triggerWeightDown = trigSF - trigUnc;
+	   }
+    else{
+ 	   triggerWeight *=1;
+           triggerWeightUp *=1;
+	   triggerWeightDown *=1;
 
+
+	    }
+    //cout<<"Trigger SF is :"<<triggerWeight<<"triggerWeightUp is :"<<triggerWeightUp<<"triggerWeightDown is :"<<triggerWeightDown<<endl;
+
+    if (_verbose) std::cout << "Reco: " << recoSF << " ID: " << idSF << " x: " << xAxisBin << " y: " << yAxisBin <<std::endl;
+    if(_ele){
+	leptonWeight *= recoSF * idSF;
+    	leptonWeightUp *= (recoSF + recoUnc) * (idSF + idUnc);
+    	leptonWeightDown *= (recoSF - recoUnc) * (idSF - idUnc);
+  }
+  else{
+	leptonWeight *=1; 
+        leptonWeightUp *=1;
+        leptonWeightDown *=1;
+
+	  }
+  	//cout<<"leptonWeight = "<<leptonWeight<<"leptonWeightUp = "<<leptonWeightUp<<"leptonWeightDown = "<<leptonWeightDown<<endl;
+
+}
   return std::make_tuple(leptonWeight,leptonWeightUp,leptonWeightDown,triggerWeight,triggerWeightUp,triggerWeightDown);
 }
 
@@ -708,24 +934,23 @@ std::tuple<Double_t,Double_t> EventWeight::getEfficBTagReshape(EventContainer * 
 
   Double_t mcNoTag = 1.;
   Double_t dataNoTag = 1.;
-
+  int n = 0;
   float jetSF = 1.;
   float jetEffic = 1.;
-
   for (auto const & jet : EventContainerObj->jets){
-    
+
     jetSF = getJetSF(jet,syst);
     jetEffic = getJetEffic(jet);
-
+    if(jetEffic==1)jetEffic=jetEffic-0.0001;	
     if (jet.IsTagged()){
       bTagWeight *= jetSF;
     } else {
-      mcNoTag *= 1 - jetEffic;
-      dataNoTag *= 1 - (jetEffic*jetSF);
+      mcNoTag *= (1 - jetEffic);
+      dataNoTag *= (1 - (jetEffic*jetSF));
     }
+	//cout<<"if jet is tagged :"<<jet.IsTagged()<<"jet SF is :"<<jetSF<<"; jet effic is :"<<jetEffic<<";bTagWeight is:"<<bTagWeight<<";mcNoTag :"<<mcNoTag<<";dataNoTag :"<<dataNoTag<<endl;
   }
-  
-  return std::make_tuple(bTagWeight,dataNoTag/mcNoTag);
+	return std::make_tuple(bTagWeight,dataNoTag/mcNoTag);
 
 }
 
@@ -744,16 +969,15 @@ Double_t EventWeight::getJetEffic(Jet jet){
 
   int binx = efficiencyPlot->GetXaxis()->FindBin(jet.Pt());
   int biny = efficiencyPlot->GetYaxis()->FindBin(jet.Eta());
-
+  //cout<<"jet type is :"<<abs(jet.GethadronFlavour())<<" ;jet pt :"<<jet.Pt()<<" ;binx :"<<binx<<" ;jet Eta"<<jet.Eta()<<" ;biny :"<<biny<<" ;jeteffic is :"<<efficiencyPlot->GetBinContent(binx,biny)<<endl;
   return efficiencyPlot->GetBinContent(binx,biny);
 }
 
 Double_t EventWeight::getJetSF(Jet jet, std::string syst){
   BTagEntry::JetFlavor jetFlavour = BTagEntry::FLAV_UDSG;
-
   if (fabs(jet.GethadronFlavour() == 5)) jetFlavour = BTagEntry::FLAV_B;
   else if (fabs(jet.GethadronFlavour() == 4)) jetFlavour = BTagEntry::FLAV_C;
-
+ 
   float jetSF = _bTagCalibReader.eval_auto_bounds(syst, jetFlavour, jet.Eta(), jet.Pt(), jet.bDiscriminator());
   if (jetSF == 0) jetSF = _bTagCalibReader.eval_auto_bounds("central", jetFlavour, jet.Eta(), jet.Pt(), jet.bDiscriminator());
 

@@ -35,7 +35,9 @@
  *      08 May 2009 - J. Holzbauer: added quarkFlavorLabel tag                *
  *****************************************************************************/
 #include "SingleTopRootAnalysis/Particles/Recon/Jet.hpp"
+#include "SingleTopRootAnalysis/Particles/Recon/BoostedJet.hpp"
 #include "SingleTopRootAnalysis/Particles/Recon/Electron.hpp"
+#include "SingleTopRootAnalysis/Particles/Recon/Muon.hpp"
 
 #include <iostream>
 #include <string>
@@ -263,10 +265,18 @@ void Jet::SetCuts(TEnv * config)
   _bMinPtCut = 		config -> GetValue("ObjectID.BJet.MinPt",0.);
   _bTagCut = 		config -> GetValue("ObjectID.BJet.BTagCut",0.0);
   _closestLeptonCut = 	config -> GetValue("ObjectID.Jet.LepCleanR",0.0);
+  _closestLeptonCutfor2D = 	config -> GetValue("ObjectID.Jet.LepCleanRfor2D",0.0);
   _jesUp = 		config -> GetValue("Systs.doJESUp",0);
   _jesDown = 		config -> GetValue("Systs.doJESDown",0);
   _jerUp = 		config -> GetValue("Systs.doJERUp",0);
   _jerDown = 		config -> GetValue("Systs.doJERDown",0);
+  _bstar = 		config -> GetValue("ifbstar",0);
+   _Elechannel =        config -> GetValue("ifelechannel",0);
+  _TT_CR =              config -> GetValue("TT_CR",0);
+  _QCD_CR =             config -> GetValue("QCD_CR",0);
+  _minMuonJetDetaR =    config -> GetValue("ObjectID.BJet.MuonDeltaRMin",0.0);
+  _minBoostedJetDetaR = config -> GetValue("ObjectID.BJet.BoostedDeltaRMin",0.0);
+  _minMuonPTrel =       config -> GetValue("ObjectID.BJet.MuonPTrelMin",0.0);
 }
 
 /******************************************************************************         
@@ -279,20 +289,27 @@ void Jet::SetCuts(TEnv * config)
  * Output: True if this jet passes jet ID cuts                                *         
  ******************************************************************************/
 
-Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met, bool isMC)
+Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<BoostedJet>& selectedboostedjets,std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met, bool isMC,TString jetType)
 {
 
-  Double_t jetPt, jetEta,jetPhi,jetE, jetCharge, jetM;
+  Double_t jetPt, jetEta,jetPhi,jetE, jetCharge, jetM, jetpx, jetpy, jetpz,jet_Uncorr_pt,jet_JesSF,jet_JerSF,pt,energy;
   jetPt     = evtr -> Jet_pt     -> operator[](iE);
   jetEta    = evtr -> Jet_eta    -> operator[](iE);
   jetPhi    = evtr -> Jet_phi    -> operator[](iE);
   jetE      = evtr -> Jet_energy -> operator[](iE);
+  jetpx     = evtr -> Jet_px     -> operator[](iE);
+  jetpy     = evtr -> Jet_py     -> operator[](iE);
+  jetpz     = evtr -> Jet_pz     -> operator[](iE);
+  jet_Uncorr_pt= evtr -> Jet_Uncorr_pt     -> operator[](iE);
+  jet_JesSF  = evtr -> Jet_JesSF-> operator[](iE);
+  jet_JerSF= evtr -> Jet_JerSF     -> operator[](iE);
+  TVector3 Jet(jetpx,jetpy,jetpz); 
+  pt = jet_Uncorr_pt*jet_JesSF*jet_JerSF;
+  energy=(jet_Uncorr_pt/jetPt)*jetE*jet_JesSF*jet_JerSF; 
+  SetPtEtaPhiE(pt,jetEta,jetPhi,energy);
 
-  if(jetE > 0){
-    SetPtEtaPhiE(jetPt,jetEta,jetPhi,jetE);
-  }else{
-    SetPtEtaPhiE(1,1,1,3);
-  }
+
+
 
   SetnumberOfConstituents		(evtr -> Jet_numberOfConstituents     	-> operator[](iE));
   SetchargedMultiplicity		(evtr -> Jet_chargedMultiplicity     	-> operator[](iE)); 
@@ -308,105 +325,117 @@ Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selecte
   SetelectronEnergy			(evtr -> Jet_electronEnergy     	-> operator[](iE));
   SetphotonEnergy			(evtr -> Jet_photonEnergy     		-> operator[](iE));
   if (isMC)  SethadronFlavour           (evtr -> Jet_hadronFlavour              -> operator[](iE));
+  //cout <<"Come from Tree :"<<"Pt = "<<jetPt <<" Eta = "<<jetEta<<" jet E ="<<jetE<<"jet P ="<<P()<<" Jet mass = "<<mass()<<endl; // Now we want to do the JER and JES systematic adjustments to the jet. This also requires correcting the MET.
 
-  // Now we want to do the JER and JES systematic adjustments to the jet. This also requires correcting the MET.
-  if (_jesUp || _jesDown || _jerUp || _jerDown) SystematicPtShift(evtr, iE, met);  
-/*
-  SetPdgId      ( evtr -> Jet_flavor_truth_trueflav -> operator[](iE));
-  SetIsBadLoose ( evtr -> Jet_isBadLoose            -> operator[](iE));
-  ///////////////////////////////////////////////////////////////////////////////
-  //
-  // b-tagging choices
-  /////////////////////////////////////////////////////////////////////////////////
-  // Upated for version 14
-  //currently no TRF b-taggers, so using a cut on weights
-  
-  std::vector<Double_t> bweight;
-  bweight.clear();
-  //cout<<evtr -> Jet_flavor_weight -> operator[](iE)<<endl;
-  bweight.push_back(evtr -> Jet_flavor_weight -> operator[](iE));//0
-  bweight.push_back(evtr -> Jet_flavor_weight_IP1D -> operator[](iE));//1
-  bweight.push_back(evtr -> Jet_flavor_weight_IP2D -> operator[](iE));//2
-  bweight.push_back(evtr -> Jet_flavor_weight_IP3D -> operator[](iE));//3
-  bweight.push_back(evtr -> Jet_flavor_weight_SV1 -> operator[](iE));//4
-  bweight.push_back(evtr -> Jet_flavor_weight_SV2 -> operator[](iE));//5
-  //for JetProb, we actually use -ln(JetProb)
-  bweight.push_back(-TMath::Log10(evtr -> Jet_flavor_weight_JetProb -> operator[](iE)));//6
-  bweight.push_back(evtr -> Jet_flavor_weight_TrackCounting2D -> operator[](iE));//7
-  bweight.push_back(evtr -> Jet_flavor_weight_SV0 -> operator[](iE));//8 
-  bweight.push_back(evtr -> Jet_flavor_weight_JetFitterCOMBNN-> operator[](iE));//9
-  SetBWeight(bweight);
-  //cout<<bweight.size()<<endl;
-  
-  double tagCut = 0;
 
-  tagCut = btagCut;
-
-  if(tagName=="default" || tagName=="bTagged" || tagName=="IP3DSV1") {
-    if(evtr -> Jet_flavor_weight -> operator[](iE) > tagCut) SetTagged(kTRUE);
-    else SetTagged(kFALSE);
-  } // if
-  else if(tagName=="SV0") {
-    if(evtr->Jet_flavor_weight_SV0->operator[](iE) > tagCut) SetTagged(kTRUE);
-    else SetTagged(kFALSE);
-  } 
-  else {
-    cout<<"<ERROR>: Error in jet.cpp: invalid tagger, "<<tagName<<endl;
-    exit(8);
+  /////////////////////////////////////////////////////////////////////////
+  // Jet Cleaning
+  /////////////////////////////////////////////////////////////////////////
+//  cout<<"we are going to jet cleaning "<<endl;
+  Bool_t passesCleaningfor2Dcut= kTRUE;
+  Bool_t selectMuon = kFALSE;
+  Double_t closestLepton = 999.;
+TLorentzVector tempjet(0,0,0,0);
+TLorentzVector jet(0,0,0,0);
+TLorentzVector closedmuon(0,0,0,0);
+//float elemass=0.0;
+float uncorrE = (jet_Uncorr_pt/jetPt)*jetE;
+jet.SetPtEtaPhiE(jet_Uncorr_pt,jetEta,jetPhi,uncorrE);
+tempjet.SetPtEtaPhiE(jetPt,jetEta,jetPhi,jetE);
+  //cout <<"Before lepton clean :"<<"Pt = "<<Pt() <<" Eta = "<<Eta()<<"Phi ="<<Phi()<<" jet E ="<<E()<<"jet P ="<<P()<<" Jet mass = "<<M()<<endl;
+  for (auto const & ele : selectedElectrons){
+    if (ele.DeltaR(*this) < _closestLeptonCut){
+//	cout <<"We do lepton clean here, Lepton Pt ="<<ele.Pt()<<" Eta = "<<ele.Eta()<<"Phi = "<<ele.Phi()<<" E ="<<ele.E()<<" P ="<<ele.P()<<" mass = "<<ele.M()<<endl;
+	//elemass=ele.M();
+	jet = jet-ele;
+	}
   }
-*/
-  /////////////////////////////////////////////////////////////////////////////
-  // Jet Pt and Eta Cuts
-  /////////////////////////////////////////////////////////////////////////////
+  for (auto const & mu : selectedMuons){
+    selectMuon = kTRUE;
+ 	if (mu.DeltaR(*this) < _closestLeptonCut) { 
+		jet=jet-mu;
+		}
+  }
+ SetPtEtaPhiE(jet.Pt()*jet_JesSF*jet_JerSF,jet.Eta(),jet.Phi(),jet.E()*jet_JesSF*jet_JerSF);
+ SetClosestLep(closestLepton);
+  //cout <<"Before JER shift :"<<"Px ="<<Px()<<"Py="<<Py()<<"Pz = "<<Pz()<<"MET ="<<met<<"Pt = "<<Pt() <<" Eta = "<<Eta()<<"Phi = "<<Phi()<<" jet E ="<<E()<<"jet P ="<<P()<<" Jet mass = "<<M()<<endl;
+  if (_jesUp || _jesDown || _jerUp || _jerDown) SystematicPtShift(evtr, iE, met);  
+  //cout <<"After JER shift :"<<"Px ="<<Px()<<"Py="<<Py()<<"Pz = "<<Pz()<<"MET ="<<met<<"Pt = "<<Pt() <<" Eta = "<<Eta()<<"Phi = "<<Phi()<<" jet E ="<<E()<<"jet P ="<<P()<<" Jet mass = "<<M()<<endl;
+//if(elemass>0&&M()<0)cout<<"find a lepton mass greater than 0 and jet mass less than 0;"<<endl;
 
-  Bool_t passPt = Pt() > _minPtCut;
-  Bool_t passEta = TMath::Abs(Eta()) < _maxEtaCut;
 
   /////////////////////////////////////////////////////////////////////////
   // Jet ID
   /////////////////////////////////////////////////////////////////////////
   
   
-  Bool_t neutralID = (TMath::Abs(Eta()) > 3. || (neutralHadEnergyFraction() < 0.99 &&  neutralEmEmEnergyFraction() < 0.99 && numberOfConstituents() > 1));
-  Bool_t chargedID = (TMath::Abs(Eta()) > 2.4 || (chargedHadronEnergyFraction() > 0. && chargedMultiplicity() > 0. && chargedEmEnergyFraction() < 0.99));
-  Bool_t neutralHighEtaID = (TMath::Abs(Eta()) < 3. || (neutralEmEmEnergyFraction() < 0.9 && (numberOfConstituents() - chargedMultiplicity()) > 10));
+ // Bool_t neutralID = (TMath::Abs(Eta()) > 3. || (neutralHadEnergyFraction() < 0.99 &&  neutralEmEmEnergyFraction() < 0.99 && numberOfConstituents() > 1));
+  //Bool_t chargedID = (TMath::Abs(Eta()) > 2.4 || (chargedHadronEnergyFraction() > 0. && chargedMultiplicity() > 0. && chargedEmEnergyFraction() < 0.99));
+ // Bool_t neutralHighEtaID = (TMath::Abs(Eta()) < 3. || (neutralEmEmEnergyFraction() < 0.9 && (numberOfConstituents() - chargedMultiplicity()) > 10));
 
-  Bool_t passesJetID = neutralID && chargedID && neutralHighEtaID;
+ // Bool_t passesJetID = neutralID && chargedID && neutralHighEtaID;
+Bool_t LowEtaID = (neutralHadEnergyFraction()<0.99 && neutralEmEmEnergyFraction()<0.99 && numberOfConstituents()>1) && ((TMath::Abs(Eta())<=2.4 && chargedHadronEnergyFraction()>0 && chargedMultiplicity()>0) || TMath::Abs(Eta())>2.4) && TMath::Abs(Eta())<=2.7;
+  Bool_t MediumEtaID = (neutralEmEmEnergyFraction()<0.99 && neutralEmEmEnergyFraction()>0.02 && (numberOfConstituents() - chargedMultiplicity())>2 && TMath::Abs(Eta())>2.7 && TMath::Abs(Eta())<=3.0 ); 
+    Bool_t HighEtaID = (neutralEmEmEnergyFraction()<0.90 && neutralHadEnergyFraction()>0.02 &&(numberOfConstituents() - chargedMultiplicity())>10 && TMath::Abs(Eta())>3.0 ); 
+    Bool_t passesJetID = LowEtaID || MediumEtaID || HighEtaID;
 
-  /////////////////////////////////////////////////////////////////////////
-  // Jet Cleaning
-  /////////////////////////////////////////////////////////////////////////
 
-  Bool_t passesCleaning = kTRUE;
- 
-  Double_t closestLepton = 999.;
 
-  for (auto const & ele : selectedElectrons){
-    if (ele.DeltaR(*this) < closestLepton) closestLepton = ele.DeltaR(*this);
-  }
-  for (auto const & mu : selectedMuons){
-    if (mu.DeltaR(*this) < closestLepton) closestLepton = mu.DeltaR(*this);
-  }
-  if (closestLepton < _closestLeptonCut) passesCleaning = kFALSE;
 
-  SetClosestLep(closestLepton);
+
+
+
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Jet Pt and Eta Cuts
+  /////////////////////////////////////////////////////////////////////////////
+  Bool_t passPt = Pt() > _minPtCut;
+  Bool_t passEta = TMath::Abs(Eta()) < _maxEtaCut;
+  Bool_t pass2Dcut = Pt()>30&&TMath::Abs(Eta())<3.0;
+
+
+
+ Double_t closestBoostJet= 999.;
+ Bool_t passBoostedJet = kTRUE;
+for (auto const & boostedjet :selectedboostedjets ){
+	    if (boostedjet.DeltaR(*this) < closestBoostJet) closestBoostJet= boostedjet.DeltaR(*this);
+	      }
+if(closestBoostJet<_minBoostedJetDetaR)passBoostedJet = kFALSE ;
+
+
+
+
 
   /////////////////////////////////////////////////////////////////////////
   // B-tag related cuts
   /////////////////////////////////////////////////////////////////////////
-
   Bool_t passbPt = Pt() > _bMinPtCut;
   Bool_t passbEta = TMath::Abs(Eta()) < _bMaxEtaCut;
   Bool_t passTagCut = bDiscriminator() > _bTagCut;
 
-  if (passbPt && passbEta && passTagCut) SetTagged(1);
-  else SetTagged(0);
 
-  if (passPt && passEta && passesJetID && passesCleaning) return kTRUE;
-  
-  return kFALSE;
 
+
+  if(_bstar){
+	  if("AfterPtCut"== jetType) return pass2Dcut;
+	  else{
+		  if (passTagCut) SetTagged(1);
+		  else SetTagged(0);
+		  if (passPt && passEta&& passesJetID && passBoostedJet) return kTRUE;
+//		  if (passesCleaningfor2Dcut)return kTRUE;
+		}
+  }
+else{
+	if (passbPt && passbEta && passTagCut) SetTagged(1);
+	else SetTagged(0);
+	if (passPt && passEta && passesJetID ) return kTRUE;
+}
+//cout<<"if is bstar "<<_bstar<<endl;
+ //cout<<"if the jet is bjet"<<_tagged<<endl;
+ //cout<<"if is pass Muonjet cut "<<passMuonJet<<endl;
+ return kFALSE;
 } //Fill()
+
 
 /******************************************************************************         
  * void Jet::FillFastSim(FastSimTree *tr, Int_t iE,const TString& tagName )   *         
@@ -501,13 +530,18 @@ Bool_t Jet::FillFastSim( std::vector<MCJet>& MCBJets, std::vector<MCJet>& MCCJet
   for(electronIterator = electrons.begin(); electronIterator != electrons.end(); electronIterator++){
     electronDeltaR = electronIterator->DeltaR(*this);
     // If jet is too close to any electron set overlap to 1 and break
-    if(electronDeltaR < electronDeltaRMin ){
+   if(electronDeltaR < electronDeltaRMin ){
       //SetOverlapWithElectron(1);
       break;
     } //if
   } //for
+ 
+
+
+
+
+ 
   
-  //
   // now check jet object ID cuts
   double maxEta=config->GetValue("ObjectID.Jet.MaxEta",100.);
   double minPt=config->GetValue("ObjectID.Jet.MinPt",0.);

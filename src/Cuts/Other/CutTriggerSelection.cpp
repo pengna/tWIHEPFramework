@@ -74,6 +74,8 @@ void CutTriggerSelection::BookHistogram(){
 
   if (_whichtrigger == 0) _triggerChannel = "Electron";
   if (_whichtrigger == 1) _triggerChannel = "Muon";
+  if (_whichtrigger == 2) _triggerChannel = "bstarMuon";
+  if (_whichtrigger == 3) _triggerChannel = "bstarElectron";
 
   // Histogram Before Cut
   std::ostringstream histNameBeforeStream;
@@ -147,17 +149,30 @@ Bool_t CutTriggerSelection::Apply()
 
   Int_t electronTrigger = 0; //I seem to have messed up the electron trigger?
   electronTrigger = EventContainerObj->HLT_Ele32_eta2p1_WPTight_Gsf;
-  Int_t muonTrigger = EventContainerObj->HLT_IsoMu24 || EventContainerObj->HLT_IsoTkMu24;
-  
+  //Int_t muonTrigger = EventContainerObj->HLT_IsoMu24 || EventContainerObj->HLT_IsoTkMu24;
+  Int_t muonTrigger = EventContainerObj->HLT_IsoMu24 || EventContainerObj->HLT_IsoTkMu24; 
+  Int_t bstarmuonTrigger = 0;
+ bstarmuonTrigger = EventContainerObj->HLT_Mu50 ||EventContainerObj->HLT_TkMu50; 
+  //Int_t bstarelectronTrigger = EventContainerObj->HLT_Ele27_eta2p1_WPTight_Gsf;
+//  Int_t bstarelectronTrigger = EventContainerObj->HLT_Ele23_CaloIdL_TrackIdL_IsoVL || EventContainerObj->HLT_Ele27_WP85_Gsf;
+  Int_t bstarelectronTrigger =  EventContainerObj->HLT_Ele27_WPTight_Gsf || EventContainerObj->HLT_Ele27_WP85_Gsf; 
   if (_whichtrigger == 0) triggerBit = EventContainerObj->HLT_Ele32_eta2p1_WPTight_Gsf;
   if (_whichtrigger == 1) {//I should really make these customisable, but I'm not gonna do that now.
     //triggerBit = EventContainerObj->HLT_IsoMu18;
     triggerBit = EventContainerObj->HLT_IsoMu24 || EventContainerObj->HLT_IsoTkMu24;
   }
+  if (_whichtrigger == 2) {triggerBit = EventContainerObj->HLT_Mu50||EventContainerObj->HLT_TkMu50;}
+  //if (_whichtrigger == 3) triggerBit = EventContainerObj->HLT_Ele27_eta2p1_WPTight_Gsf;
+  //if (_whichtrigger == 3) triggerBit = EventContainerObj->HLT_Ele23_CaloIdL_TrackIdL_IsoVL || EventContainerObj->HLT_Ele27_WP85_Gsf;
+  if (_whichtrigger == 3) triggerBit = EventContainerObj->HLT_Ele27_WPTight_Gsf || EventContainerObj->HLT_Ele27_WP85_Gsf;
   
-  if (_whichtrigger == 0) passesTrigger = electronTrigger != 0. and muonTrigger == 0;
-  if (_whichtrigger == 1) passesTrigger = electronTrigger == 0. and muonTrigger != 0;
   
+  
+  if (_whichtrigger == 0) passesTrigger = electronTrigger != 0. and muonTrigger == 0 ;
+  if (_whichtrigger == 1) passesTrigger = electronTrigger == 0. and muonTrigger != 0 ;
+  if (_whichtrigger == 2) passesTrigger = bstarmuonTrigger !=0; //and bstarelectronTrigger ==0;
+  if (_whichtrigger == 3) passesTrigger = bstarelectronTrigger != 0. and bstarmuonTrigger ==0;
+ //cout<<_whichtrigger<<"we used trigger "; 
   //if (triggerBit != 0.) passesTrigger = kTRUE;
 
   // Fill the histograms before the cuts
