@@ -335,7 +335,29 @@ class EventContainer
   inline void SetEventWSF(const Double_t& w_WJet_) {_EventWSF = w_WJet_;}; //tagging prob per event
   inline Double_t GetEventWSF() const {return _EventWSF;};
   inline Double_t EventWSF() const {return GetEventWSF();};
+// W_tagging weight up per event 
+    inline void SetEventWSFUp(const Double_t& w_WJetUp_) {_EventWSFUp = w_WJetUp_;}; //tagging prob per event
+    inline Double_t GetEventWSFUp() const {return _EventWSFUp;};
+    inline Double_t EventWSFUp() const {return GetEventWSFUp();};
+// W_tagging weight up per event 
+     inline void SetEventWSFDown(const Double_t& w_WJetDown_) {_EventWSFDown = w_WJetDown_;}; //tagging prob per event
+         inline Double_t GetEventWSFDown() const {return _EventWSFDown;};
+         inline Double_t EventWSFDown() const {return GetEventWSFDown();};
  
+ inline void SetEventTopptreweight(const Double_t& w_TopPt_) {_EventTopptreweight = w_TopPt_;}; //tagging prob per event
+ inline Double_t GetEventTopptreweight() const {return _EventTopptreweight;};
+ inline Double_t EventTopptreweight() const {return GetEventTopptreweight();};
+   
+   inline void SetEventTopptreweightUp(const Double_t& w_TopPtUp_) {_EventTopptreweightUp = w_TopPtUp_;}; //tagging prob per event
+   inline Double_t GetEventTopptreweightUp() const {return _EventTopptreweightUp;};
+   inline Double_t EventTopptreweightUp() const {return GetEventTopptreweightUp();};
+   
+   inline void SetEventTopptreweightDown(const Double_t& w_TopPtDown_) {_EventTopptreweightDown = w_TopPtDown_;}; //tagging prob per event
+        inline Double_t GetEventTopptreweightDown() const {return _EventTopptreweightDown;};
+        inline Double_t EventTopptreweightDown() const {return GetEventTopptreweightDown();};
+
+
+
   //lepton SF weight per event
   inline void SetEventLepSFWeight(const Double_t& lepSFweight) {_EventLepSFWeight = lepSFweight;};
   inline Double_t GetEventLepSFWeight() const {return _EventLepSFWeight;};
@@ -451,6 +473,7 @@ class EventContainer
   Float_t _EventPileupMinBiasDownWeight;
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventWSF; // this may be the same as the tagging weight, but I'm making it different anyway
+  Float_t _EventTopptreweight; 
   Float_t _EventLepSFWeight;
   Float_t _EventTrigSFWeight;
   Float_t _EventGenWeight;
@@ -462,7 +485,10 @@ class EventContainer
   Float_t _EventLepSFWeightDown;
   Float_t _EventTrigSFWeightUp;
   Float_t _EventTrigSFWeightDown;
-
+  Float_t _EventWSFUp;
+  Float_t _EventWSFDown;
+  Float_t _EventTopptreweightUp;
+  Float_t _EventTopptreweightDown;
   //MultijetJESUncertaintyProvider myJES;
   // CalibrationDataVariables CalibVar;
   std::string taggername;
@@ -513,6 +539,7 @@ class EventContainer
   std::vector<Electron>   unIsolatedElectrons;
   std::vector<Muon>       muons;
   std::vector<Muon>       tightMuons;
+  std::vector<Muon>       tightwoIsoMuons;
   std::vector<Muon>       vetoMuons;
   std::vector<Muon>       ptetaMuons;
   std::vector<Muon>       isolatedMuons;
@@ -520,6 +547,7 @@ class EventContainer
   std::vector<Tau>        taus;
   std::vector<Jet>        jets;
   std::vector<BoostedJet> boostedjets;
+  std::vector<BoostedJet> allboostedjets;
   std::vector<Jet>        alljets;//no jet checks
   std::vector<Jet>        jetors;//overlap removal vector for electron/jets
   std::vector<Jet>        jetjetors;//overlap removal vector for jet/jets
@@ -534,9 +562,12 @@ class EventContainer
 
   //Pointers to collections
   std::vector<Electron> * electronsToUsePtr;
+  std::vector<Electron> * electronsToUsePtr2D;
   std::vector<Muon>     * muonsToUsePtr;
+  std::vector<Muon>     * muonsToUsePtr2D;
   std::vector<BoostedJet> * boostedjetsToUsePtr;
   std::vector<Jet> * jetsToUsePtr;
+  std::vector<Jet> * taggedjetsToUsePtr;
 
   std::vector<TLorentzVector>      jetmsSpecial;//MET tool
   

@@ -81,13 +81,16 @@ public :
    Int_t           HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL;
    Int_t           HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL;
    Int_t           HLT_Ele105_CaloIdVT_GsfTrkIdT;
+   Int_t           HLT_Ele115_CaloIdVT_GsfTrkIdT;
    Int_t           HLT_Ele27_eta2p1_WP75_Gsf;
    Int_t           HLT_Ele27_WP85_Gsf;
    Int_t           HLT_Ele27_eta2p1_WPLoose_Gsf;
    Int_t           HLT_Ele32_eta2p1_WPTight_Gsf;
    Int_t	   HLT_Ele27_WPTight_Gsf;
+   Int_t	   HLT_Ele27_eta2p1_WPTight_Gsf;
    Int_t           HLT_Mu45_eta2p1;
    Int_t           HLT_Mu50;
+   Int_t           HLT_TkMu50;
    Int_t           HLT_IsoMu17_eta2p1;
    Int_t           HLT_IsoMu24_eta2p1;
    Int_t           HLT_IsoMu18;
@@ -795,18 +798,21 @@ public :
    TBranch        *b_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL;   //!
    TBranch        *b_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL;   //!
    TBranch        *b_HLT_Ele105_CaloIdVT_GsfTrkIdT;   //!
+   TBranch        *b_HLT_Ele115_CaloIdVT_GsfTrkIdT;   //!
    TBranch        *b_HLT_Ele27_eta2p1_WP75_Gsf;   //!
    TBranch        *b_HLT_Ele27_WP85_Gsf;   //!
    TBranch        *b_HLT_Ele27_eta2p1_WPLoose_Gsf;   //!
    TBranch        *b_HLT_Ele32_eta2p1_WPTight_Gsf;   //!
    TBranch        *b_HLT_Mu45_eta2p1;   //!
    TBranch        *b_HLT_Mu50;   //!
+   TBranch        *b_HLT_TkMu50;   //!
    TBranch        *b_HLT_IsoMu17_eta2p1;   //!
    TBranch        *b_HLT_IsoMu24_eta2p1;   //!
    TBranch        *b_HLT_IsoMu18;   //!
    TBranch        *b_HLT_Ele23_WPLoose_Gsf;   //!
    TBranch        *b_HLT_Ele23_CaloIdL_TrackIdL_IsoVL;   //!
    TBranch        *b_HLT_Ele27_WPTight_Gsf;  //!
+   TBranch        *b_HLT_Ele27_eta2p1_WPTight_Gsf;  //!
    TBranch        *b_HLT_IsoTkMu20;   //!
    TBranch        *b_HLT_IsoTkMu22;   //!
    TBranch        *b_HLT_IsoMu22;   //!
@@ -2169,13 +2175,16 @@ void EventTree::Init(TTree *tree)
    fChain->SetBranchAddress("HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL", &HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL, &b_HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL);
    fChain->SetBranchAddress("HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL", &HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL, &b_HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL);
    fChain->SetBranchAddress("HLT_Ele105_CaloIdVT_GsfTrkIdT", &HLT_Ele105_CaloIdVT_GsfTrkIdT, &b_HLT_Ele105_CaloIdVT_GsfTrkIdT);
+   fChain->SetBranchAddress("HLT_Ele115_CaloIdVT_GsfTrkIdT", &HLT_Ele115_CaloIdVT_GsfTrkIdT, &b_HLT_Ele115_CaloIdVT_GsfTrkIdT);
    fChain->SetBranchAddress("HLT_Ele27_eta2p1_WP75_Gsf", &HLT_Ele27_eta2p1_WP75_Gsf, &b_HLT_Ele27_eta2p1_WP75_Gsf);
    fChain->SetBranchAddress("HLT_Ele27_WP85_Gsf", &HLT_Ele27_WP85_Gsf, &b_HLT_Ele27_WP85_Gsf);
    fChain->SetBranchAddress("HLT_Ele27_eta2p1_WPLoose_Gsf", &HLT_Ele27_eta2p1_WPLoose_Gsf, &b_HLT_Ele27_eta2p1_WPLoose_Gsf);
    fChain->SetBranchAddress("HLT_Ele32_eta2p1_WPTight_Gsf", &HLT_Ele32_eta2p1_WPTight_Gsf, &b_HLT_Ele32_eta2p1_WPTight_Gsf);
    fChain->SetBranchAddress("HLT_Ele27_WPTight_Gsf", &HLT_Ele27_WPTight_Gsf, &b_HLT_Ele27_WPTight_Gsf);
+   fChain->SetBranchAddress("HLT_Ele27_eta2p1_WPTight_Gsf", &HLT_Ele27_eta2p1_WPTight_Gsf, &b_HLT_Ele27_eta2p1_WPTight_Gsf);
    fChain->SetBranchAddress("HLT_Mu45_eta2p1", &HLT_Mu45_eta2p1, &b_HLT_Mu45_eta2p1);
    fChain->SetBranchAddress("HLT_Mu50", &HLT_Mu50, &b_HLT_Mu50);
+   fChain->SetBranchAddress("HLT_TkMu50", &HLT_TkMu50, &b_HLT_TkMu50);
    fChain->SetBranchAddress("HLT_IsoMu17_eta2p1", &HLT_IsoMu17_eta2p1, &b_HLT_IsoMu17_eta2p1);
    fChain->SetBranchAddress("HLT_IsoMu24_eta2p1", &HLT_IsoMu24_eta2p1, &b_HLT_IsoMu24_eta2p1);
    fChain->SetBranchAddress("HLT_IsoMu18", &HLT_IsoMu18, &b_HLT_IsoMu18);

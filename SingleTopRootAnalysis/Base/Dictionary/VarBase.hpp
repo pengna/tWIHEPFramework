@@ -21,7 +21,6 @@ public:
   
   //Standard set event container method
   inline void SetEventContainer(EventContainer * obj){ _eventContainerObj = obj;};
-
   //Book the branches
   void BookBranches(TTree * skimTree);
 
@@ -45,7 +44,8 @@ _histos.Add(h);
   //Do we want to make histograms for these variables?
   void SetDoHists(bool doHists){_makeHists = doHists;};
   bool DoHists(){return _makeHists;};
-
+  bool _runAdditionalVariables;
+   void SetRunAdditionalVariables(bool run){_runAdditionalVariables = run;};
   //Fill the variables. There are two methods for this - the first is called from the AdditionalVarsProcessor which calls the individual VarBase classes filling routines before filling the branches themselves.
   virtual void FillBranches(EventContainer * evtObj) = 0;
 
@@ -63,7 +63,8 @@ protected:
   std::map<string,int> _intVars;
   std::map<string,float> _floatVars;
   std::map<string,TBranch*> _branchVec;
-
+  std::map<string,std::vector<int> > _intVecVars;
+    std::map<string,std::vector<float> > _floatVecVars;
   //Fill the histograms if we're doinng that
   void FillHistograms(double weight = -999.);
 

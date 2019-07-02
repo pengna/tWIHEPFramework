@@ -28,15 +28,14 @@
  *      17 June 2015 - Created by Huaqiao ZHANG                               *
  *****************************************************************************/
 
-#ifndef jet_h
-#define jet_h
+#ifndef boostedjet_h
+#define boostedjet_h
 
-#include "SingleTopRootAnalysis/Particles/Truth/MCJet.hpp"
+//#include "SingleTopRootAnalysis/Particles/Truth/MCJet.hpp"
 #include "SingleTopRootAnalysis/Particles/Truth/MCTau.hpp"
 #include "SingleTopRootAnalysis/Particles/Recon/Particle.hpp"
 #include "SingleTopRootAnalysis/Particles/Recon/Electron.hpp"
 #include "SingleTopRootAnalysis/Particles/Recon/Muon.hpp"
-#include "SingleTopRootAnalysis/Particles/Recon/BoostedJet.hpp"
 #include "SingleTopRootAnalysis/Trees/EventTree.hpp"
 #include "SingleTopRootAnalysis/Trees/FastSimTree.hpp"
 //#include "SingleTopRootAnalysis/Base/Dictionary/MultijetJESUncertaintyProvider.hpp"
@@ -49,35 +48,54 @@
 
 class Electron;
 class Muon;
-class BoostedJet;
 
-class Jet: public Particle
+class BoostedJet: public Particle
 {
  public:
   // Default Constructor
-  Jet();
+  BoostedJet();
 
   // Copy Constructor
-  Jet(const Jet& other);
+  BoostedJet(const BoostedJet& other);
 
   // Construtor using particle
-  Jet(const Particle& other);
+  BoostedJet(const Particle& other);
 
   // Destructor
-  ~Jet();
+  ~BoostedJet();
 
   // Set all contents to their defaults
-  inline void Clear() { Particle::Clear(); _numberOfConstituents=0; _chargedMultiplicity=0;  _bDiscriminator = -999.0; _pileupId = 0.0; _mass = 0.0; _uncorrPt = 0.0; _neutralHadEnergyFraction=0.0; _neutralEmEmEnergyFraction = 0.0; _chargedHadronEnergyFraction =0.0; _chargedEmEnergyFraction=0.0; _muonEnergyFraction=0.0; _electronEnergy=0.0; _photonEnergy=0.0; _tagged = kFALSE; _hadronFlavour=-1;
+  inline void Clear() { Particle::Clear();_prunedmass=0.0;_softdropmass=0.0;_tau1=0.0;_tau2=0.0;_tau3=0.0; _numberOfConstituents=0; _chargedMultiplicity=0;  _bDiscriminator = -999.0; _mass = 0.0; _uncorrPt = 0.0; _neutralHadEnergyFraction=0.0; _neutralEmEmEnergyFraction = 0.0; _chargedHadronEnergyFraction =0.0; _chargedEmEnergyFraction=0.0; _muonEnergyFraction=0.0; _electronEnergy=0.0; _photonEnergy=0.0; _tagged = kFALSE; _hadronFlavour=-1;
 }
 
   void SetCuts(TEnv* config);
 
-  // Fill the jet from an EventTree 
-  Bool_t Fill( double myJESCorr, double myJERCorr,std::vector<BoostedJet>& selectedboostedjets, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met, bool isMC,TString jetType);
+  // Fill the boostedjet from an EventTree 
+  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met, bool isMC);
   //  Bool_t Fill( double myJESCorr, double myJERCorr, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE);
-  // Also fill from FastSim tree:
-  Bool_t FillFastSim( std::vector<MCJet>& MCBJets, std::vector<MCJet>& MCCJets, std::vector<MCTau>& MCTaus,  std::vector<Electron>& electrons, FastSimTree *tr,Int_t iE,TEnv *config,const TString& tagName="default", Double_t btagCut = 999, Double_t mistagCut = 999, Double_t eshift = 0 );
- 
+
+  inline void Setprunedmass(Double_t prunedmass){_prunedmass =prunedmass;};
+  inline Double_t Getprunedmass() const {return _prunedmass;};
+  inline Double_t prunedmass() const {return _prunedmass;};
+
+  inline void Setsoftdropmass(Double_t softdropmass){_softdropmass =softdropmass;};
+  inline Double_t Getsoftdropmass() const {return _softdropmass;};
+  inline Double_t softdropmass() const {return _softdropmass;};
+
+
+  inline void Settau1(Double_t tau1){_tau1 = tau1;};
+  inline Double_t Gettau1() const {return _tau1;};
+  inline Double_t tau1() const {return _tau1;};
+
+  inline void Settau2(Double_t tau2){_tau2 = tau2;};
+  inline Double_t Gettau2() const {return _tau2;};
+  inline Double_t tau2() const {return _tau2;};
+
+  inline void Settau3(Double_t tau3){_tau3 = tau3;};
+  inline Double_t Gettau3() const {return _tau3;};
+  inline Double_t tau3() const {return _tau3;};
+
+
   inline void SetnumberOfConstituents(Int_t numberOfConstituents){_numberOfConstituents = numberOfConstituents;};
   inline Int_t GetnumberOfConstituents() const {return _numberOfConstituents;};
   inline Int_t numberOfConstituents() const {return _numberOfConstituents;};
@@ -94,9 +112,6 @@ class Jet: public Particle
   inline Double_t GetbDiscriminator() const {return _bDiscriminator;};
   inline Double_t bDiscriminator() const {return _bDiscriminator;};
 
-  inline void SetpileupId(Double_t pileupId){_pileupId = pileupId;};
-  inline Double_t GetpileupId() const {return _pileupId;};
-  inline Double_t pileupId() const {return _pileupId;};
 
   inline void Setmass(Double_t mass){_mass = mass;};
   inline Double_t Getmass() const {return _mass;};
@@ -144,15 +159,15 @@ class Jet: public Particle
 
   // Overloaded Operators
   // +=
-  Jet& operator+=(const Jet& other);
+  BoostedJet& operator+=(const BoostedJet& other);
   // +
-  Jet operator+(const Jet& other);
-  // = Jet const
-  Jet& operator=(const Particle& other);
+  BoostedJet operator+(const BoostedJet& other);
+  // = BoostedJet const
+  BoostedJet& operator=(const Particle& other);
   // = Particle const
-  Jet& operator=(const Jet& other);
-  // = Jet non-const
-  Jet& operator=(Jet& other);
+  BoostedJet& operator=(const BoostedJet& other);
+  // = BoostedJet non-const
+  BoostedJet& operator=(BoostedJet& other);
     
 
  private:
@@ -160,8 +175,12 @@ class Jet: public Particle
   Int_t _chargedMultiplicity;   
   Int_t _hadronFlavour;
   Double_t _bDiscriminator;   
-  Double_t _pileupId;   
   Double_t _mass;   
+  Double_t _prunedmass;   
+  Double_t _softdropmass;   
+  Double_t _tau1;   
+  Double_t _tau2;   
+  Double_t _tau3;   
   Double_t _neutralHadEnergyFraction;   
   Double_t _neutralEmEmEnergyFraction;   
   Double_t _chargedHadronEnergyFraction;   
@@ -172,35 +191,42 @@ class Jet: public Particle
   Double_t _uncorrPt;  
   Int_t _tagged;
   Double_t _closestLep;
-  Double_t _closestLeptonCutfor2D;
 
-  // Cuts applied to the jet objects
+  // Cuts applied to the boostedjet objects
   Double_t _maxEtaCut;
   Double_t _minPtCut;
+  Double_t _minCRPtCut;
   Double_t _bMaxEtaCut;
   Double_t _bMinPtCut;
   Double_t _bTagCut;
   Double_t _closestLeptonCut;
-  Double_t _minMuonJetDetaR;
-  Double_t _minBoostedJetDetaR;
+  Double_t _minMuonBoostedJetDetaR;
+  Double_t _minprunedmass;
+  Double_t _maxprunedmass;
+  Double_t _minQCDprunedmass;
+  Double_t _maxQCDprunedmass;
+  Double_t _minsoftdropmass;
+  Double_t _maxsoftdropmass;
+  Double_t _tau21;
+  Double_t _tau32;
+
   Int_t    _bstar;
   Int_t    _Elechannel;
   Int_t    _TT_CR;
   Int_t    _QCD_CR;
-  Double_t _minMuonPTrel;  
   // Are we running systematic variations?
   Int_t _jesUp;
   Int_t _jesDown;
   Int_t _jerUp;
   Int_t _jerDown;
 
-  // Apply the jet correction systematics
+  // Apply the boostedjet correction systematics
   void SystematicPtShift(EventTree * evtr, Int_t iE, TLorentzVector * met);
  
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system
   // Must come at end of class definition
-  ClassDef(Jet,0)
+  ClassDef(BoostedJet,0)
   ////////////////////////////////////////////////////////////////////////////////
 };
 

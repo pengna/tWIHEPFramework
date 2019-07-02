@@ -33,7 +33,10 @@
 #include "SingleTopRootAnalysis/Trees/EventTree.hpp"
 #include "SingleTopRootAnalysis/Trees/FastSimTree.hpp"
 #include "SingleTopRootAnalysis/Base/Dictionary/Top_MET.hpp"
+#include "SingleTopRootAnalysis/Particles/Recon/Muon.hpp"
 
+class Muon;
+class Jet;
 class Electron: public Particle
 {
  public:
@@ -65,14 +68,16 @@ class Electron: public Particle
   // Set all contents to their defaults
   inline void Clear() { Particle::Clear(); _passVetoId = 0.0; _passLooseId = 0.0; _passMediumId = 0.0; _passTightId = 0.0; _passHEEPId = 0.0; _passConversionVeto = 0.0;
   _patElectron_d0 = 0.0; _patElectron_dz = 0.0; _expectedMissingInnerHits = 0.0;
-  _isoChargedHadrons = 0.0; _isoNeutralHadrons = 0.0; _isoPhotons = 0.0; _isoPU = 0.0;
+  _isoChargedHadrons = 0.0; _isoNeutralHadrons = 0.0; _isoPhotons = 0.0; _isoPU = 0.0;_relIsoR=0.0;_ptrel=0.0;_dr=0.0;
   }
 
   //Set up the cuts
   void SetCuts(TEnv* config, TString electronType);
 
   // Fill the electron from an EventTree
-  Bool_t Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t isSimulation=false);
+  //Bool_t Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t isSimulation=false , std::vector<Muon>& selectedMuons);
+  Bool_t Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t isSimulation, std::vector<Muon>& selectedMuons,std::vector<Jet>& selectedjets);
+  //Bool_t Fill(EventTree *evtr, Int_t iE, TString electronType, Bool_t isSimulation=false);
 
   // also fill from a fastsim tree
   Bool_t FillFastSim(FastSimTree *tr, Int_t iE,TEnv* config,TString electronType);
@@ -173,6 +178,25 @@ class Electron: public Particle
   inline Int_t GetMissingHits() const {return _missingHits;};
   inline Int_t missingHits() const {return _missingHits;};
 
+  inline void SetrelIsoR(Double_t relIsoR){_relIsoR = relIsoR;};
+  inline Double_t GetrelIsoR() const {return _relIsoR;};
+  inline Double_t relIsoR() const {return _relIsoR;};
+
+  inline void Setptrel(Double_t ptrel){_ptrel = ptrel;};
+  inline Double_t Getptrel() const {return _ptrel;};
+  inline Double_t ptrel() const {return _ptrel;};
+
+  inline void Setdr(Double_t dr){_dr = dr;};
+  inline Double_t Getdr() const {return _dr;};
+  inline Double_t dr() const {return _dr;};
+
+
+
+
+
+//inline void SetRelPt(Double_t relpt){_relPt = relPt;};
+  //inline Double_t GetRelPt() const {return _relPt;};
+   // inline Double_t relPt() const {return _relPt;};
  private:
 
   Int_t _passVetoId;
@@ -204,6 +228,13 @@ class Electron: public Particle
   
   //Isolation
   Double_t _relIsoPFRhoEA;
+  Double_t _minLeptonJetDetaR;
+  Double_t _relPtcut;
+  Double_t  _minMuonEleDetaR;
+Double_t _relIsoR;
+  Double_t _ptrel;
+    Double_t _dr;
+
 
   ///////////////////////////////////////////
   // Maps containing the cut values to be placed on the different type of selected leptons
@@ -215,8 +246,10 @@ class Electron: public Particle
   std::map<TString,Double_t> _dZCutBarrel;
   std::map<TString,Double_t> _d0CutEndcap;
   std::map<TString,Double_t> _d0CutBarrel;
-  
-  
+  Int_t _bstar;  
+  Int_t _Elechannel;  
+  Int_t _QCD_CR;  
+  Int_t _TT_CR;  
 
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system

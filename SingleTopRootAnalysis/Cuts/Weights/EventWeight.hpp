@@ -44,7 +44,7 @@ class EventWeight : public HistoCut
 public:
 
   // Parameterized Constructor
-  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE, Bool_t verbose = kFALSE);
+  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE, Bool_t verbose = kFALSE,Bool_t useWSF = kFALSE,Bool_t useTopPtreweight= kFALSE);
   
   // Default Destructor
   ~EventWeight();
@@ -62,11 +62,15 @@ public:
   void setPileUpWgt(Bool_t val=true) { _usePileUpWgt=val; };
   void setPileUpSyst(Bool_t val=false) { _doPileupSysts=val; };
   void setbWeight(Bool_t val=true) { _usebWeight=val; };
+  void setWSF(Bool_t val=true) { _useWSF=val; };
+  void setTopPtreweight(Bool_t val=true) { _useTopPtreweight=val; };
   void setEfficbTag(Bool_t val=true) { _runEfficiencyBasedbTag=val; };
   Bool_t isMCatNLO() const { return _useMCatNLO; };
   Bool_t isPileUpWgt() const { return _usePileUpWgt; };
   Bool_t isPileupSysts() const { return _doPileupSysts; };
   Bool_t isbWeight() const { return _usebWeight; };
+  Bool_t isWSF() const { return _useWSF; };
+  Bool_t isTopPtreweight() const { return _useTopPtreweight; };
   Bool_t isEfficbTag() const { return _runEfficiencyBasedbTag; };
   
 
@@ -84,6 +88,8 @@ private:
   Bool_t _usePileUpWgt;  // set to true if this MC is MC@NLO and we need to use the corresponding weight
   Bool_t _doPileupSysts; // set to true if including the systematic uncertainties associated with pileup reweighting in the output file 
   Bool_t _usebWeight;  // set to true if using b-tag weights
+  Bool_t _useWSF;  // set to true if using W-tag weights
+  Bool_t _useTopPtreweight;  // set to true if using W-tag weights
   Bool_t _useNoWeight;  //No weight except MCatNLO weight
   Bool_t _useLeptonSFs; // Use lepton SFs. Needs to be configured in the overall config file
   Bool_t _usebTagReshape; // Do CSV discriminant reshaping
@@ -93,6 +99,7 @@ private:
   myTH1F* _hMCatNLOWeight; // Histogram of MCatNLO weight
   myTH1F* _hPileUpWeight; // Histogram of PileUpWgt weight
   myTH1F* _hbWeight; // Histogram of b weight
+  myTH1F* _hWSF; // Histogram of b weight
   myTH1F* _hLeptonSFWeight; //Histogram of the lepton SF claculated for the event
   myTH1F* _hTriggerSFWeight; //Histogram of trigger SF
   std::map<std::string,myTH1F*> _hbTagReshape; //Map of histograms containing the information for b tag reshaping and its associated systematics
@@ -111,7 +118,7 @@ private:
   TGraphAsymmErrors* _muonTkSF;
   TH2F* _eleRecoSF;
   TH2F* _eleIDSF;
-
+  TH2F* _eleTrigSF;
   //Pileup reweighting hisotgrams
   TH1F* _dataPV;
   TH1F* _mcPV;
@@ -132,14 +139,29 @@ private:
   std::map<std::string,float> _bTagSystValues;
 
   std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
-  void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName);
+  //void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName);
+  void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName, TString eleTrigFileName, TString eleTrigHistName);
   std::tuple<Double_t,Double_t> getBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
   std::tuple<Double_t,Double_t> getEfficBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
-
+  std::tuple<bool> GenWBoson(EventContainer* EventContainerObj,Double_t Wjet_phi,Double_t Wjet_eta);
+  std::tuple<Double_t,Double_t,Double_t> getWSF(EventContainer* EventContainerObj);
+  std::tuple<Double_t,Double_t,Double_t> TopSF(EventContainer* EventContainerObj);
+  std::tuple<Double_t,Double_t,Double_t> TopPtReweight(EventContainer* EventContainerObj);
   Double_t getJetSF(Jet jet, std::string syst);
   Double_t getJetEffic(Jet jet);
 
- //Root::TPileupReweighting* PileupReweighting;
+  double deltaPhi(double phi1, double phi2){
+	  double deltaphi = TMath::Abs(phi1-phi2);
+	  if(deltaphi > TMath::Pi()) deltaphi = TMath::TwoPi() - deltaphi;
+	  return deltaphi;
+  }
+  double deltaEta(double eta1, double eta2){
+	  return (eta1-eta2);
+  };
+  double deltaR(double dphi, double deta){
+	  return sqrt(pow(dphi,2)+pow(deta,2));
+  };
+
 
 };
 

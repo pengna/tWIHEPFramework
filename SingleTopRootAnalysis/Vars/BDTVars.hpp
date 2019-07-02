@@ -42,6 +42,8 @@ private:
   std::vector<TLorentzVector> Jet4000e24;
   std::vector<TLorentzVector> Jet3500e24;
 
+  TLorentzVector sumJet;
+  TLorentzVector sumBJet;
   TLorentzVector totalJets;
   TLorentzVector sumJets2030;
   TLorentzVector sumJets2040;

@@ -162,6 +162,7 @@ BINS_Example= bin/example/test_analysis.x bin/example/test_analysis2.x
 BINS_Matching= bin/Matching/MatchQuality.x
 BINS_ParticleStudies= bin/ParticleStudies/electron_study.x bin/ParticleStudies/jet_study.x bin/ParticleStudies/MCParticle_study.x bin/ParticleStudies/muon_study.x
 BINS_Wt= bin/Wt/Wt_generic.x
+BINS_bstar = bin/bstar/bstar_generic.x
 BINS_Vertex= bin/Wt/Wt_nVertOnly.x
 BINS_Synch= bin/Wt/Wt_synch.x
 #BINS_Wt= bin/Wt/Wt.x bin/Wt/Wt_mumu.x bin/Wt/Wteu.x bin/Wt/Wt_Tree.x bin/Wt/Wt_generic.x
@@ -187,6 +188,7 @@ help:
 	@echo "  make  all             -->  Make all executables"
 	@echo "  make  St              -->  St executables"
 	@echo "  make  Wt              -->  Wt executables"
+	@echo "  make  bstar              -->  bstar executables"
 	@echo "  make  Skimming              -->  Skimming executables"
 	@echo "  make  Example         -->  Example executable"
 	@echo "  make  Matching        -->  Matching executables"
@@ -202,6 +204,7 @@ help:
 	@echo "  make cleanExe             -->  Removes all executables"
 	@echo "  make cleanSt              -->  Removes St executables"
 	@echo "  make cleanWt              -->  Removes Wt executables"
+	@echo "  make cleanbstar              -->  Removes bstar executables"
 	@echo "  make cleanSkimming              -->  Removes Skimming executables"
 	@echo "  make cleanExample         -->  Removes Example executables"
 	@echo "  make cleanMatching        -->  Removes Matching executables"
@@ -229,11 +232,13 @@ dbg:
 # Target: Executable categories
 # Make executables belonging to a certain category
 ####################################################################################
-all: lib St Wt Skimming FER2 Matching ParticleStudies MCStudies EventComparison BTag
+all: lib St Wt bstar Skimming FER2 Matching ParticleStudies MCStudies EventComparison BTag
 
 St: lib $(BINS_St)
 
 Wt: lib $(BINS_Wt)
+
+bstar: lib $(BINS_bstar)
 
 Synch: lib $(BINS_Synch)
 
@@ -269,7 +274,7 @@ $(DIR_OBJ)/%dict.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_OBJ)/Base/CutFlow $(DIR_OBJ)/Base/Dictionary $(DIR_OBJ)/Base/Histograms 
 	@mkdir -p $(DIR_OBJ)/Trees
 	@mkdir -p $(DIR_OBJ)/Particles/Recon $(DIR_OBJ)/Particles/Truth $(DIR_OBJ)/Particles/TruthAll
-	@mkdir -p $(DIR_OBJ)/Cuts/Electron $(DIR_OBJ)/Cuts/IsolatedMuon $(DIR_OBJ)/Cuts/Jet $(DIR_OBJ)/Cuts/Lepton $(DIR_OBJ)/Cuts/Muon $(DIR_OBJ)/Cuts/Other $(DIR_OBJ)/Cuts/TaggedJet 
+	@mkdir -p $(DIR_OBJ)/Cuts/BoostedJet $(DIR_OBJ)/Cuts/Electron $(DIR_OBJ)/Cuts/IsolatedMuon $(DIR_OBJ)/Cuts/Jet $(DIR_OBJ)/Cuts/Lepton $(DIR_OBJ)/Cuts/Muon $(DIR_OBJ)/Cuts/Other $(DIR_OBJ)/Cuts/TaggedJet 
 	@mkdir -p $(DIR_OBJ)/Histogramming/Matching  $(DIR_OBJ)/Histogramming/Recon  $(DIR_OBJ)/Histogramming/Topological  $(DIR_OBJ)/Histogramming/Truth  $(DIR_OBJ)/Histogramming/TruthAll $(DIR_OBJ)/Histogramming/Other
 	@mkdir -p $(DIR_OBJ)/Vars
 
@@ -277,7 +282,7 @@ $(DIR_OBJ)/%dict.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_TMP)/Base/CutFlow $(DIR_TMP)/Base/Dictionary $(DIR_TMP)/Base/Histograms
 	@mkdir -p $(DIR_TMP)/Trees
 	@mkdir -p $(DIR_TMP)/Particles/Recon $(DIR_TMP)/Particles/Truth $(DIR_TMP)/Particles/TruthAll
-	@mkdir -p $(DIR_TMP)/Cuts/Electron $(DIR_TMP)/Cuts/IsolatedMuon $(DIR_TMP)/Cuts/Jet $(DIR_TMP)/Cuts/Lepton $(DIR_TMP)/Cuts/Muon $(DIR_TMP)/Cuts/Other $(DIR_TMP)/Cuts/TaggedJet $(DIR_TMP)/Cuts/Tau $(DIR_TMP)/Cuts/Weights
+	@mkdir -p $(DIR_TMP)/Cuts/BoostedJet $(DIR_TMP)/Cuts/Electron $(DIR_TMP)/Cuts/IsolatedMuon $(DIR_TMP)/Cuts/Jet $(DIR_TMP)/Cuts/Lepton $(DIR_TMP)/Cuts/Muon $(DIR_TMP)/Cuts/Other $(DIR_TMP)/Cuts/TaggedJet $(DIR_TMP)/Cuts/Tau $(DIR_TMP)/Cuts/Weights
 	@mkdir -p $(DIR_TMP)/Histogramming/Matching  $(DIR_TMP)/Histogramming/Recon  $(DIR_TMP)/Histogramming/Topological  $(DIR_TMP)/Histogramming/Truth  $(DIR_TMP)/Histogramming/TruthAll $(DIR_TMP)/Histogramming/Other
 	@mkdir -p $(DIR_TMP)/Vars
 
@@ -285,7 +290,7 @@ $(DIR_OBJ)/%dict.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_DEP)/Base/CutFlow $(DIR_DEP)/Base/Dictionary $(DIR_DEP)/Base/Histograms
 	@mkdir -p $(DIR_DEP)/Trees
 	@mkdir -p $(DIR_DEP)/Particles/Recon $(DIR_DEP)/Particles/Truth $(DIR_DEP)/Particles/TruthAll
-	@mkdir -p $(DIR_DEP)/Cuts/Electron $(DIR_DEP)/Cuts/IsolatedMuon $(DIR_DEP)/Cuts/Jet $(DIR_DEP)/Cuts/Lepton $(DIR_DEP)/Cuts/Muon $(DIR_DEP)/Cuts/Other $(DIR_DEP)/Cuts/TaggedJet $(DIR_DEP)/Cuts/Tau $(DIR_DEP)/Cuts/Weights
+	@mkdir -p $(DIR_DEP)/Cuts/BoostedJet  $(DIR_DEP)/Cuts/Electron $(DIR_DEP)/Cuts/IsolatedMuon $(DIR_DEP)/Cuts/Jet $(DIR_DEP)/Cuts/Lepton $(DIR_DEP)/Cuts/Muon $(DIR_DEP)/Cuts/Other $(DIR_DEP)/Cuts/TaggedJet $(DIR_DEP)/Cuts/Tau $(DIR_DEP)/Cuts/Weights
 	@mkdir -p $(DIR_DEP)/Histogramming/Matching  $(DIR_DEP)/Histogramming/Recon  $(DIR_DEP)/Histogramming/Topological  $(DIR_DEP)/Histogramming/Truth  $(DIR_DEP)/Histogramming/TruthAll $(DIR_DEP)/Histogramming/Other
 	@mkdir -p $(DIR_DEP)/Vars
 
@@ -314,14 +319,14 @@ $(DIR_OBJ)/%.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_OBJ)/Base/CutFlow $(DIR_OBJ)/Base/Dictionary $(DIR_OBJ)/Base/Histograms
 	@mkdir -p $(DIR_OBJ)/Trees
 	@mkdir -p $(DIR_OBJ)/Particles/Recon $(DIR_OBJ)/Particles/Truth $(DIR_OBJ)/Particles/TruthAll 
-	@mkdir -p $(DIR_OBJ)/Cuts/Electron $(DIR_OBJ)/Cuts/IsolatedMuon $(DIR_OBJ)/Cuts/Jet $(DIR_OBJ)/Cuts/Lepton $(DIR_OBJ)/Cuts/Muon $(DIR_OBJ)/Cuts/Other $(DIR_OBJ)/Cuts/TaggedJet $(DIR_OBJ)/Cuts/Tau $(DIR_OBJ)/Cuts/Weights
+	@mkdir -p $(DIR_OBJ)/Cuts/BoostedJet$(DIR_OBJ)/Cuts/Electron $(DIR_OBJ)/Cuts/IsolatedMuon $(DIR_OBJ)/Cuts/Jet $(DIR_OBJ)/Cuts/Lepton $(DIR_OBJ)/Cuts/Muon $(DIR_OBJ)/Cuts/Other $(DIR_OBJ)/Cuts/TaggedJet $(DIR_OBJ)/Cuts/Tau $(DIR_OBJ)/Cuts/Weights
 	@mkdir -p $(DIR_OBJ)/Histogramming/Matching  $(DIR_OBJ)/Histogramming/Recon  $(DIR_OBJ)/Histogramming/Topological  $(DIR_OBJ)/Histogramming/Truth  $(DIR_OBJ)/Histogramming/TruthAll $(DIR_OBJ)/Histogramming/Other
 
 	@mkdir -p $(DIR_DEP)
 	@mkdir -p $(DIR_DEP)/Base/CutFlow $(DIR_DEP)/Base/Dictionary $(DIR_DEP)/Base/Histograms
 	@mkdir -p $(DIR_DEP)/Trees
 	@mkdir -p $(DIR_DEP)/Particles/Recon $(DIR_DEP)/Particles/Truth $(DIR_DEP)/Particles/TruthAll
-	@mkdir -p $(DIR_DEP)/Cuts/Electron $(DIR_DEP)/Cuts/IsolatedMuon $(DIR_DEP)/Cuts/Jet $(DIR_DEP)/Cuts/Lepton $(DIR_DEP)/Cuts/Muon $(DIR_DEP)/Cuts/Other $(DIR_DEP)/Cuts/TaggedJet $(DIR_DEP)/Cuts/Tau $(DIR_DEP)/Cuts/Weights
+	@mkdir -p $(DIR_DEP)/Cuts/BoostedJet$(DIR_DEP)/Cuts/Electron $(DIR_DEP)/Cuts/IsolatedMuon $(DIR_DEP)/Cuts/Jet $(DIR_DEP)/Cuts/Lepton $(DIR_DEP)/Cuts/Muon $(DIR_DEP)/Cuts/Other $(DIR_DEP)/Cuts/TaggedJet $(DIR_DEP)/Cuts/Tau $(DIR_DEP)/Cuts/Weights
 	@mkdir -p $(DIR_DEP)/Histogramming/Matching  $(DIR_DEP)/Histogramming/Recon  $(DIR_DEP)/Histogramming/Topological $(DIR_DEP)/Histogramming/Truth  $(DIR_DEP)/Histogramming/TruthAll $(DIR_DEP)/Histogramming/Other
 
         # Create dependency files
@@ -355,7 +360,7 @@ lib/lib$(LIB)$(SUF_LIB): $(OBJ)
 	@mkdir -p $(DIR_OBJ)/Base/CutFlow $(DIR_OBJ)/Base/Dictionary $(DIR_OBJ)/Base/Histograms
 	@mkdir -p $(DIR_OBJ)/Trees
 	@mkdir -p $(DIR_OBJ)/Particles/Recon $(DIR_OBJ)/Particles/Truth $(DIR_OBJ)/Particles/TruthAll
-	@mkdir -p $(DIR_OBJ)/Cuts/Electron $(DIR_OBJ)/Cuts/IsolatedMuon $(DIR_OBJ)/Cuts/Jet $(DIR_OBJ)/Cuts/Lepton $(DIR_OBJ)/Cuts/Muon $(DIR_OBJ)/Cuts/Other $(DIR_OBJ)/Cuts/TaggedJet $(DIR_OBJ)/Cuts/Tau $(DIR_OBJ)/Cuts/Weights
+	@mkdir -p $(DIR_OBJ)/Cuts/BoostedJet$(DIR_OBJ)/Cuts/Electron $(DIR_OBJ)/Cuts/IsolatedMuon $(DIR_OBJ)/Cuts/Jet $(DIR_OBJ)/Cuts/Lepton $(DIR_OBJ)/Cuts/Muon $(DIR_OBJ)/Cuts/Other $(DIR_OBJ)/Cuts/TaggedJet $(DIR_OBJ)/Cuts/Tau $(DIR_OBJ)/Cuts/Weights
 	@mkdir -p $(DIR_OBJ)/Histogramming/Matching  $(DIR_OBJ)/Histogramming/Recon  $(DIR_OBJ)/Histogramming/Topological  $(DIR_OBJ)/Histogramming/Truth  $(DIR_OBJ)/Histogramming/TruthAll $(DIR_OBJ)/Histogramming/Other
 
 #	$(AR) lib/lib$(LIB).a $(OBJ)
@@ -389,6 +394,8 @@ cleanBTag:
 	rm -f $(BINS_BTag)
 cleanWt:
 	rm -f $(BINS_Wt)
+cleanbstar:
+	rm -f $(BINS_bstar)
 cleanSynch:
 	rm -f $(BINS_Synch)
 cleanSkimming:
@@ -396,11 +403,11 @@ cleanSkimming:
 cleanSt:
 	rm -f $(BINS_St)
 
-cleanExe: cleanSt cleanWt cleanSynch cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
+cleanExe: cleanSt cleanWt cleanbstar cleanSynch cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
 
 cleanall: clean
 
-clean:  cleanSt cleanWt cleanSynch cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
+clean:  cleanSt cleanWt cleanbstar cleanSynch cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
 	rm -rf ti_files
 	rm -rf $(DIR_OBJ)/*
 	rm -rf $(DIR_TMP)/*

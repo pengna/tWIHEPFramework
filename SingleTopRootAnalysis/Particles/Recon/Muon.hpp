@@ -33,8 +33,9 @@
 #include "SingleTopRootAnalysis/Trees/EventTree.hpp"
 #include "SingleTopRootAnalysis/Trees/FastSimTree.hpp"
 #include <TEnv.h>
-
 using namespace std;
+class Jet;
+
 class Muon: public Particle
 {
 public:
@@ -52,10 +53,10 @@ public:
   ~Muon();
 
   // Set all contents to their defaults
-  inline void Clear() { Particle::Clear(); _passTightId = kFALSE; _passLooseId = kFALSE;_isSoft = kFALSE; _isHighPt = kFALSE; _isoCharged = 0.0; _isoSum = 0.0; _isoCharParPt = 0.0; _isoNeutralHadron = 0.0;  _isoPhoton = 0.0;  _isoPU = 0.0; _chi2=0.0; _dxy=0.0; _validHits = 0.0; _validHitsInner = 0.0; _matchedStat=0.0; _TLayers=0.0; _relIsoR04=0.0;};
+  inline void Clear() { Particle::Clear(); _passTightId = kFALSE; _passLooseId = kFALSE;_isSoft = kFALSE; _isHighPt = kFALSE; _isoCharged = 0.0; _isoSum = 0.0; _isoCharParPt = 0.0; _isoNeutralHadron = 0.0;  _isoPhoton = 0.0;  _isoPU = 0.0; _chi2=0.0; _dxy=0.0; _validHits = 0.0; _validHitsInner = 0.0; _matchedStat=0.0; _TLayers=0.0; _relIsoR04=0.0;_miniIsoR=0.0;_ptrel=0.0;_dr=0.0;};
 
   // Fill the muon from an EventTree
-  Bool_t Fill(EventTree *evtr,int iE,TString muonType, Bool_t isSimulation);
+  Bool_t Fill(EventTree *evtr,std::vector<Jet>& selectedjets,int iE,TString muonType, Bool_t isSimulation);
   // also fill from a fastsim tree
   Bool_t FillFastSim(TEnv *config, FastSimTree *tr, Int_t iE,TString muonType);
 
@@ -149,6 +150,18 @@ public:
   inline Double_t GetrelIsoR04() const {return _relIsoR04;};
   inline Double_t relIsoR04() const {return _relIsoR04;};
 
+  inline void SetminiIsoR(Double_t miniIsoR){_miniIsoR = miniIsoR;};
+    inline Double_t GetminiIsoR() const {return _miniIsoR;};
+      inline Double_t miniIsoR() const {return _miniIsoR;};
+
+  inline void Setptrel(Double_t ptrel){_ptrel = ptrel;};
+  inline Double_t Getptrel() const {return _ptrel;};
+  inline Double_t ptrel() const {return _ptrel;};
+
+  inline void Setdr(Double_t dr){_dr = dr;};
+  inline Double_t Getdr() const {return _dr;};
+  inline Double_t dr() const {return _dr;};
+
   inline void Setndof(Double_t ndof){_ndof = ndof;};
   inline Double_t Getndof() const {return _ndof;};
   inline Double_t ndof() const {return _ndof;};
@@ -178,14 +191,24 @@ private:
   Double_t _dz;
   Double_t _TLayers;
   Double_t _relIsoR04;
+  Double_t _miniIsoR;
+  Double_t _ptrel;
+  Double_t _dr;
   Double_t _ndof;
   Double_t _charge;
+  Double_t _minLeptonJetDetaR;
+  Double_t _relPtcut;
 
   //////////////////////////////////
   // Definitions of the objects go here. This way we don't need to access the configuration file for every particle
   map<TString,Double_t> _minPtCuts;
   map<TString,Double_t> _maxEtaCuts;
   map<TString,Double_t> _maxRelIsoCuts;
+  map<TString,Double_t> _maxMiniIsoCuts;
+  
+  Int_t _bstar;
+  Int_t _TT_CR;
+  Int_t _QCD_CR;
 
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system

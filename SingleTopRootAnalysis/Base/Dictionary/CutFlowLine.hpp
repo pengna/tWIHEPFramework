@@ -27,7 +27,8 @@
 #define __CutFlowLine__
 
 #include "TNamed.h"
-
+#include <iostream>
+#include <string>
 
 class CutFlowLine : public TNamed {
 public:
@@ -41,7 +42,9 @@ public:
   void Print(Option_t *option = "") const; 
   
   // call this to tell the line that this cut passed or failed.
-  inline void PassCut(const Double_t& weight) { _exposedCount++; _exposedYield+=weight; _passCount++; _passYield+=weight; };
+  inline void PassCut(const Double_t& weight) { _exposedCount++; _exposedYield+=weight; _passCount++; _passYield+=weight;
+  //std::cout<<"weight is :"<<weight<<std::endl;
+  };
   inline void FailCut(const Double_t& weight) { _exposedCount++; _exposedYield+=weight; };
 
   // get the pass count and yield.
