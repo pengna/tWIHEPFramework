@@ -215,7 +215,8 @@ EventContainer::EventContainer():
   _debugLevel(0),   _doFastSim(false),_doSkim(false),
   _sourceName("NONE"),
   _globalEventWeight(1.), _treeEventWeight(1.), _outputEventWeight(1.),_EventPileupWeight(-1),
-  _config("Configuration"), _JESconfig("JESConfiguration"),_jesError(0.), _jesShift(0), _bTagAlgo("default"), _bTagCut(999), _misTagCut(999), jeteoverlap(kFALSE),closeindex(999),ejordr(999), bestjetdr(999), _isFirstEvent(true), isSimulation(kTRUE), _badJetEvent(kFALSE),  _celloutShift(0),_softjetShift(0),_pileupShift(0),_larShift(0), _JESconfigread(false),_jesUShift(0),_jesPtShift(0),_jesEtaShift(0)
+  _EventPileupMinBiasUpWeight(-1),_EventPileupMinBiasDownWeight(-1),
+  _config("Configuration"), _JESconfig("JESConfiguration"),_jesError(0.), _jesShift(0), _bTagAlgo("default"), _bTagCut(999), _misTagCut(999), jeteoverlap(kFALSE),closeindex(999),ejordr(999), bestjetdr(999), _isFirstEvent(true), isSimulation(kTRUE), _badJetEvent(kFALSE),  _celloutShift(0),_softjetShift(0),_pileupShift(0),_larShift(0),_metShift(0), _JESconfigread(false),_jesUShift(0),_jesPtShift(0),_jesEtaShift(0),_useUnisolatedLeptons(kFALSE),_trigID(0)
 {
  
 } //EventContainer()
@@ -268,7 +269,7 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
   actualIntPerXing = 0;
   averageIntPerXing = 0 ;
 //  Pvtxall_n = -999;
-  isSimulation = kTRUE;
+//  isSimulation = kTRUE;
 
   _eventCount = 0;
   electrons.clear();
@@ -325,13 +326,16 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
 //  }
 //
 //  //taggername = "SV0";
-//  taggername = "JetFitterCOMBNN";
+//  taggername = "Jet1FitterCOMBNN";
 //  CalibROOT = new CalibrationDataInterfaceROOT(taggername, "config/btag/BTagCalibration.env", ""); 
 //  CalibVar.jetAuthor = "AntiKt4Topo";
 //  uncertainty = Total;
 //
-
   
+  // Check for any systematic uncertainties we may be calculating
+  _metShift = _config.GetValue("Systs.metShift",0);
+  _channelName = _config.GetValue("ChannelName","");
+
   return;
 } //Initialize()
 
@@ -346,15 +350,45 @@ void EventContainer::Initialize( EventTree* eventTree, TruthTree* truthTree)
 void EventContainer::SetupObjectDefinitions(){
   newMuon.SetCuts(GetConfig(),"Tight");
   newMuon.SetCuts(GetConfig(),"All");
+  newMuon.SetCuts(GetConfig(),"UnIsolated");
   newMuon.SetCuts(GetConfig(),"Veto");
 
   newElectron.SetCuts(GetConfig(),"Tight");
   newElectron.SetCuts(GetConfig(),"All");
   newElectron.SetCuts(GetConfig(),"Veto");
+  newElectron.SetCuts(GetConfig(),"UnIsolated");
 
   newJet.SetCuts(GetConfig());
 
 }
+
+/******************************************************************************
+ * void EventContainer::SetUseUnisolatedLeptons(                              *
+ *           Bool_t useUnisolatedLeptons, int whichtrig)                      *
+ *                                                                            *
+ * Used to switch between QCD estimation and non. This is important for       *
+ * the jet cleaning algorithm						      *
+ *                                                                            *
+ * Input:  None                                                               *
+ * Output: None                                                               *
+ ******************************************************************************/
+
+void EventContainer::SetUseUnisolatedLeptons(const Bool_t& useUnisolatedLeptons, int whichtrig){
+  _useUnisolatedLeptons = useUnisolatedLeptons;
+  _trigID = whichtrig;
+  electronsToUsePtr = &tightElectrons;
+  muonsToUsePtr = &tightMuons;
+  if (_trigID == 0 && _useUnisolatedLeptons){
+    electronsToUsePtr = &unIsolatedElectrons;
+  }
+  else if (_trigID == 1 && useUnisolatedLeptons){
+    muonsToUsePtr = &unIsolatedMuons;
+  }
+
+  //For the synch excercise we want it to always be tight leptons, so I'm gonna add here the ability to just make it all tight.
+  //  if (GetChannelName() == "ee" || GetChannelName() == "emu" || GetChannelName() == "mumu"){
+  // }
+} //SetUseUnisolatedLeptons
 
 /******************************************************************************
  * void EventContainer::InitializeFastSim()                                   *
@@ -380,7 +414,6 @@ void EventContainer::SetupObjectDefinitions(){
  ******************************************************************************/
 Int_t EventContainer::ReadEvent()
 {
-
   // Set the event weight if there is any
   if(DoFastSim()) {
     // Will have to be updated when we have a fast sim tree
@@ -398,8 +431,8 @@ Int_t EventContainer::ReadEvent()
     safejeteventdown= -999;
   }  else {
     _treeEventWeight = 1.0;
-    runNumber          = 1;//_eventTree -> 
-    eventNumber        = 1;//_eventTree -> 
+    runNumber          = _eventTree -> EVENT_run;
+    eventNumber        = _eventTree -> EVENT_event;
     actualIntPerXing   = 1;//_eventTree -> 
     averageIntPerXing  = 1;//_eventTree -> 
     bcid               = 1;//_eventTree -> 
@@ -409,7 +442,7 @@ Int_t EventContainer::ReadEvent()
     safejeteventup= -999;
     safejeteventdown= -999;
   }
-  isSimulation = kTRUE;
+  //  isSimulation = kTRUE;
   _badJetEvent = kFALSE;
 
   // Reset all of the particle vectors
@@ -455,7 +488,7 @@ Int_t EventContainer::ReadEvent()
   // ***************************************************
   // Reconstructed
   else {
-    isSimulation = kTRUE;//_eventTree->isSimulation;
+    //    isSimulation = _eventTree->isSimulation; // Why is this always set to true?!?
     _badJetEvent = kFALSE;
     //must be done for each event
     // Electrons, Jets, Muons, missingEt
@@ -486,14 +519,44 @@ Int_t EventContainer::ReadEvent()
     //Pvtxall_n = _eventTree->Vertex_n;
 
     ///////////////////////////////////////////
-    // Fill MET info
+    // Fill MET info 
     ///////////////////////////////////////////
+    // Should I update this to use PUPPI information?!?
     missingEt = _eventTree->Met_type1PF_pt;
     missingEx = _eventTree->Met_type1PF_px;
     missingPhi = _eventTree->Met_type1PF_phi;
     missingEy = _eventTree->Met_type1PF_py;
 
+    missingEt_xy = _eventTree->Met_type1PFxy_pt;
+    missingEx_xy = _eventTree->Met_type1PFxy_px;
+    missingPhi_xy = _eventTree->Met_type1PFxy_phi;
+    missingEy_xy = _eventTree->Met_type1PFxy_py;
+
+    passesMETFilters = _eventTree->Flag_METFilters;
+
+    //Fill pvtx information
+    nPvtx = _eventTree->nBestVtx;
+    trueInteractions = _eventTree->trueInteractions;
+    npuVertices = _eventTree->npuVertices;
     
+    // Systematic variations on met to be re-calculated here.
+    if (_metShift != 0){
+      float oldEt = missingEt;
+      missingEt = (_metShift == 1) ? _eventTree->Met_type1PF_shiftedPtUp : _eventTree->Met_type1PF_shiftedPtDown;
+
+      float ratioSF = missingEt/oldEt;
+      missingEx *= ratioSF;
+      missingEy *= ratioSF;
+
+      missingEt_xy *= ratioSF;
+      missingEx_xy *= ratioSF;
+      missingEy_xy *= ratioSF;
+    }
+
+    missingEtVec.SetPtEtaPhiE(missingEt,0.,missingPhi,missingEt);
+    missingEtVec_xy.SetPtEtaPhiE(missingEt_xy,0.,missingPhi_xy,missingEt_xy);
+
+
     ///////////////////////////////////////////
     // Electrons-->refilled and sorted later in method!!
     ///////////////////////////////////////////
@@ -529,6 +592,11 @@ Int_t EventContainer::ReadEvent()
         vetoElectrons.push_back(newElectron);
       }
 
+      newElectron.Clear();
+      useObj=newElectron.Fill(_eventTree,  io,"UnIsolated",isSimulation);
+      if(useObj) {
+        unIsolatedElectrons.push_back(newElectron);
+      }
     } //for
     ///////////////////////////////////////////
     // Muons
@@ -570,6 +638,7 @@ Int_t EventContainer::ReadEvent()
     bestjetdr = 999;
     jeteoverlap = kFALSE;
     //cout <<"EVENT"<<endl;
+
     Double_t ejoverlap = GetConfig() -> GetValue("ObjectID.Jet.ElectronDeltaRMin", 0.0);
     for(Int_t io = 0;io < _eventTree -> Jet_pt->size(); io++) {
       newJet.Clear();
@@ -578,20 +647,32 @@ Int_t EventContainer::ReadEvent()
       ejordr = 999;
       bestjetdr = 999;
       //      missingEt = -888; 
-      
-      useObj = newJet.Fill(1.0,1.0, tightMuons, tightElectrons, _eventTree, io);
+      useObj = newJet.Fill(1.0,1.0, *muonsToUsePtr, *electronsToUsePtr, _eventTree, io, &missingEtVec, isSimulation);
       //      useObj = newJet.Fill(1.0,1.0, _eventTree, io);
       
       missingEt = TMath::Sqrt(pow(missingEx,2) + pow(missingEy,2));//so MET gets JES adjustment toogEx=top_met.MET_ExMiss();
-     /////////////////////////////////////
-      
-     //   alljets.push_back(newJet);
-     if(useObj) {
-       jets.push_back(newJet);
+      /////////////////////////////////////
+     
+      //On the first jet in the event fill up the JES corrected met and jet lists
+      if (io == 0) {
+	metVecsJESShifted.clear();
+	jesShiftedJets.clear();
+	for (int jesSyst = 0; jesSyst < newJet.GetNumberOfJESCorrections(); jesSyst++){
+	  metVecsJESShifted.push_back(missingEtVec);
+	  std::vector<Jet> tempVec;
+	  jesShiftedJets.push_back(tempVec);
+	}
+      }
  
-       if(newJet.IsTagged()) taggedJets.push_back(newJet);
-       else unTaggedJets.push_back(newJet);
+      alljets.push_back(newJet);
+     
+      if(useObj) {
+	jets.push_back(newJet);
+ 
+	if(newJet.IsTagged()) taggedJets.push_back(newJet);
+	else unTaggedJets.push_back(newJet);
    
+	
         //NOTE: PdgId of +/-1 is used for light quark jets when charge information is available and 
 	//uncharged particles that are not labeled as b, c, or tau are given an ID of 0
 	//Currently no charge information is available so all particles in this catagory have an
@@ -599,14 +680,35 @@ Int_t EventContainer::ReadEvent()
 	//NOTE: This PDGId() method returns the flavor of the MC particle associated
 	//with the jet (wrt position).  It is NOT nessesarily the jet's flavor, but
 	//a reasonable assumption BASED ON MC AND RECO INFORMATION
-
+	
 	//if(newJet.GetAbsPdgId() == 5)    bLabeledJets.push_back(newJet);
 	//if(newJet.GetAbsPdgId() == 4)    cLabeledJets.push_back(newJet);
 	//if(newJet.GetAbsPdgId() == 15)   tauLabeledJets.push_back(newJet);
 	//if((newJet.GetAbsPdgId() == 1) || (newJet.GetAbsPdgId() == 0) )  lightQuarkLabeledJets.push_back(newJet);
-     } // if useObj
-    } //jets
+      } // if useObj
+      //Now for each jet shift it by all of the JES corrections and append it to the shifted jet collections if it passes selections now
+      for (int jesSyst = 0; jesSyst < newJet.GetNumberOfJESCorrections(); jesSyst++){
+	if (newJet.ShiftPtWithJESCorr(jesSyst,&(metVecsJESShifted[jesSyst]))) jesShiftedJets[jesSyst].push_back(newJet);
+	
+      }
+	  
 
+    } //jets
+    //Debugging for new JES corrections
+    /*    Int_t printNums = -1;
+    Int_t numberOfDiffs = 0;
+    if (jets.size() > 0){
+      for (int jesSyst = 0; jesSyst < jets[0].GetNumberOfJESCorrections() ; jesSyst++){
+	if (jesShiftedJets[jesSyst].size() != jets.size()) {
+	  printNums = jesSyst;
+	  numberOfDiffs++;
+	}
+      }
+    }
+    if (printNums > -1){
+      std::cout << "#Jets in event: " << jets.size() << " but " << printNums << " has " << jesShiftedJets[printNums].size() << "(" << numberOfDiffs << ")" << std::endl;
+      }*/
+    
 /*
     missingEx = _eventTree -> MissingEt_etx / 1000.0;
     missingEy = _eventTree -> MissingEt_ety / 1000.0;
@@ -655,7 +757,7 @@ Int_t EventContainer::ReadEvent()
     top_met.ApplyPileupUncertainty(pileupShift());
       
     missingPhi = top_met.MET_MetPhi();
-    missingEx=top_met.MET_ExMiss()/1000;
+    missingE1x=top_met.MET_ExMiss()/1000;
     missingEy=top_met.MET_EyMiss()/1000;      
     sumEt=top_met.MET_SumEt()/1000;
  

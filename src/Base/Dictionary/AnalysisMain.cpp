@@ -51,6 +51,7 @@
 #include <TTreeIndex.h>
 #include <TSystem.h>
 #include <TChain.h>
+#include <TGraphAsymmErrors.h>
 #include "SingleTopRootAnalysis/Base/Histograms/utils.hpp"
 
 using namespace std;
@@ -69,6 +70,7 @@ ClassImp(AnalysisMain)
  * Output: None
  ******************************************************************************/
 AnalysisMain::AnalysisMain(): CutListProcessor("cutter"),            // New Instance of CutListProcessor class
+                              AdditionalVarsProcessor(),
 			      _histogramFile(NULL),                  // Output file points to NULL
 			      _eventLimit(0),                        // Initialize max number of events processed
 			      _histogramFileName("histograms.root"), // Initialize output file name_skimFileName("NONE"),                 // Initialize skim output file name
@@ -84,32 +86,18 @@ AnalysisMain::AnalysisMain(): CutListProcessor("cutter"),            // New Inst
 			      _hevents(NULL),                         // events histo points to NULL
 			      _totalEvents(0),                        //events double is 0
                               _totalMCatNLOEvents(0),                  //events double is 0
-			      _newBranchb(NULL),
-			      _newBranchNBPb(NULL),
-			      _EventWeightb(-999),
 			      _EventNBeforePreselb(-999),
 			      _newBranchHFORb(NULL),
-			      _newBranchHFORb2(NULL),
+                              _newBranchNBPb(NULL),
 			      _HFORb(-999),
-			      _EventWeightb2(-999),
 			      
-			      _EventTagWeightb(-999),
-			      _EventTagWeightBupb(-999),
-			      _EventTagWeightBdownb(-999),
-			      _EventTagWeightLqupb(-999),
-			      _EventTagWeightLqdownb(-999),
-
 			      chainConfig(NULL),
 			      
-			      _EventTagWeightb2(-999),
-			      _EventTagWeightBupb2(-999),
-			      _EventTagWeightBdownb2(-999),
-			      _EventTagWeightLqupb2(-999),
-			      _EventTagWeightLqdownb2(-999),
+			      
 			      _SkimMax(1)
 {
 
-  // cout << "AnalysisMain::AnalysisMain " << "Constructor called" << endl;
+  cout << "AnalysisMain::AnalysisMain " << "Constructor called" << endl;
 } // AnalysisMain::AnalysisMain()
 
 
@@ -253,6 +241,7 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
     cout << "<AnalysisMain::ParseCmdLine> "<<"*  -MisTagCut #    - use this to specify cut on b-tagging weight (4.5, etc)*" << endl;
     cout << "<AnalysisMain::ParseCmdLine> "<<"*                    used for mis-tag rate uncertainty.               *" << endl;
     cout << "<AnalysisMain::ParseCmdLine> "<<"*                    Can also be passed through config file.               *" << endl;
+    cout << "<AnalysisMain::ParseCmdLine> "<<"*  -evtList #       A comma separated list of events to run on             *" << endl;
     cout << "<AnalysisMain::ParseCmdLine> "<<"*                                                                          *" << endl;
     cout << "<AnalysisMain::ParseCmdLine> "<<"****************************************************************************" << endl;
     return 1;
@@ -283,6 +272,28 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
       fileSingleIndex = i + 1;
       ++i;
       fileSingleFlag = kTRUE;
+    }//if single root file
+
+    else if( !strcmp(argv[i],"-evtList") ) { 
+      // Check if file name parameter is in command line
+      if (argc < i+1) {
+	cout << "<AnalysisMain::ParseCmdLine> " << "ERROR: Missing evt-list-file name in cmd line" << endl;
+	return 1;
+      }//if 
+      std::string listInStr = argv[i+1];
+      ++i;
+      std::stringstream ss(listInStr);
+      
+      int i;
+
+      while (ss.good()) {
+	std::string substr;
+	getline(ss,substr,',');
+	_eventsToRunOn.push_back(std::stoi(substr));
+      }
+      cout << "<AnalysisMain::ParseCmdLine> " << "Running over only events: ";
+      for (auto const evtID : _eventsToRunOn) cout << evtID << ",";
+      cout << endl;
     }//if single root file
 
     // FLAG: config file
@@ -957,6 +968,11 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
 
   // Add histogram to _histogramFile directory in memory
   SetDirectory (_histogramFile);
+  // Add this information to the additional variable processor
+  SetVariableHistogramDirectory (_histogramFile);
+  SetVariableEventContainer(GetEventContainer());
+  //Set the number of cuts
+  SetNCuts(GetNumberOfCuts());
   // Book Histograms
   cout << "<AnalysisMain::Loop::BookHistogram Start> " << endl;
   CutListProcessor::BookHistogram();
@@ -979,6 +995,10 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
   Bool_t writeThisEvent    = kFALSE;
   Bool_t firstEventWritten = kFALSE;
 
+  //  if (_skimEventTree != NULL){
+  // AdditionalVarsProcessor::BookBranches(_skimEventTree);
+  //}
+
   // Loop over events in chain until (1) Out of events or (2) Have reached limit specified on command line
   //cout << "<AnalysisMain::Loop> " <<  "Beginning loop over events, _numEvent is "<<_eventLimit << ", eventInChain is "<<eventInChain<<endl;
   cout << "<AnalysisMain::Loop> " << endl;
@@ -987,48 +1007,51 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
     eventCounter++;
     if( 0 == (eventInChain%10000) ) cout << "<AnalysisMain::Loop> " << "Processing event " << eventInChain << endl;
 
+    //If we're only doing specific events, check them here.
+    if (_eventsToRunOn.size() > 0){
+      bool skipEvent = true;
+      for (auto const eventID : _eventsToRunOn){
+	if (eventID == this->eventNumber){
+	  skipEvent = false;
+	  break;
+	}
+      }
+      if (skipEvent) {
+	eventInChain = GetNextEvent(); 
+	continue;
+      }
+      std::cout << "Running on event: " << this->eventNumber << std::endl;
+    }
+
     // Fill the histograms
     writeThisEvent = CutListProcessor::Apply(this);
     // Fill Trees for Skim Events
-    if(DoSkim() && writeThisEvent) {
+    if (writeThisEvent) { 
       if (!firstEventWritten) {
 	firstEventWritten = kTRUE;
-	if( NULL != _skimEventTree) {
-	  _EventWeightb = -999;
-	  _newBranchb = _skimEventTree->Branch("EventWeight", &_EventWeightb, "EventWeight/F");
-	  _HFORb = -999;
-	  _newBranchHFORb = _skimEventTree->Branch("hfor_type", &_HFORb, "hfor_type/I");
-	  _EventNBeforePreselb = -999;
-	  _newBranchNBPb                 = _skimEventTree->Branch("EventNBeforePresel",   &_EventNBeforePreselb,   "EventNBeforePresel/F");
-	  _newBranchEventPileupWeight    = _skimEventTree->Branch("EventPileupWeight",    &_EventPileupWeightb,    "EventPileupWeight/F");
-	  _newBranchEventTagWeight       = _skimEventTree->Branch("EventTagWeight",       &_EventTagWeightb,       "EventTagWeight/F");
-	  _newBranchEventTagWeightBup    = _skimEventTree->Branch("EventTagWeightBup",    &_EventTagWeightBupb,    "EventTagWeightBup/F");
-	  _newBranchEventTagWeightBdown  = _skimEventTree->Branch("EventTagWeightBdown",  &_EventTagWeightBdownb,  "EventTagWeightBdown/F");
-	  _newBranchEventTagWeightLqup   = _skimEventTree->Branch("EventTagWeightLqup",   &_EventTagWeightLqupb,   "EventTagWeightLqup/F");
-	  _newBranchEventTagWeightLqdown = _skimEventTree->Branch("EventTagWeightLqdown", &_EventTagWeightLqdownb, "EventTagWeightLqdown/F");
-	  
-	  _EventTagWeightb= 1;
-	  _EventTagWeightBupb= 1;
-	  _EventTagWeightBdownb= 1;
-	  _EventTagWeightLqupb= 1;
-	  _EventTagWeightLqdownb= 1;
-	  _EventPileupWeightb= 1;
-
+	if (!AdditionalVarsProcessor::BookBranches(_skimEventTree,this)){
+	  std::cout << "Something has gone wrong in the branch booking!" << std::endl;
+	  break;
+	}
+	if (DoSkim()){
+	  if( NULL != _skimEventTree) {
+	    _HFORb = -999;
+	    _newBranchHFORb = _skimEventTree->Branch("hfor_type", &_HFORb, "hfor_type/I");
+	    _EventNBeforePreselb = -999;
+	    _newBranchNBPb                 = _skimEventTree->Branch("EventNBeforePresel",   &_EventNBeforePreselb,   "EventNBeforePresel/F"); 
+	  }
+	}
+      }
+      AdditionalVarsProcessor::ResetBranches();
+      AdditionalVarsProcessor::FillBranches(this);
+      if(DoSkim()) {
+	if(NULL != _skimEventTree) {
+	  _EventNBeforePreselb   = _totalMCatNLOEvents;
+	  //AdditionalVarsProcessor::OutputBranches();
+	  _skimEventTree          -> Fill();
 	}
       } //if
-    
-      if(NULL != _skimEventTree) {
-	_EventNBeforePreselb   = _totalMCatNLOEvents;
-	_EventWeightb          = EventContainer::GetOutputEventWeight();
-	_EventPileupWeightb    = EventContainer::GetEventPileupWeight();
-	_EventTagWeightb       = EventContainer::GetEventTagWeight();
-	_EventTagWeightBupb    = EventContainer::GetEventTagWeight_Bup();
-	_EventTagWeightBdownb  = EventContainer::GetEventTagWeight_Bdown();
-	_EventTagWeightLqupb   = EventContainer::GetEventTagWeight_Lqup();
-	_EventTagWeightLqdownb = EventContainer::GetEventTagWeight_Lqdown();
-	_skimEventTree          -> Fill();
-      }
-    } //if
+    }
 
     // Read the next event in the chain
     //cout << "<AnalysisMain::Loop> " << "Getting next event in chain " << eventInChain<<endl;

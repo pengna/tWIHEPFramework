@@ -27,16 +27,16 @@ OSYS=$(shell uname -s)
 
 # For MacOS (Darwin) include -bind_at_local
 ifeq ($(OSYS),Darwin)
-  SPECIALFLAGS= $(OPT) -bind_at_load
+  SPECIALFLAGS= $(OPT) -bind_at_load #-fsanitize=address
 else
-  SPECIALFLAGS= $(OPT)
+  SPECIALFLAGS= $(OPT) #-fsanitize=address
 endif
 
 ####################################################################################
 # Flags that root demands:
 ####################################################################################
 
-ROOTCFLAGS=$(shell root-config --cflags) 
+ROOTCFLAGS=$(shell root-config --cflags)
 ROOTLIBS=$(shell root-config --libs) -lTreePlayer -lMLP
 #LIBS = externaltools/bunchcrossing/TrigBunchCrossingTool/standalone/libTrigBunchCrossingTool.so -lrt
 # For gcc version 4 and greater use -iquote instead of -I.
@@ -97,7 +97,7 @@ endif
 ifeq ($(VERSION-4),true)
         CFLAGS = $(SPECIALFLAGS) -iquote- -iquote. -iquote${DIR_INC} -iquote${DIR_SRC}
 else
-        CFLAGS = $(SPECIALFLAGS)  -I. -I${DIR_INC} -I${DIR_SRC}
+        CFLAGS = $(SPECIALFLAGS) -I. -I${DIR_INC} -I${DIR_SRC}
 endif
 
 LFLAGS = $(SPECIALFLAGS)
@@ -113,6 +113,7 @@ DIR_BASE_DICTIONARY = $(DIR_SRC)/Base/Dictionary
 DIR_PARTICLES       = $(DIR_SRC)/Particles/
 DIR_TREES           = $(DIR_SRC)/Trees/
 DIR_CUTS            = $(DIR_SRC)/Cuts/
+DIR_VARS            = $(DIR_SRC)/Vars/
 DIR_HIST            = $(DIR_SRC)/Histogramming/
 
 ####################################################################################
@@ -137,6 +138,7 @@ SRC = $(subst $(DIR_BASE)      ,, $(shell find $(DIR_BASE)      -name \*$(SUF_SR
       $(subst $(DIR_PARTICLES) ,, $(shell find $(DIR_PARTICLES) -name \*$(SUF_SRC) -type f ) ) \
       $(subst $(DIR_TREES)     ,, $(shell find $(DIR_TREES)     -name \*$(SUF_SRC) -type f ) ) \
       $(subst $(DIR_CUTS)      ,, $(shell find $(DIR_CUTS)      -name \*$(SUF_SRC) -type f ) ) \
+      $(subst $(DIR_VARS)      ,, $(shell find $(DIR_VARS)      -name \*$(SUF_SRC) -type f ) ) \
       $(subst $(DIR_HIST)      ,, $(shell find $(DIR_HIST)      -name \*$(SUF_SRC) -type f ) ) 
 
 OBJ_TMP = $(subst $(SUF_SRC),$(SUF_OBJ),$(SRC))
@@ -160,6 +162,8 @@ BINS_Example= bin/example/test_analysis.x bin/example/test_analysis2.x
 BINS_Matching= bin/Matching/MatchQuality.x
 BINS_ParticleStudies= bin/ParticleStudies/electron_study.x bin/ParticleStudies/jet_study.x bin/ParticleStudies/MCParticle_study.x bin/ParticleStudies/muon_study.x
 BINS_Wt= bin/Wt/Wt_generic.x
+BINS_Vertex= bin/Wt/Wt_nVertOnly.x
+BINS_Synch= bin/Wt/Wt_synch.x
 #BINS_Wt= bin/Wt/Wt.x bin/Wt/Wt_mumu.x bin/Wt/Wteu.x bin/Wt/Wt_Tree.x bin/Wt/Wt_generic.x
 BINS_Skimming= bin/Skimming/Skimming.x 
 BINS_St= bin/St/St_subtractQCD.x
@@ -231,6 +235,10 @@ St: lib $(BINS_St)
 
 Wt: lib $(BINS_Wt)
 
+Synch: lib $(BINS_Synch)
+
+nVert: lib $(BINS_Vertex)
+
 Skimming: lib $(BINS_Skimming)
 
 Example: lib $(BINS_Example)
@@ -263,6 +271,7 @@ $(DIR_OBJ)/%dict.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_OBJ)/Particles/Recon $(DIR_OBJ)/Particles/Truth $(DIR_OBJ)/Particles/TruthAll
 	@mkdir -p $(DIR_OBJ)/Cuts/Electron $(DIR_OBJ)/Cuts/IsolatedMuon $(DIR_OBJ)/Cuts/Jet $(DIR_OBJ)/Cuts/Lepton $(DIR_OBJ)/Cuts/Muon $(DIR_OBJ)/Cuts/Other $(DIR_OBJ)/Cuts/TaggedJet 
 	@mkdir -p $(DIR_OBJ)/Histogramming/Matching  $(DIR_OBJ)/Histogramming/Recon  $(DIR_OBJ)/Histogramming/Topological  $(DIR_OBJ)/Histogramming/Truth  $(DIR_OBJ)/Histogramming/TruthAll $(DIR_OBJ)/Histogramming/Other
+	@mkdir -p $(DIR_OBJ)/Vars
 
 	@mkdir -p $(DIR_TMP)
 	@mkdir -p $(DIR_TMP)/Base/CutFlow $(DIR_TMP)/Base/Dictionary $(DIR_TMP)/Base/Histograms
@@ -270,6 +279,7 @@ $(DIR_OBJ)/%dict.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_TMP)/Particles/Recon $(DIR_TMP)/Particles/Truth $(DIR_TMP)/Particles/TruthAll
 	@mkdir -p $(DIR_TMP)/Cuts/Electron $(DIR_TMP)/Cuts/IsolatedMuon $(DIR_TMP)/Cuts/Jet $(DIR_TMP)/Cuts/Lepton $(DIR_TMP)/Cuts/Muon $(DIR_TMP)/Cuts/Other $(DIR_TMP)/Cuts/TaggedJet $(DIR_TMP)/Cuts/Tau $(DIR_TMP)/Cuts/Weights
 	@mkdir -p $(DIR_TMP)/Histogramming/Matching  $(DIR_TMP)/Histogramming/Recon  $(DIR_TMP)/Histogramming/Topological  $(DIR_TMP)/Histogramming/Truth  $(DIR_TMP)/Histogramming/TruthAll $(DIR_TMP)/Histogramming/Other
+	@mkdir -p $(DIR_TMP)/Vars
 
 	@mkdir -p $(DIR_DEP)
 	@mkdir -p $(DIR_DEP)/Base/CutFlow $(DIR_DEP)/Base/Dictionary $(DIR_DEP)/Base/Histograms
@@ -277,6 +287,7 @@ $(DIR_OBJ)/%dict.o: $(DIR_SRC)/%$(SUF_SRC)
 	@mkdir -p $(DIR_DEP)/Particles/Recon $(DIR_DEP)/Particles/Truth $(DIR_DEP)/Particles/TruthAll
 	@mkdir -p $(DIR_DEP)/Cuts/Electron $(DIR_DEP)/Cuts/IsolatedMuon $(DIR_DEP)/Cuts/Jet $(DIR_DEP)/Cuts/Lepton $(DIR_DEP)/Cuts/Muon $(DIR_DEP)/Cuts/Other $(DIR_DEP)/Cuts/TaggedJet $(DIR_DEP)/Cuts/Tau $(DIR_DEP)/Cuts/Weights
 	@mkdir -p $(DIR_DEP)/Histogramming/Matching  $(DIR_DEP)/Histogramming/Recon  $(DIR_DEP)/Histogramming/Topological  $(DIR_DEP)/Histogramming/Truth  $(DIR_DEP)/Histogramming/TruthAll $(DIR_DEP)/Histogramming/Other
+	@mkdir -p $(DIR_DEP)/Vars
 
 # Create dependency files                                                                                                                                                                       
 	$(CPP) $(RCXX)  -MM  $(@:$(DIR_OBJ)/%dict$(SUF_OBJ)=$(DIR_SRC)/%$(SUF_SRC)) >  $(DIR_DEP)/$(@:$(DIR_OBJ)/%$(SUF_OBJ)=%$(SUF_DEP))
@@ -378,16 +389,18 @@ cleanBTag:
 	rm -f $(BINS_BTag)
 cleanWt:
 	rm -f $(BINS_Wt)
+cleanSynch:
+	rm -f $(BINS_Synch)
 cleanSkimming:
 	rm -f $(BINS_Skimming)
 cleanSt:
 	rm -f $(BINS_St)
 
-cleanExe: cleanSt cleanWt cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
+cleanExe: cleanSt cleanWt cleanSynch cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
 
 cleanall: clean
 
-clean:  cleanSt cleanWt cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
+clean:  cleanSt cleanWt cleanSynch cleanSkimming cleanEventComparison cleanExample cleanParticleStudies cleanMCStudies
 	rm -rf ti_files
 	rm -rf $(DIR_OBJ)/*
 	rm -rf $(DIR_TMP)/*

@@ -36,7 +36,7 @@ class HistogrammingMuon : public HistoCut
 public:
 
   // Parameterized Constructor
-  HistogrammingMuon(EventContainer *obj, TString muonType);
+  HistogrammingMuon(EventContainer *obj, TString muonType, Bool_t unisolated = kFALSE);
   
   // Destructor
   ~HistogrammingMuon();
@@ -105,6 +105,8 @@ private:
  myTH1F *_hJetDeltaR;
 
   TString muonType; // Type of muon being plotted
+
+  Bool_t _unisolated;
 
 };
 

@@ -52,6 +52,9 @@ private:
   // Histograms
   myTH1F* _hPrimaryVertexBefore;     // Histogram Before GRL Cut
   myTH1F* _hPrimaryVertexAfter;      // Histogram After GRL Cut
+  myTH1F* _hNTrueInteractions;       //Histogram containing the true number of interactions
+  myTH1F* _hNTrueIntsUnweighted;       //Histogram containing the true number of interactions without weight applide. this is for PU reweighting purposes.
+  
 
   // Variables to cut PVs on 
   Double_t _ndofCut;

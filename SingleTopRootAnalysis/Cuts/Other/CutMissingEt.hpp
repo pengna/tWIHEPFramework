@@ -28,6 +28,8 @@
 #include "SingleTopRootAnalysis/Base/Dictionary/HistoCut.hpp"
 #include "SingleTopRootAnalysis/Base/Dictionary/EventContainer.hpp"
 
+#include <vector>
+#include <sstream>
 
 class CutMissingEt : public HistoCut 
 {

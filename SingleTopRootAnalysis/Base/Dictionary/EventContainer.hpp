@@ -225,6 +225,9 @@ class EventContainer
   // get whether we should do the Config tree or not
   inline Bool_t DoConfig(void) const { return _doConfig; };
 
+  void SetUseUnisolatedLeptons(const Bool_t& a=true, int whichtrig=1);
+  inline Bool_t UseUnisolatedLeptons(void) const {return _useUnisolatedLeptons; };
+
   // Set the global event weight
   inline void SetGlobalEventWeight(const Double_t& wt) { _globalEventWeight=wt; };
   // set the output event weight.
@@ -307,16 +310,71 @@ class EventContainer
   inline Double_t GetTreeEventWeight()   const { return _treeEventWeight;   };
   inline Double_t GetGlobalEventWeight() const { return _globalEventWeight; };
 
- //pileup weight per event
+  //pileup weight per event
   inline void SetEventPileupWeight(const Double_t& pileupweight) {_EventPileupWeight = pileupweight;}; //tagging prob per event
   inline Double_t GetEventPileupWeight() const {return _EventPileupWeight;}; 
   inline Double_t EventPileupWeight() const {return GetEventPileupWeight();}; 
+
+  //pileup weight per event with min bias x-sec pushed up
+  inline void SetEventPileupMinBiasUpWeight(const Double_t& pileupweight) {_EventPileupMinBiasUpWeight = pileupweight;}; 
+  inline Double_t GetEventPileupMinBiasUpWeight() const {return _EventPileupMinBiasUpWeight;}; 
+  inline Double_t EventPileupMinBiasUpWeight() const {return GetEventPileupMinBiasUpWeight();}; 
+
+  //pileup weight per event with min bias x-sec pushed down
+  inline void SetEventPileupMinBiasDownWeight(const Double_t& pileupweight) {_EventPileupMinBiasDownWeight = pileupweight;}; 
+  inline Double_t GetEventPileupMinBiasDownWeight() const {return _EventPileupMinBiasDownWeight;}; 
+  inline Double_t EventPileupMinBiasDownWeight() const {return GetEventPileupMinBiasDownWeight();}; 
 
  //b weight per event
   inline void SetEventbWeight(const Double_t& bweight) {_EventbWeight = bweight;}; //tagging prob per event
   inline Double_t GetEventbWeight() const {return _EventbWeight;}; 
   inline Double_t EventbWeight() const {return GetEventbWeight();}; 
+  
+  //lepton SF weight per event
+  inline void SetEventLepSFWeight(const Double_t& lepSFweight) {_EventLepSFWeight = lepSFweight;};
+  inline Double_t GetEventLepSFWeight() const {return _EventLepSFWeight;};
+  inline Double_t EventLepSFWeight() const {return GetEventLepSFWeight();};
 
+  //lepton SF weight up variation per event
+  inline void SetEventLepSFWeightUp(const Double_t& lepSFweight) {_EventLepSFWeightUp = lepSFweight;};
+  inline Double_t GetEventLepSFWeightUp() const {return _EventLepSFWeightUp;};
+  inline Double_t EventLepSFWeightUp() const {return GetEventLepSFWeightUp();};
+
+  //lepton SF weight down variation per event
+  inline void SetEventLepSFWeightDown(const Double_t& lepSFweight) {_EventLepSFWeightDown = lepSFweight;};
+  inline Double_t GetEventLepSFWeightDown() const {return _EventLepSFWeightDown;};
+  inline Double_t EventLepSFWeightDown() const {return GetEventLepSFWeightDown();};
+
+  //lepton SF weight per event
+  inline void SetEventTrigSFWeight(const Double_t& lepSFweight) {_EventTrigSFWeight = lepSFweight;};
+  inline Double_t GetEventTrigSFWeight() const {return _EventTrigSFWeight;};
+  inline Double_t EventTrigSFWeight() const {return GetEventTrigSFWeight();};
+
+  //lepton SF weight up variation per event
+  inline void SetEventTrigSFWeightUp(const Double_t& lepSFweight) {_EventTrigSFWeightUp = lepSFweight;};
+  inline Double_t GetEventTrigSFWeightUp() const {return _EventTrigSFWeightUp;};
+  inline Double_t EventTrigSFWeightUp() const {return GetEventTrigSFWeightUp();};
+
+  //lepton SF weight down variation per event
+  inline void SetEventTrigSFWeightDown(const Double_t& lepSFweight) {_EventTrigSFWeightDown = lepSFweight;};
+  inline Double_t GetEventTrigSFWeightDown() const {return _EventTrigSFWeightDown;};
+  inline Double_t EventTrigSFWeightDown() const {return GetEventTrigSFWeightDown();};
+
+
+  //set and get btag weights for central and systematics
+  inline void SetEventbTagReshape(const Double_t& lepSFweight, std::string systName = "central" ) {_EventbTagReshape[systName] = lepSFweight;};
+  inline Double_t GetEventbTagReshape(std::string systName = "central") {return _EventbTagReshape[systName];};
+  inline Double_t EventbTagReshape() {return GetEventbTagReshape();};
+
+  //set and get btag weights for central and systematics
+  inline void SetEventMisTagReshape(const Double_t& lepSFweight, std::string systName = "central" ) {_EventMisTagReshape[systName] = lepSFweight;};
+  inline Double_t GetEventMisTagReshape(std::string systName = "central") {return _EventMisTagReshape[systName];};
+  inline Double_t EventMisTagReshape() {return GetEventMisTagReshape();};
+
+  //Gen weight for event (actually just up or down)
+  inline void SetGenWeight(const Double_t& genWeight) {_EventGenWeight = genWeight;};
+  inline Double_t GetGenWeight() const {return _EventGenWeight;};
+  inline Double_t GenWeight() const {return GetGenWeight();};
 
  //Tagging probabiliy weight per event
   inline void SetEventTagWeight(const Double_t& taggingweight) {_EventTagWeight = taggingweight;}; //tagging prob per event
@@ -354,6 +412,17 @@ class EventContainer
   inline Bool_t GetBadJetEvent() const { return _badJetEvent; };
   inline void SetBadJetEvent(Bool_t bb) { _badJetEvent=bb; };
 
+  inline void SetnPvt(const int& nPvt) { nPvtx = nPvt; };
+  inline Int_t GetnPvt() const { return nPvtx; };
+  inline Int_t nPvt() const {return nPvtx;};
+  
+  inline TString GetChannelName() const {return _channelName;};
+
+  inline void SetIsSimulation(bool isSim){isSimulation = isSim;};
+  inline bool GetIsSimulation(){return isSimulation;};
+  //inline bool isSimulation() { return _isSimulation;};
+
+
    // Get the configuration 
   TEnv * GetConfig() {return &_config; };
 
@@ -372,7 +441,20 @@ class EventContainer
   Float_t _EventTagWeight_Lqup;//tagging weight per event applying the Lq SF up shift
   Float_t _EventTagWeight_Lqdown;//tagging weight per event applying the Lq SF down shift
   Float_t _EventPileupWeight;
+  Float_t _EventPileupMinBiasUpWeight;
+  Float_t _EventPileupMinBiasDownWeight;
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
+  Float_t _EventLepSFWeight;
+  Float_t _EventTrigSFWeight;
+  Float_t _EventGenWeight;
+  std::map<std::string,Float_t> _EventbTagReshape;
+  std::map<std::string,Float_t> _EventMisTagReshape;
+
+  //Add in the systematic variations to the SFs
+  Float_t _EventLepSFWeightUp;
+  Float_t _EventLepSFWeightDown;
+  Float_t _EventTrigSFWeightUp;
+  Float_t _EventTrigSFWeightDown;
 
   //MultijetJESUncertaintyProvider myJES;
   // CalibrationDataVariables CalibVar;
@@ -436,11 +518,16 @@ class EventContainer
   std::vector<Jet>        jetms;//overlap removal vector for muons
   std::vector<Jet>        taggedJets;
   std::vector<Jet>        unTaggedJets;
+  std::vector<std::vector<Jet> > jesShiftedJets;
   std::vector<Jet>        bLabeledJets;
   std::vector<Jet>        cLabeledJets;
   std::vector<Jet>        tauLabeledJets;
   std::vector<Jet>        lightQuarkLabeledJets;
   std::vector<Neutrino>   neutrinos;
+
+  //Pointers to collections
+  std::vector<Electron> * electronsToUsePtr;
+  std::vector<Muon>     * muonsToUsePtr;
 
   std::vector<TLorentzVector>      jetmsSpecial;//MET tool
   
@@ -449,10 +536,26 @@ class EventContainer
   Double_t missingEx;
   Double_t missingPhi;
   Double_t missingEy;
+  TLorentzVector missingEtVec;
   // and the sum of scalar ET
   Double_t sumEt;
 
+  Double_t missingEt_xy;
+  Double_t missingEx_xy;
+  Double_t missingEy_xy;
+  Double_t missingPhi_xy;
+  TLorentzVector missingEtVec_xy;
+  
+  //A vector of JES shifted METs
+  std::vector<TLorentzVector> metVecsJESShifted;
+
+  //Track whterh it passes the MET filters
+  Int_t passesMETFilters;
+
+  //Various variables for plotting primary vertex information
   Int_t nPvtx;
+  Int_t trueInteractions;
+  Int_t npuVertices;
 
   Double_t particleHT;
   Double_t particleMTotal;
@@ -551,6 +654,9 @@ protected:
   TEnv _JESconfig;
   bool _JESconfigread;
 private:
+
+  //The name of the channel being used. this is currently used for synch, but might be used for trigger or something.
+  TString _channelName;
   
   // Target top mass used in the best jet algorithm
   Double_t _targetTopMass;
@@ -569,6 +675,10 @@ private:
   Double_t _softjetShift;
   Double_t _pileupShift;
   Int_t _larShift;
+
+  //met uncertainty shift, +1,-1 or 0 as above.
+  Int_t _metShift;
+
   // which b-tag algorithm to use?
   TString _bTagAlgo;
  // which b-tag weight cut to use?
@@ -588,6 +698,8 @@ private:
   Bool_t _doTruth;      // should we include the truth tree at all?
   Bool_t _doSkim;       // should we skim?
   Bool_t _doConfig;     // should we include the Bkgd tree at all?
+  Bool_t _useUnisolatedLeptons;   // should we use unisolated leptons? (for QCD estimation)
+  Int_t _trigID;
 
   // Info for source that we are reading (i.e. tb, tq, tW, tt_lepjets, tt_dilep, etc.
   TString _sourceName;    // Source Name

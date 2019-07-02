@@ -31,8 +31,11 @@
 
 #include "SingleTopRootAnalysis/Base/Dictionary/HistoCut.hpp"
 #include "SingleTopRootAnalysis/Base/Dictionary/EventContainer.hpp"
-
+#include "SingleTopRootAnalysis/Base/Dictionary/BTagEntry.hpp"
+#include "SingleTopRootAnalysis/Base/Dictionary/BTagCalibration.hpp"
+#include "SingleTopRootAnalysis/Base/Dictionary/BTagCalibrationReader.hpp"
 //#include "externaltools/pileup/PileupReweighting/TPileupReweighting.h"
+#include <TGraphAsymmErrors.h>
 
 
 class EventWeight : public HistoCut
@@ -41,7 +44,7 @@ class EventWeight : public HistoCut
 public:
 
   // Parameterized Constructor
-  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false);
+  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE, Bool_t doIterFitbTag = kTRUE, Bool_t verbose = kFALSE);
   
   // Default Destructor
   ~EventWeight();
@@ -54,13 +57,18 @@ public:
 
   Double_t PileupAdjust(int eventNumber = 0, int runnumber = 0);
 
-  // methods for weighting for MC generatd with MCatNLO
+ // methods for weighting for MC generatd with MCatNLO
   void setMCatNLO(Bool_t val=true) { _useMCatNLO=val; };
   void setPileUpWgt(Bool_t val=true) { _usePileUpWgt=val; };
+  void setPileUpSyst(Bool_t val=false) { _doPileupSysts=val; };
   void setbWeight(Bool_t val=true) { _usebWeight=val; };
+  void setEfficbTag(Bool_t val=true) { _runEfficiencyBasedbTag=val; };
   Bool_t isMCatNLO() const { return _useMCatNLO; };
   Bool_t isPileUpWgt() const { return _usePileUpWgt; };
+  Bool_t isPileupSysts() const { return _doPileupSysts; };
   Bool_t isbWeight() const { return _usebWeight; };
+  Bool_t isEfficbTag() const { return _runEfficiencyBasedbTag; };
+  
 
     // methods for weighting for MC generatd with NoWeight
   void setNoWeight(Bool_t val=true) { _useNoWeight=val; };
@@ -74,16 +82,65 @@ private:
   //  vector<double> vecPileUpWgt;  // vector to store vertex Pile up reweighting weights
   Bool_t _useMCatNLO;  // set to true if this MC is MC@NLO and we need to use the corresponding weight
   Bool_t _usePileUpWgt;  // set to true if this MC is MC@NLO and we need to use the corresponding weight
+  Bool_t _doPileupSysts; // set to true if including the systematic uncertainties associated with pileup reweighting in the output file 
   Bool_t _usebWeight;  // set to true if using b-tag weights
   Bool_t _useNoWeight;  //No weight except MCatNLO weight
+  Bool_t _useLeptonSFs; // Use lepton SFs. Needs to be configured in the overall config file
+  Bool_t _usebTagReshape; // Do CSV discriminant reshaping
   // Histograms
   myTH1F* _hTreeWeight;   // Histogram of input tree weights
   myTH1F* _hGlobalWeight; // Histogram of global weights
   myTH1F* _hMCatNLOWeight; // Histogram of MCatNLO weight
   myTH1F* _hPileUpWeight; // Histogram of PileUpWgt weight
   myTH1F* _hbWeight; // Histogram of b weight
+  myTH1F* _hLeptonSFWeight; //Histogram of the lepton SF claculated for the event
+  myTH1F* _hTriggerSFWeight; //Histogram of trigger SF
+  std::map<std::string,myTH1F*> _hbTagReshape; //Map of histograms containing the information for b tag reshaping and its associated systematics
+  std::map<std::string,myTH1F*> _hMisTagReshape; //Map of histograms containing the information for b tag reshaping and its associated systematics
+  myTH1F* _hGenWeight; //Histogram of the gen weight for the event
   myTH1F* _hOutputWeight; // Histogram of output weights
   Double_t _totalMCatNLOEvents;
+  BTagCalibration _bTagCalib;
+  BTagCalibrationReader _bTagCalibReader;
+
+  //Histograms that are used for applying scale factors to leptons
+  TH2F* _muonIsoSF;
+  TH2F* _muonIDSF;
+  TH2F* _muonTrigSF;
+  TGraphAsymmErrors* _muonTkSF;
+  TH2F* _eleRecoSF;
+  TH2F* _eleIDSF;
+  TH2F* _eleTrigSF;
+
+  //Pileup reweighting hisotgrams
+  TH1F* _dataPV;
+  TH1F* _mcPV;
+  //Pileup reweighting systematic histograms
+  TH1F* _minBiasUpPV;
+  TH1F* _minBiasDownPV;
+
+  //b-tagging efficiency plots
+  Bool_t _runEfficiencyBasedbTag;
+  TH1F* _bFlavEffic;
+  TH1F* _cFlavEffic;
+  TH1F* _lightFlavEffic;
+
+  //Toggle between iterative fit or default b-tag SFs
+  Bool_t _doIterFitbTag;
+
+  //For debugging
+  Bool_t _verbose;
+
+  std::vector<std::string> _bTagSystNames;
+  std::map<std::string,float> _bTagSystValues;
+
+  std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
+  void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName, TString eleTrigFileName, TString eleTrigHistName);
+  std::tuple<Double_t,Double_t> getBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
+  std::tuple<Double_t,Double_t> getEfficBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
+
+  Double_t getJetSF(Jet jet, std::string syst);
+  Double_t getJetEffic(Jet jet);
 
  //Root::TPileupReweighting* PileupReweighting;
 

@@ -35,7 +35,7 @@ class HistogrammingMtW : public HistoCut
 public:
 
   // Parameterized Constructor
-  HistogrammingMtW(EventContainer *obj);
+  HistogrammingMtW(EventContainer *obj, bool unisolated = false);
   
   // Destructor
   ~HistogrammingMtW();
@@ -52,6 +52,10 @@ public:
 private:
   // Histograms declarations 
   myTH1F* _hMtW;  // Histogram of MtW
+
+  Particle lepton; // Assign the TLorentzVector of the primary lepton to this lepton in order to correctly calculate the mtw in case of unisolated leptons.
+
+  bool _unisolated; //Whether we are using unisolated leptons
 
 };
 
