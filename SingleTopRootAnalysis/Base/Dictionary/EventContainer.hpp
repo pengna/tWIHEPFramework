@@ -343,6 +343,21 @@ class EventContainer
      inline void SetEventWSFDown(const Double_t& w_WJetDown_) {_EventWSFDown = w_WJetDown_;}; //tagging prob per event
          inline Double_t GetEventWSFDown() const {return _EventWSFDown;};
          inline Double_t EventWSFDown() const {return GetEventWSFDown();};
+
+  inline void SetEventToptagging(const Double_t& w_Toptagging_) {_EventToptagging = w_Toptagging_;}; //tagging prob per event
+  inline Double_t GetEventToptagging() const {return _EventToptagging;};
+  inline Double_t EventToptagging() const {return GetEventToptagging();};
+// W_tagging weight up per event 
+    inline void SetEventToptaggingUp(const Double_t& w_ToptaggingUp_) {_EventToptaggingUp = w_ToptaggingUp_;}; //tagging prob per event
+    inline Double_t GetEventToptaggingUp() const {return _EventToptaggingUp;};
+    inline Double_t EventToptaggingUp() const {return GetEventToptaggingUp();};
+// W_tagging weight up per event 
+     inline void SetEventToptaggingDown(const Double_t& w_ToptaggingDown_) {_EventToptaggingDown = w_ToptaggingDown_;}; //tagging prob per event
+         inline Double_t GetEventToptaggingDown() const {return _EventToptaggingDown;};
+         inline Double_t EventToptaggingDown() const {return GetEventToptaggingDown();};
+
+
+
  
  inline void SetEventTopptreweight(const Double_t& w_TopPt_) {_EventTopptreweight = w_TopPt_;}; //tagging prob per event
  inline Double_t GetEventTopptreweight() const {return _EventTopptreweight;};
@@ -473,6 +488,7 @@ class EventContainer
   Float_t _EventPileupMinBiasDownWeight;
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventWSF; // this may be the same as the tagging weight, but I'm making it different anyway
+  Float_t _EventToptagging; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventTopptreweight; 
   Float_t _EventLepSFWeight;
   Float_t _EventTrigSFWeight;
@@ -487,6 +503,8 @@ class EventContainer
   Float_t _EventTrigSFWeightDown;
   Float_t _EventWSFUp;
   Float_t _EventWSFDown;
+  Float_t _EventToptaggingUp;
+  Float_t _EventToptaggingDown;
   Float_t _EventTopptreweightUp;
   Float_t _EventTopptreweightDown;
   //MultijetJESUncertaintyProvider myJES;

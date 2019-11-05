@@ -985,10 +985,8 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
   // Start the stopwatch
   TStopwatch stopwatch;
   stopwatch.Start();
-
   // Get Event count which is determined from position in chain
   Int_t eventInChain = GetNextEvent();
-
   // Initialize Event count which is determined by looping over events
   Int_t eventCounter = 0;
   

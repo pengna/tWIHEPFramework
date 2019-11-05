@@ -47,6 +47,12 @@ bstarVars::bstarVars(bool makeHistos){
 	_floatVars["M_Eta_BJet"] = -6.;
 	_floatVars["M_Phi_BJet"] = -3.2; 
 	_floatVars["M_Mass_BJet"]       = 300.;
+	_floatVars["M_E_LeadBJet"]   =500.;
+        _floatVars["M_Pt_LeadBJet"]  = 500.;
+        _floatVars["M_Eta_LeadBJet"] = -6.;
+        _floatVars["M_Phi_LeadBJet"] = -3.2; 
+        _floatVars["M_Mass_LeadBJet"]       = 300.;
+
 	_floatVecVars["M_E_AllBJet"];
 	_floatVecVars["M_Pt_AllBJet"];
 	_floatVecVars["M_Eta_AllBJet"] ;
@@ -149,10 +155,10 @@ void bstarVars::FillBranches(EventContainer * evtObj){
 				_floatVars["M_Pt_Lepton"]         = (Lepton).Pt();
 				_floatVars["M_Eta_Lepton"]        = (Lepton).Eta();
 				_floatVars["M_Phi_Lepton"]        = (Lepton).Phi();
-			  	_floatVars["M_mindr_Jet"]      = evtObj->electronsToUsePtr->at(i).dr();  	
-			  	_floatVars["M_minptrel_Jet"]      = evtObj->electronsToUsePtr->at(i).ptrel();  	
-			  	_floatVars["M_relIsoR_Ele"]      = evtObj->electronsToUsePtr->at(i).relIsoR();  	
-	//		  	_floatVars["M_miniIsoR"]      = evtObj->electronsToUsePtr->at(i).miniIsoR();  	
+			  //	_floatVars["M_mindr_Jet"]      = evtObj->electronsToUsePtr->at(i).dr();  	
+			  //	_floatVars["M_minptrel_Jet"]      = evtObj->electronsToUsePtr->at(i).ptrel();  	
+			  //	_floatVars["M_relIsoR_Ele"]      = evtObj->electronsToUsePtr->at(i).relIsoR();  	
+			//  	_floatVars["M_miniIsoR"]      = evtObj->electronsToUsePtr->at(i).miniIsoR();  	
 	
 				
 	
@@ -262,6 +268,7 @@ void bstarVars::FillBranches(EventContainer * evtObj){
 		//Get Top
 		TLorentzVector Jet_p4(0,0,0,0);
 		TLorentzVector LeadJet_p4(0,0,0,0);
+		TLorentzVector ChosedJet_p4(0,0,0,0);
 		TLorentzVector Top_p4(0,0,0,0);
 		TLorentzVector Top(0,0,0,0);
 		TLorentzVector Top_temp(0,0,0,0);
@@ -281,6 +288,7 @@ void bstarVars::FillBranches(EventContainer * evtObj){
 			if(topmassdiff_temp<mintopmassdiff){
 				DeltaRLepton = evtObj->taggedjetsToUsePtr->at(i).DeltaR(Lepton);
 				mintopmassdiff=topmassdiff_temp;
+				ChosedJet_p4=Jet_p4;
 				Top = Top_temp;
 				Top_p4.SetPtEtaPhiM(Top.Pt(),Top.Eta(),Top.Phi(),Top.M());
 				
@@ -304,11 +312,18 @@ void bstarVars::FillBranches(EventContainer * evtObj){
 		_floatVars["M_Eta_Topleadjet"]        = (Topleadjet_p4).Eta();   
 		_floatVars["M_Phi_Topleadjet"]        = (Topleadjet_p4).Phi();	
 
-		_floatVars["M_Mass_BJet"]     = (LeadJet_p4).M();
-		_floatVars["M_E_BJet"]     = (LeadJet_p4).E();
-		_floatVars["M_Pt_BJet"]     = (LeadJet_p4).Pt();
-		_floatVars["M_Eta_BJet"]     = (LeadJet_p4).Eta();
-		_floatVars["M_Phi_BJet"]     = (LeadJet_p4).Phi();
+		_floatVars["M_Mass_BJet"]     = (ChosedJet_p4).M();
+                _floatVars["M_E_BJet"]     = (ChosedJet_p4).E();
+                _floatVars["M_Pt_BJet"]     = (ChosedJet_p4).Pt();
+                _floatVars["M_Eta_BJet"]     = (ChosedJet_p4).Eta();
+                _floatVars["M_Phi_BJet"]     = (ChosedJet_p4).Phi();
+
+
+		_floatVars["M_Mass_LeadBJet"]     = (LeadJet_p4).M();
+		_floatVars["M_E_LeadBJet"]     = (LeadJet_p4).E();
+		_floatVars["M_Pt_LeadBJet"]     = (LeadJet_p4).Pt();
+		_floatVars["M_Eta_LeadBJet"]     = (LeadJet_p4).Eta();
+		_floatVars["M_Phi_LeadBJet"]     = (LeadJet_p4).Phi();
 
 
 

@@ -102,6 +102,7 @@ int main(int argc, char **argv)
   Bool_t useLeptonSFs = kFALSE;
   Bool_t verbose  = kFALSE;
   Bool_t useWSF = kFALSE;
+  Bool_t useToptagging= kFALSE;
   Bool_t useTopPtreweight= kFALSE;
   Bool_t usebTagReweight = kFALSE;
   TString leptonTypeToSelect = "Tight"; //This variable is altered to unisolated when running QCD estimation.
@@ -133,6 +134,11 @@ int main(int argc, char **argv)
     if (!strcmp(argv[i], "-WSF")){
       useWSF = kTRUE;
       cout << "Driver: Using W-tag SFs" << endl;
+    }
+
+     if (!strcmp(argv[i], "-Toptagging")){
+      useToptagging = kTRUE;
+      cout << "Driver: Using Toptagging SFs" << endl;
     }
 
     if (!strcmp(argv[i], "-TopPtreweight")){
@@ -230,14 +236,13 @@ int main(int argc, char **argv)
   /////////////////////////////////////////////////////////////////////////////////
   // ******** Cuts and Histograms applied to all studies ********
 
-
-  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight, useLeptonSFs, usebTagReweight,verbose,useWSF,useTopPtreweight));
+  mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight, useLeptonSFs, usebTagReweight,verbose,useWSF,useToptagging,useTopPtreweight));
   mystudy.AddCut(new CutElectronN(particlesObj, leptonTypeToSelect));
   mystudy.AddCut(new CutMuonN(particlesObj, leptonTypeToSelect));     //require that lepton to be isolated, central, high pt
   mystudy.AddCut(new CutBoostedJetN(particlesObj,nBoostedJets));
  mystudy.AddCut(new CutTaggedJetN(particlesObj,nbJets));
-// mystudy.AddCut(new CutJetN(particlesObj,nbJets));
-  mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
+ //mystudy.AddCut(new CutJetN(particlesObj,nbJets));
+ mystudy.AddCut(new CutTriggerSelection(particlesObj, whichtrig));
  //mystudy.AddCut(new CutMissingEt(particlesObj));
 
  // mystudy.AddCut(new CutMuonN(particlesObj, "Veto"));     //require that lepton to be isolated, central, high pt

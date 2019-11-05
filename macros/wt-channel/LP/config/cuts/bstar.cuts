@@ -33,7 +33,7 @@ Cut.Muon.Veto.Number.Min:  1
 Cut.Muon.Veto.Number.Max:  1
 # ############## Jet Cuts ##############################
 # Jet multiplicity cuts
-Cut.Jet.Number.Min:  0
+Cut.Jet.Number.Min:  1
 Cut.Jet.Number.Max:  999
 #Cut.Jet.Pt.1.Min:  30
 #Cut.Jet.Pt.1.Max: 999

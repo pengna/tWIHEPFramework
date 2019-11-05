@@ -53,7 +53,7 @@ public:
   ~Muon();
 
   // Set all contents to their defaults
-  inline void Clear() { Particle::Clear(); _passTightId = kFALSE; _passLooseId = kFALSE;_isSoft = kFALSE; _isHighPt = kFALSE; _isoCharged = 0.0; _isoSum = 0.0; _isoCharParPt = 0.0; _isoNeutralHadron = 0.0;  _isoPhoton = 0.0;  _isoPU = 0.0; _chi2=0.0; _dxy=0.0; _validHits = 0.0; _validHitsInner = 0.0; _matchedStat=0.0; _TLayers=0.0; _relIsoR04=0.0;_miniIsoR=0.0;_ptrel=0.0;_dr=0.0;};
+  inline void Clear() { Particle::Clear(); _passTightId = kFALSE; _passLooseId = kFALSE;_isSoft = kFALSE; _isHighPt = kFALSE; _isoCharged = 0.0; _isoSum = 0.0; _isoCharParPt = 0.0; _isoNeutralHadron = 0.0;  _isoPhoton = 0.0;  _isoPU = 0.0; _chi2=0.0; _dxy=0.0; _dz=0.0;_index =0;_validHits = 0.0; _validHitsInner = 0.0; _matchedStat=0.0; _TLayers=0.0; _relIsoR04=0.0;_miniIsoR=0.0;_ptrel=0.0;_dr=0.0;_ndof=0.0;_charge=0.0;};
 
   // Fill the muon from an EventTree
   Bool_t Fill(EventTree *evtr,std::vector<Jet>& selectedjets,int iE,TString muonType, Bool_t isSimulation);
@@ -142,6 +142,11 @@ public:
   inline Double_t Getdz() const {return _dz;};
   inline Double_t dz() const {return _dz;};
 
+  inline void Setindex(Int_t index){_index = index;};
+  inline Int_t Getindex() const {return _index;};
+  inline Int_t index() const {return _index;};
+
+
   inline void SetTLayers(Double_t TLayers){_TLayers = TLayers;};
   inline Double_t GetTLayers() const {return _TLayers;};
   inline Double_t TLayers() const {return _TLayers;};
@@ -189,6 +194,7 @@ private:
   Double_t _matchedStat;
   Double_t _dxy;
   Double_t _dz;
+  Int_t _index;
   Double_t _TLayers;
   Double_t _relIsoR04;
   Double_t _miniIsoR;

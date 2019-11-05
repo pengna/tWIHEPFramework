@@ -203,14 +203,17 @@ class BoostedJet: public Particle
   Double_t _minMuonBoostedJetDetaR;
   Double_t _minprunedmass;
   Double_t _maxprunedmass;
-  Double_t _minQCDprunedmass;
-  Double_t _maxQCDprunedmass;
+  Double_t _minpuppisoftdropmass;
+  Double_t _maxpuppisoftdropmass;
   Double_t _minsoftdropmass;
   Double_t _maxsoftdropmass;
-  Double_t _tau21;
+  Double_t _tau21_2016;
+  Double_t _tau21_2017;
+  Double_t _tau21_2018;
   Double_t _tau32;
 
   Int_t    _bstar;
+  Int_t    _dataEra;
   Int_t    _Elechannel;
   Int_t    _TT_CR;
   Int_t    _QCD_CR;

@@ -67,7 +67,7 @@ class Electron: public Particle
 
   // Set all contents to their defaults
   inline void Clear() { Particle::Clear(); _passVetoId = 0.0; _passLooseId = 0.0; _passMediumId = 0.0; _passTightId = 0.0; _passHEEPId = 0.0; _passConversionVeto = 0.0;
-  _patElectron_d0 = 0.0; _patElectron_dz = 0.0; _expectedMissingInnerHits = 0.0;
+  _patElectron_d0 = 0.0; _patElectron_dz = 0.0; _patElectron_index = 0; _expectedMissingInnerHits = 0.0;
   _isoChargedHadrons = 0.0; _isoNeutralHadrons = 0.0; _isoPhotons = 0.0; _isoPU = 0.0;_relIsoR=0.0;_ptrel=0.0;_dr=0.0;
   }
 
@@ -121,6 +121,10 @@ class Electron: public Particle
   inline void SetpatElectron_dz(Double_t patElectron_dz){_patElectron_dz = patElectron_dz;};
   inline Double_t GetpatElectron_dz() const {return _patElectron_dz;};
   inline Double_t patElectron_dz() const {return _patElectron_dz;};
+
+   inline void SetpatElectron_index(Int_t patElectron_index){_patElectron_index = patElectron_index;};
+  inline Int_t GetpatElectron_index() const {return _patElectron_index;};
+  inline Int_t patElectron_index() const {return _patElectron_index;};
 
   inline void SetisoChargedHadrons(Double_t isoChargedHadrons){_isoChargedHadrons = isoChargedHadrons;};
   inline Double_t GetisoChargedHadrons() const {return _isoChargedHadrons;};
@@ -210,6 +214,7 @@ class Electron: public Particle
 
   Double_t _patElectron_d0;
   Double_t _patElectron_dz;
+  Int_t _patElectron_index;
   Double_t _isoChargedHadrons;
   Double_t _isoNeutralHadrons;
   Double_t _isoPhotons;
@@ -247,6 +252,7 @@ Double_t _relIsoR;
   std::map<TString,Double_t> _d0CutEndcap;
   std::map<TString,Double_t> _d0CutBarrel;
   Int_t _bstar;  
+  Int_t _dataEra;  
   Int_t _Elechannel;  
   Int_t _QCD_CR;  
   Int_t _TT_CR;  

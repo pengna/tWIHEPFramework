@@ -284,15 +284,20 @@ void BoostedJet::SetCuts(TEnv * config)
   _jerUp = 			config -> GetValue("Systs.doJERUp",0);
   _jerDown = 			config -> GetValue("Systs.doJERDown",0);
   _bstar = 			config -> GetValue("ifbstar",0);
+   _dataEra=                    config -> GetValue("_dataEra",0);
   _Elechannel = 		config -> GetValue("ifelechannel",0);
   _TT_CR = 			config -> GetValue("TT_CR",0);
   _QCD_CR = 			config -> GetValue("QCD_CR",0);
   _minMuonBoostedJetDetaR =     config -> GetValue("ObjectID.BoostedJet.MuonDeltaRMin",0.0);
   _minprunedmass = 		config -> GetValue("ObjectID.BoostedJet.MinPrunedMass",0.0);
   _maxprunedmass = 		config -> GetValue("ObjectID.BoostedJet.MaxPrunedMass",999.9);
+  _minpuppisoftdropmass= 	config -> GetValue("ObjectID.BoostedJet.MinPuppiSofeDropMass",0.0);
+  _maxpuppisoftdropmass= 	config -> GetValue("ObjectID.BoostedJet.MaxPuppiSofeDropMass",0.0);
   _minsoftdropmass = 		config -> GetValue("ObjectID.BoostedJet.MinSoftdropMass",0.0);
   _maxsoftdropmass = 		config -> GetValue("ObjectID.BoostedJet.MaxSoftdropMass",999.9);
-  _tau21 = 			config -> GetValue("ObjectID.BoostedJet.Tau21",0.0);
+  _tau21_2016 = 			config -> GetValue("ObjectID.BoostedJet.Tau21.2016",0.0);
+  _tau21_2017 = 			config -> GetValue("ObjectID.BoostedJet.Tau21.2017",0.0);
+  _tau21_2018 = 			config -> GetValue("ObjectID.BoostedJet.Tau21.2017",0.0);
   _tau32 = 			config -> GetValue("ObjectID.BoostedJet.Tau32",0.0);
 
 
@@ -311,7 +316,7 @@ void BoostedJet::SetCuts(TEnv * config)
 Bool_t BoostedJet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& selectedMuons, std::vector<Electron>& selectedElectrons, EventTree *evtr, Int_t iE, TLorentzVector * met, bool isMC)
 {
 
-  Double_t boostedjetPt, boostedjetEta,boostedjetPhi,boostedjetE, boostedjetCharge, boostedjetM,prunedmass,softdropmass,tau1,tau2,tau3,boostedjet_Uncorr_pt,boostedjet_JesSF,boostedjet_JerSF,boostedjet_pt,energy;
+  Double_t boostedjetPt, boostedjetEta,boostedjetPhi,boostedjetE, boostedjetCharge, boostedjetM,prunedmass,softdropmass,tau1,tau2,tau3,boostedjet_Uncorr_pt,boostedjet_JesSF,boostedjet_JerSF,boostedjet_pt,energy,boostedjet_puppi_softdrop_masscorr;
   boostedjetPt     = evtr -> BoostedJet_pt     -> operator[](iE);
   boostedjetEta    = evtr -> BoostedJet_eta    -> operator[](iE);
   boostedjetPhi    = evtr -> BoostedJet_phi    -> operator[](iE);
@@ -326,7 +331,8 @@ Bool_t BoostedJet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& 
   boostedjet_JerSF     = evtr -> BoostedJet_JerSF     -> operator[](iE);
   boostedjet_pt = boostedjet_Uncorr_pt*boostedjet_JesSF*boostedjet_JerSF;
   energy = (boostedjet_Uncorr_pt/boostedjetPt)*boostedjetE*boostedjet_JesSF*boostedjet_JerSF;
-  SetPtEtaPhiE(boostedjet_pt,boostedjetEta,boostedjetPhi,energy);
+  boostedjet_puppi_softdrop_masscorr=evtr -> BoostedJet_puppi_softdrop_masscorr -> operator[](iE);
+  SetPtEtaPhiE(boostedjetPt,boostedjetEta,boostedjetPhi,boostedjetE);
 
   Setprunedmass                         (evtr -> BoostedJet_pruned_mass -> operator[](iE));
   Setsoftdropmass                         (evtr -> BoostedJet_softdrop_mass -> operator[](iE));
@@ -346,13 +352,7 @@ Bool_t BoostedJet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& 
   SetphotonEnergy			(evtr -> BoostedJet_photonEnergy     		-> operator[](iE));
 
   // Now we want to do the JER and JES systematic adjustments to the jet. This also requires correcting the MET.
-
-
-
-
-
-
-
+  if (_jesUp || _jesDown || _jerUp || _jerDown) SystematicPtShift(evtr, iE, met);  
 
 
 
@@ -365,33 +365,54 @@ Bool_t BoostedJet::Fill( double myJESCorr, double myJERCorr, std::vector<Muon>& 
   Bool_t passesCleaning = kTRUE;
   Bool_t selectMuon = kFALSE;
   Double_t closestLepton = 999.;
-TLorentzVector closedmuon(0,0,0,0);
-TLorentzVector tempjet(0,0,0,0);
-TLorentzVector jet(0,0,0,0);
-jet.SetPtEtaPhiE(boostedjet_Uncorr_pt,Eta(),Phi(),(boostedjet_Uncorr_pt/boostedjetPt)*boostedjetE);
-//tempjet.SetPtEtaPhiE(boostedjetPt,boostedjetEta,boostedjetPhi,boostedjetE);
+  TLorentzVector closedmuon(0,0,0,0);
+  TLorentzVector tempjet(0,0,0,0);
+  TLorentzVector jet(0,0,0,0);
+  jet.SetPtEtaPhiE(boostedjet_Uncorr_pt,Eta(),Phi(),(boostedjet_Uncorr_pt/boostedjetPt)*boostedjetE);  
   for (auto const & ele : selectedElectrons){
 	  if (ele.DeltaR(*this) < _minMuonBoostedJetDetaR)
 	  {
 		  jet=jet-ele;
-//		tempjet=tempjet-ele;	  
 	  }
   }
   for (auto const & mu : selectedMuons){
 	  selectMuon = kTRUE;
 	  if (mu.DeltaR(*this) < _minMuonBoostedJetDetaR) 
 	  {
-	//	  closestLepton = mu.DeltaR(*this);
-	//	closedmuon.SetPtEtaPhiE(mu.Pt(),mu.Eta(),mu.Phi(),mu.E());
-		jet=jet-mu;
-//	  	tempjet = tempjet-mu;
+		  jet=jet-mu;
 	  }
   }
-  //  float jetenergycorr = tempjet.E()*(jet.Pt()/tempjet.Pt())*boostedjet_JesSF*boostedjet_JerSF;
-    SetPtEtaPhiE(jet.Pt()*boostedjet_JesSF*boostedjet_JerSF,jet.Eta(),jet.Phi(),jet.E()*boostedjet_JesSF*boostedjet_JerSF);
+  SetPtEtaPhiE(jet.Pt()*boostedjet_JesSF*boostedjet_JerSF,jet.Eta(),jet.Phi(),jet.E()*boostedjet_JesSF*boostedjet_JerSF);  
   SetClosestLep(closestLepton);
 
-  if (_jesUp || _jesDown || _jerUp || _jerDown) SystematicPtShift(evtr, iE, met);  
+  /////////////////////////////////////////////////////////////////////////
+  // Jet ID
+  /////////////////////////////////////////////////////////////////////////
+  
+  Bool_t LowEtaID =kTRUE;
+  Bool_t MediumEtaID= kTRUE;
+  Bool_t HighEtaID = kTRUE;
+
+ if(_dataEra==2016){
+    LowEtaID = (neutralHadEnergyFraction()<0.99 && neutralEmEmEnergyFraction()<0.99 && numberOfConstituents()>1) && ((TMath::Abs(Eta())<=2.4 && chargedHadronEnergyFraction()>0 && chargedMultiplicity()>0 && chargedEmEnergyFraction() < 0.99) || TMath::Abs(Eta())>2.4) && TMath::Abs(Eta())<=2.7;
+    MediumEtaID = (neutralEmEmEnergyFraction()>0.01 && neutralHadEnergyFraction()<0.98 && (numberOfConstituents() - chargedMultiplicity())>2 && TMath::Abs(Eta())>2.7 && TMath::Abs(Eta())<=3.0 );
+    HighEtaID = (neutralEmEmEnergyFraction()<0.90 &&(numberOfConstituents() - chargedMultiplicity())>10 && TMath::Abs(Eta())>3.0 );
+  }else if(_dataEra==2017){
+    LowEtaID = (neutralHadEnergyFraction()<0.90 && neutralEmEmEnergyFraction()<0.90 && numberOfConstituents()>1) && ((TMath::Abs(Eta())<=2.4 && chargedHadronEnergyFraction()>0 && chargedMultiplicity()>0) || TMath::Abs(Eta())>2.4) && TMath::Abs(Eta())<=2.7;
+    MediumEtaID = (neutralEmEmEnergyFraction()<0.99 && neutralEmEmEnergyFraction()>0.02 && (numberOfConstituents() - chargedMultiplicity())>2 && TMath::Abs(Eta())>2.7 && TMath::Abs(Eta())<=3.0 );
+    HighEtaID = (neutralEmEmEnergyFraction()<0.90 && neutralHadEnergyFraction()>0.02 &&(numberOfConstituents() - chargedMultiplicity())>10 && TMath::Abs(Eta())>3.0 );
+  }else if(_dataEra==2018){
+    LowEtaID = (neutralHadEnergyFraction()<0.90 && chargedMultiplicity()>0 ) && ((TMath::Abs(Eta())<=2.6 && neutralEmEmEnergyFraction()<0.90 && numberOfConstituents()>1 && chargedHadronEnergyFraction()>0 ) || (TMath::Abs(Eta())>2.6 && neutralEmEmEnergyFraction()<0.99)) && TMath::Abs(Eta())<=2.7;
+    MediumEtaID = (neutralEmEmEnergyFraction()<0.99 && neutralEmEmEnergyFraction()>0.02 && (numberOfConstituents() - chargedMultiplicity())>2 && TMath::Abs(Eta())>2.7 && TMath::Abs(Eta())<=3.0 );
+    HighEtaID = (neutralEmEmEnergyFraction()<0.90 && neutralHadEnergyFraction()>0.2 &&(numberOfConstituents() - chargedMultiplicity())>10 && TMath::Abs(Eta())>3.0 );
+  }else{
+    std::cout<<"ERROR in Jet dataEra must be 2016/2017/2018 " << std::endl;
+  }
+
+    Bool_t passesJetID = LowEtaID || MediumEtaID || HighEtaID;
+
+
+
 
   /////////////////////////////////////////////////////////////////////////////
   // Jet Pt and Eta Cuts
@@ -406,27 +427,31 @@ jet.SetPtEtaPhiE(boostedjet_Uncorr_pt,Eta(),Phi(),(boostedjet_Uncorr_pt/boostedj
 
 
 
-//cout<<"softdropmass from boostedjet: "<<softdropmass<<endl;
-Double_t tau21 = tau2/tau1;
-Double_t tau32 = tau3/tau2;
-//cout<<"tau21 = "<<tau21 <<endl;
-Bool_t passmasswindow;
-if(_TT_CR){
-	passmasswindow =_minsoftdropmass<softdropmass && softdropmass< _maxsoftdropmass;}
-else{	
-	passmasswindow =_minprunedmass <prunedmass && prunedmass< _maxprunedmass;}
-Bool_t passtau;
-if(_TT_CR){
-	passtau = tau32<_tau32;}
-else if(_QCD_CR){
-	passtau =tau21>_tau21;}
-else{
-        passtau	= tau21<_tau21;}
+  //cout<<"softdropmass from boostedjet: "<<softdropmass<<endl;
+  Double_t tau21 = tau2/tau1;
+  Double_t tau32 = tau3/tau2;
+  //cout<<"tau21 = "<<tau21 <<endl;
+  Bool_t passmasswindow=kTRUE;
+  if(_TT_CR){
+	  passmasswindow =_minsoftdropmass<softdropmass && softdropmass< _maxsoftdropmass;}
+  else{	
+	  passmasswindow =_minpuppisoftdropmass <boostedjet_puppi_softdrop_masscorr && boostedjet_puppi_softdrop_masscorr< _maxpuppisoftdropmass;}
+  Bool_t passtau = kTRUE;
+  if(_TT_CR){
+	  passtau = tau32<_tau32;}
+  else if(_QCD_CR){
+	  if(_dataEra==2016){passtau =tau21>_tau21_2016;}
+	  if(_dataEra==2017){passtau =tau21>_tau21_2017;}
+	  if(_dataEra==2018){passtau =tau21>_tau21_2018;}
+  }
+  else{
+	  if(_dataEra==2016){   passtau	= tau21<_tau21_2016;}
+	  if(_dataEra==2017){   passtau	= tau21<_tau21_2017;}
+	  if(_dataEra==2018){   passtau	= tau21<_tau21_2018;}
+  }
 
+  if (passPt && passEta  && passmasswindow && passtau &&passesJetID) return kTRUE;
 
- //if (passPt && passEta  && passMuonBoostedJetDetaR && passmasswindow && passtau) return kTRUE;
-	if (passPt && passEta  && passmasswindow && passtau) return kTRUE;
-  
   return kFALSE;
 
 } //Fill()

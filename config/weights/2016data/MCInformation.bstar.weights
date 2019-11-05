@@ -1,0 +1,138 @@
+
+Processing Cal_EvtNumber.cc...
+################# 
+### Fall 17 MC Informations #### 
+###################
+ 
+#The luminosity of the Sample to be processed
+Weight.Lumi: 35900 
+ 
+# 300000 - WJetHT70To100
+Weight.Source.300000: 1353
+Events.Source.300000: 10020533
+# 300001 - WJetHT100To200
+Weight.Source.300001: 1345
+Events.Source.300001: 78043017
+# 300002 - WJetHT200To400
+Weight.Source.300002: 359.7 
+Events.Source.300002: 38984322
+# 300003 - WJetHT400To600
+Weight.Source.300003: 48.91
+Events.Source.300003: 7759701
+# 300005 - WJetHT600To800
+Weight.Source.300005: 12.05
+Events.Source.300005: 18687480
+# 300004 - WJetHT800To1200
+Weight.Source.300004: 5.501
+Events.Source.300004: 9251988
+# 300006 - WJetHT1200To2500
+Weight.Source.300006: 1.329
+Events.Source.300006: 6891591
+# 300007 - WJetHT2500ToInf
+Weight.Source.300007: 0.03216
+Events.Source.300007: 2785458
+# 500000 - WJets
+Weight.Source.500000: 61526.7
+Events.Source.500000: 86916455
+# 500001 - QCDHT100To200
+Weight.Source.500001: 27990000
+Events.Source.500001: 82293477
+# 500002 - QCDHT200To300
+Weight.Source.500002: 1712000
+Events.Source.500002: 38857977
+# 500003 - QCDHT300To500
+Weight.Source.500003: 347700
+Events.Source.500003: 17804562
+# 500004 - QCDHT500To700
+Weight.Source.500004: 32100
+Events.Source.500004: 44206548
+# 500005 - QCDHT700To1000
+Weight.Source.500005: 6831
+Events.Source.500005: 21890930
+# 500006 - QCDHT1000To1500
+Weight.Source.500006: 1207
+Events.Source.500006: 15210939
+# 500007 - QCDHT1500To2000
+Weight.Source.500007: 119.9
+Events.Source.500007: 1139633
+# 500008 - QCDHT2000Toinf
+Weight.Source.500008: 25.24
+Events.Source.500008: 6352671
+# 500009 - RH_1200
+Weight.Source.500009: 1.936
+Events.Source.500009: 100000
+# 500010 - RH_1400
+Weight.Source.500010: 0.7816
+Events.Source.500010: 99800
+# 500011 - RH_1600
+Weight.Source.500011: 0.3416
+Events.Source.500011: 99200
+# 500012 - RH_1800
+Weight.Source.500012: 0.1583
+Events.Source.500012: 97600
+# 500013 - RH_2000
+Weight.Source.500013: 0.07675
+Events.Source.500013: 100000
+# 500014 - RH_2200
+Weight.Source.500014: 0.03864
+Events.Source.500014: 137600
+# 500015 - RH_2400
+Weight.Source.500015: 0.02008
+Events.Source.500015: 100000
+# 500016 - RH_2600
+Weight.Source.500016: 0.01068
+Events.Source.500016: 100000
+# 500017 - RH_2800
+Weight.Source.500017: 0.005814
+Events.Source.500017: 100000
+# 500018 - RH_3000
+Weight.Source.500018: 0.003224
+Events.Source.500018: 100000
+# 500019 - TT
+Weight.Source.500019: 831.76
+Events.Source.500019: 99096969
+# 500024 - WW
+Weight.Source.500024: 118.7
+Events.Source.500024: 7982180
+# 500020 - WZ
+Weight.Source.500020: 47.13
+Events.Source.500020: 3997571
+# 500021 - ZZ
+Weight.Source.500021: 16.523
+Events.Source.500021: 1091930
+# 500022 - ST
+Weight.Source.500022: 35.85
+Events.Source.500022: 244430
+# 500023 - SaT
+Weight.Source.500023: 35.85
+Events.Source.500023: 6933094
+# 500025 - LH_1200
+Weight.Source.500025: 1.944
+Events.Source.500025: 100000
+# 500026 - LH_1400
+Weight.Source.500026: 0.785
+Events.Source.500026: 100000
+# 500027 - LH_1600
+Weight.Source.500027: 0.343
+Events.Source.500027: 100000 
+# 500028 - LH_1800
+Weight.Source.500028: 0.159
+Events.Source.500028: 100000
+# 500029 - LH_2000
+Weight.Source.500029: 0.077
+Events.Source.500029: 100000
+# 500030 - LH_2200
+Weight.Source.500030: 0.039
+Events.Source.500030: 97000
+# 500031 - LH_2400
+Weight.Source.500031: 0.02
+Events.Source.500031: 100000
+# 500032 - LH_2600
+Weight.Source.500032: 0.011
+Events.Source.500032: 100000
+# 500033 - LH_2800
+Weight.Source.500033: 0.006
+Events.Source.500033: 100000
+# 500034 - LH_3000
+Weight.Source.500034: 0.003
+Events.Source.500034: 100000

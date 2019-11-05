@@ -1,0 +1,144 @@
+# Combining the MC information into a single configuration file, because it's way too complicated as it is. 
+# The Weight.Source.ID is now the cross section * BR only. Lumi is included as an additional variable in this file so that changes in lumi can be applied easily.
+# 5th July 2015 - Duncan Leggat
+#########################################
+#I will be using my own codes because what is a D3PD.
+#########################################
+
+# The luminosity of the sample to be processed. For some reason before it was already in all of the weights, which is not ideal.
+Weight.Lumi: 59740.
+
+# 400000 - WJetHT70To100
+Weight.Source.400000: 1353
+Events.Source.400000: 28060302
+# 400001 - WJetHT100To200
+Weight.Source.400001: 1345
+Events.Source.400001: 29488310
+# 400002 - WJetHT200To400
+Weight.Source.400002: 359.7 
+Events.Source.400002: 25423155
+# 400003 - WJetHT400To600
+Weight.Source.400003: 48.91
+Events.Source.400003: 5915969
+# 400005 - WJetHT600To800
+Weight.Source.400005: 12.05
+Events.Source.400005: 19699782
+# 400004 - WJetHT800To1200
+Weight.Source.400004: 5.501
+Events.Source.400004: 8362227
+# 400006 - WJetHT1200To2500
+Weight.Source.400006: 1.329
+Events.Source.400006: 7571583
+# 400007 - WJetHT2500ToInf
+Weight.Source.400007: 0.03216
+Events.Source.400007: 3191612
+
+
+# 500000 - WJets
+Weight.Source.500000: 61526.7
+Events.Source.500000: 70966439
+# 500001 - QCDHT100To200
+Weight.Source.500001: 27990000 
+Events.Source.500001: 93952968
+# 500002 - QCDHT200To300
+Weight.Source.500002: 1712000
+Events.Source.500002: 54251666
+# 500003 - QCDHT300To500
+Weight.Source.500003: 347700
+Events.Source.500003: 60871557
+# 500004 - QCDHT500To700
+Weight.Source.500004: 32100
+Events.Source.500004: 55056202
+# 500005 - QCDHT700To1000
+Weight.Source.500005: 6831
+Events.Source.500005: 48038740
+# 500006 - QCDHT1000To1500
+Weight.Source.500006: 1207
+Events.Source.500006: 15407797
+# 500007 - QCDHT1500To2000
+Weight.Source.500007: 119.9
+Events.Source.500007: 10857752
+# 500008 - QCDHT2000Toinf
+Weight.Source.500008: 25.24
+Events.Source.500008: 5414545
+# 500009 - RH_1200
+Weight.Source.500009: 1.936
+Events.Source.500009: 99948
+# 500010 - RH_1400
+Weight.Source.500010: 0.7816
+Events.Source.500010: 99908
+# 500011 - RH_1600
+Weight.Source.500011: 0.3416
+Events.Source.500011: 99890
+# 500012 - RH_1800
+Weight.Source.500012: 0.1583
+Events.Source.500012: 99836
+# 500013 - RH_2000
+Weight.Source.500013: 0.07675
+Events.Source.500013: 99768
+# 500014 - RH_2200
+Weight.Source.500014: 0.03864
+Events.Source.500014: 99708
+# 500015 - RH_2400
+Weight.Source.500015: 0.02008
+Events.Source.500015: 99664
+# 500016 - RH_2600
+Weight.Source.500016: 0.01068
+Events.Source.500016: 95528
+# 500017 - RH_2800
+Weight.Source.500017: 0.005814
+Events.Source.500017: 99374
+# 500018 - RH_3000
+Weight.Source.500018: 0.003224
+Events.Source.500018: 99198
+# 5000191 - TTToSemiLeptonic
+Weight.Source.5000191: 365.34
+Events.Source.5000191: 100728756
+# 5000192 - TTToHadronic
+Weight.Source.5000192: 377.96
+Events.Source.5000192: 132685932
+# 500024 - WW
+Weight.Source.500024: 118.7 
+Events.Source.500024: 7850000
+# 500020 - WZ
+Weight.Source.500020: 47.13
+Events.Source.500020: 3885000
+# 500021 - ZZ
+Weight.Source.500021: 16.523
+Events.Source.500021: 1979000
+# 500022 - ST
+Weight.Source.500022: 35.85
+Events.Source.500022: 9431182
+# 500023 - SaT
+Weight.Source.500023: 35.85
+Events.Source.500023: 7588180
+# 500025 - LH_1200
+Weight.Source.500025: 1.944
+Events.Source.500025: 99940
+# 500026 - LH_1400
+Weight.Source.500026: 0.785
+Events.Source.500026: 99898
+# 500027 - LH_1600
+Weight.Source.500027: 0.343
+Events.Source.500027: 99872
+# 500028 - LH_1800
+Weight.Source.500028: 0.159
+Events.Source.500028: 99820
+# 500029 - LH_2000
+Weight.Source.500029: 0.077
+Events.Source.500029: 96768
+# 500030 - LH_2200
+Weight.Source.500030: 0.039
+Events.Source.500030: 83726
+# 500031 - LH_2400
+Weight.Source.500031: 0.02
+Events.Source.500031: 99642
+# 500032 - LH_2600
+Weight.Source.500032: 0.011
+Events.Source.500032: 99526
+# 500033 - LH_2800
+Weight.Source.500033: 0.006
+Events.Source.500033: 99382
+# 500034 - LH_3000
+Weight.Source.500034: 0.003
+Events.Source.500034: 99220

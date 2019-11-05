@@ -1,0 +1,319 @@
+# Combining the MC information into a single configuration file, because it's way too complicated as it is. 
+# The Weight.Source.ID is now the cross section * BR only. Lumi is included as an additional variable in this file so that changes in lumi can be applied easily.
+# 5th July 2015 - Duncan Leggat
+#########################################
+#I will be using my own codes because what is a D3PD.
+#########################################
+
+# The luminosity of the sample to be processed. For some reason before it was already in all of the weights, which is not ideal.
+#Weight.Lumi: 27217.
+
+
+#The luminosity of the Sample to be processed
+Weight.Lumi: 41500
+
+# 500000 - WJets
+Weight.Source.500000: 61526.7 
+Events.Source.500000: 71508216
+PileUp.Source.500000: WJets
+
+# 500001 - QCDHT100To200
+Weight.Source.500001: 27990000 
+Events.Source.500001: 143786918
+PileUp.Source.500001: QCDHT100To200
+
+# 500002 - QCDHT200To300
+Weight.Source.500002: 1712000 
+Events.Source.500002: 58632274
+PileUp.Source.500002: QCDHT200To300
+
+# 500003 - QCDHT300To500
+Weight.Source.500003: 347700 
+Events.Source.500003: 59082462
+PileUp.Source.500003: QCDHT300To500
+
+# 500004 - QCDHT500To700
+Weight.Source.500004: 32100 
+Events.Source.500004: 53441554
+PileUp.Source.500004: QCDHT500To700
+
+# 500005 - QCDHT700To1000
+Weight.Source.500005: 6831 
+Events.Source.500005: 46180998
+PileUp.Source.500005: QCDHT700To1000
+
+# 500006 - QCDHT1000To1500
+Weight.Source.500006: 1207 
+Events.Source.500006: 16700052
+PileUp.Source.500006: QCDHT1000To1500
+
+# 500007 - QCDHT1500To2000
+Weight.Source.500007: 119.9 
+Events.Source.500007: 11468137
+PileUp.Source.500007: QCDHT1500To2000
+
+# 500008 - QCDHT2000Toinf
+Weight.Source.500008: 25.24 
+Events.Source.500008: 5669354
+PileUp.Source.500008: QCDHT2000Toinf
+
+# 500009 - RH_1200
+Weight.Source.500009: 1.936
+Events.Source.500009: 93942
+PileUp.Source.500009: RH_1200
+
+# 500010 - RH_1400
+Weight.Source.500010: 0.7816
+Events.Source.500010: 95914
+PileUp.Source.500010: RH_1400
+
+# 500011 - RH_1600
+Weight.Source.500011: 0.3416
+Events.Source.500011: 99868
+PileUp.Source.500011: RH_1600
+
+# 500012 - RH_1800
+Weight.Source.500012: 0.1583
+Events.Source.500012: 93834
+PileUp.Source.500012: RH_1800
+
+# 500013 - RH_2000
+Weight.Source.500013: 0.07675
+Events.Source.500013: 99792
+PileUp.Source.500013: RH_2000
+
+# 500014 - RH_2200
+Weight.Source.500014: 0.03864
+Events.Source.500014: 99704
+PileUp.Source.500014: RH_2200
+
+# 500015 - RH_2400
+Weight.Source.500015: 0.02008
+Events.Source.500015: 96618
+PileUp.Source.500015: RH_2400
+
+# 500016 - RH_2600
+Weight.Source.500016: 0.01068
+Events.Source.500016: 99498
+PileUp.Source.500016: RH_2600
+
+# 500017 - RH_2800
+Weight.Source.500017: 0.005814
+Events.Source.500017: 99414
+PileUp.Source.500017: RH_2800
+
+# 500018 - RH_3000
+Weight.Source.500018: 0.003224
+Events.Source.500018: 99186
+PileUp.Source.500018: RH_3000
+
+# 5000191 - TTToSemiLeptonic
+Weight.Source.5000191: 365.34
+Events.Source.5000191: 43195567
+PileUp.Source.5000191: TTToSemiLeptonic
+
+# 5000192 - TTToHadronic
+Weight.Source.5000192: 377.96
+Events.Source.5000192: 39427832
+PileUp.Source.5000192: TTToHadronic
+
+# 500024 - WW
+Weight.Source.500024: 118.7 
+Events.Source.500024: 7765828
+PileUp.Source.500024: WW
+
+# 500020 - WZ
+Weight.Source.500020: 47.13
+Events.Source.500020: 3928630
+PileUp.Source.500020: WZ
+
+# 500021 - ZZ
+Weight.Source.500021: 16.523
+Events.Source.500021: 1925931
+PileUp.Source.500021: ZZ
+
+# 500022 - ST
+Weight.Source.500022: 35.85 
+Events.Source.500022: 7664086
+PileUp.Source.500022: ST
+
+# 500023 - SaT
+Weight.Source.500023: 35.85
+Events.Source.500023: 7916640
+PileUp.Source.500023: SaT
+
+# 500025 - LH_1200
+Weight.Source.500025: 1.944
+Events.Source.500025: 99950
+PileUp.Source.500025: LH_1200
+
+# 500026 - LH_1400
+Weight.Source.500026: 0.785
+Events.Source.500026: 99912
+PileUp.Source.500026: LH_1400
+
+# 500027 - LH_1600
+Weight.Source.500027: 0.343
+Events.Source.500027: 99864
+PileUp.Source.500027: LH_1600
+
+# 500028 - LH_1800
+Weight.Source.500028: 0.159
+Events.Source.500028: 99824
+PileUp.Source.500028: LH_1800
+
+# 500029 - LH_2000
+Weight.Source.500029: 0.077
+Events.Source.500029: 99756
+PileUp.Source.500029: LH_2000
+
+# 500030 - LH_2200
+Weight.Source.500030: 0.039
+Events.Source.500030: 89738
+PileUp.Source.500030: LH_2200
+
+# 500031 - LH_2400
+Weight.Source.500031: 0.02
+Events.Source.500031: 99620
+PileUp.Source.500031: LH_2400
+
+# 500032 - LH_2600
+Weight.Source.500032: 0.011
+Events.Source.500032: 99482
+PileUp.Source.500032: LH_2600
+
+# 500033 - LH_2800
+Weight.Source.500033: 0.006
+Events.Source.500033: 99344
+PileUp.Source.500033: LH_2800
+
+# 500034 - LH_3000
+Weight.Source.500034: 0.003
+Events.Source.500034: 95238
+PileUp.Source.500034: LH_3000
+
+# 300000 - WJetHT70To100
+Weight.Source.300000: 1353
+Events.Source.300000: 22229710
+PileUp.Source.300000: WJetHT70To100
+
+# 300001 - WJetHT100To200
+Weight.Source.300001: 1345 
+Events.Source.300001: 35804623
+PileUp.Source.300001: WJetHT100To200
+
+# 300002 - WJetHT200To400
+Weight.Source.300002: 359.7
+Events.Source.300002: 21192211
+PileUp.Source.300002: WJetHT200To400
+
+# 300003 - WJetHT400To600
+Weight.Source.300003: 48.91
+Events.Source.300003: 14250114
+PileUp.Source.300003: WJetHT400To600
+
+# 300005 - WJetHT600To800
+Weight.Source.300005: 12.05
+Events.Source.300005: 21582309
+PileUp.Source.300005: WJetHT600To800
+
+# 300004 - WJetHT800To1200
+Weight.Source.300004: 5.501
+Events.Source.300004: 20272990
+PileUp.Source.300004: WJetHT800To1200
+
+# 300006 - WJetHT1200To2500
+Weight.Source.300006: 1.329
+Events.Source.300006: 19991892
+PileUp.Source.300006: WJetHT1200To2500
+
+# 300007 - WJetHT2500ToInf
+Weight.Source.300007: 0.03216
+Events.Source.300007: 20629585
+PileUp.Source.300007: WJetHT2500ToInf
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

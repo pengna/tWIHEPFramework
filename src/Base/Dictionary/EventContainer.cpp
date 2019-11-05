@@ -498,10 +498,10 @@ Int_t EventContainer::ReadEvent()
     missingPhi = _eventTree->Met_type1PF_phi;
     missingEy = _eventTree->Met_type1PF_py;
 
-    missingEt_xy = _eventTree->Met_type1PFxy_pt;
-    missingEx_xy = _eventTree->Met_type1PFxy_px;
-    missingPhi_xy = _eventTree->Met_type1PFxy_phi;
-    missingEy_xy = _eventTree->Met_type1PFxy_py;
+    missingEt_xy = _eventTree->Met_type1PF_pt;
+    missingEx_xy = _eventTree->Met_type1PF_px;
+    missingPhi_xy = _eventTree->Met_type1PF_phi;
+    missingEy_xy = _eventTree->Met_type1PF_py;
 
     passesMETFilters = _eventTree->Flag_METFilters;
 

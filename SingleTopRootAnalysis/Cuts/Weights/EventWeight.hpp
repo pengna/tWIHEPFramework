@@ -44,7 +44,7 @@ class EventWeight : public HistoCut
 public:
 
   // Parameterized Constructor
-  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE, Bool_t verbose = kFALSE,Bool_t useWSF = kFALSE,Bool_t useTopPtreweight= kFALSE);
+  EventWeight(EventContainer *obj, Double_t TotalMCatNLOEvents = 0,const std::string& MCtype="none", Bool_t pileup = false, Bool_t bWeight = false, Bool_t useLeptonSFs = kFALSE, Bool_t usebTagReshape = kFALSE, Bool_t verbose = kFALSE,Bool_t useWSF = kFALSE,Bool_t useToptagging = kFALSE,Bool_t useTopPtreweight= kFALSE);
   
   // Default Destructor
   ~EventWeight();
@@ -63,6 +63,7 @@ public:
   void setPileUpSyst(Bool_t val=false) { _doPileupSysts=val; };
   void setbWeight(Bool_t val=true) { _usebWeight=val; };
   void setWSF(Bool_t val=true) { _useWSF=val; };
+  void setToptagging(Bool_t val=true) { _useToptagging=val; };
   void setTopPtreweight(Bool_t val=true) { _useTopPtreweight=val; };
   void setEfficbTag(Bool_t val=true) { _runEfficiencyBasedbTag=val; };
   Bool_t isMCatNLO() const { return _useMCatNLO; };
@@ -70,6 +71,7 @@ public:
   Bool_t isPileupSysts() const { return _doPileupSysts; };
   Bool_t isbWeight() const { return _usebWeight; };
   Bool_t isWSF() const { return _useWSF; };
+  Bool_t isToptagging() const { return _useToptagging; };
   Bool_t isTopPtreweight() const { return _useTopPtreweight; };
   Bool_t isEfficbTag() const { return _runEfficiencyBasedbTag; };
   
@@ -89,6 +91,7 @@ private:
   Bool_t _doPileupSysts; // set to true if including the systematic uncertainties associated with pileup reweighting in the output file 
   Bool_t _usebWeight;  // set to true if using b-tag weights
   Bool_t _useWSF;  // set to true if using W-tag weights
+  Bool_t _useToptagging;  // set to true if using W-tag weights
   Bool_t _useTopPtreweight;  // set to true if using W-tag weights
   Bool_t _useNoWeight;  //No weight except MCatNLO weight
   Bool_t _useLeptonSFs; // Use lepton SFs. Needs to be configured in the overall config file
@@ -100,6 +103,7 @@ private:
   myTH1F* _hPileUpWeight; // Histogram of PileUpWgt weight
   myTH1F* _hbWeight; // Histogram of b weight
   myTH1F* _hWSF; // Histogram of b weight
+  myTH1F* _hToptagging; // Histogram of b weight
   myTH1F* _hLeptonSFWeight; //Histogram of the lepton SF claculated for the event
   myTH1F* _hTriggerSFWeight; //Histogram of trigger SF
   std::map<std::string,myTH1F*> _hbTagReshape; //Map of histograms containing the information for b tag reshaping and its associated systematics
@@ -112,19 +116,23 @@ private:
 
   //Histograms that are used for applying scale factors to leptons
   //For now we are only using muons as we veto on electroons anyway
-  TH2F* _muonIsoSF;
-  TH2F* _muonIDSF;
+  TH2D* _muonIsoSF;
+  TH2D* _muonIDSF;
   TH2F* _muonTrigSF;
   TGraphAsymmErrors* _muonTkSF;
   TH2F* _eleRecoSF;
   TH2F* _eleIDSF;
   TH2F* _eleTrigSF;
   //Pileup reweighting hisotgrams
-  TH1F* _dataPV;
-  TH1F* _mcPV;
+  TH1D* _dataPV;
+  TH1D* _mcPV;
   //Pileup reweighting systematic histograms
-  TH1F* _minBiasUpPV;
-  TH1F* _minBiasDownPV;
+  TH1D* _minBiasUpPV;
+  TH1D* _minBiasDownPV;
+  
+  TH1F* ToptaggingSF;
+  TH1F* ToptaggingSFUp;
+  TH1F* ToptaggingSFDown;
 
   //b-tagging efficiency plots
   Bool_t _runEfficiencyBasedbTag;
@@ -141,6 +149,7 @@ private:
   std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> getLeptonWeight(EventContainer * EventContainerObj);
   //void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName);
   void setLeptonHistograms(TString muonIDFileName, TString muonIDHistName, TString muonIsoFileName, TString muonIsoHistName, TString muonTrigFileName, TString muonTrigHistName, TString muonTkFileName, TString eleRecoFileName, TString eleRecoHistName, TString eleIDFileName, TString eleIDHistName, TString eleTrigFileName, TString eleTrigHistName);
+  void setToptaggingHistograms(TString ToptaggingFileName);
   std::tuple<Double_t,Double_t> getBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
   std::tuple<Double_t,Double_t> getEfficBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
   std::tuple<bool> GenWBoson(EventContainer* EventContainerObj,Double_t Wjet_phi,Double_t Wjet_eta);

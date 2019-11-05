@@ -44,11 +44,12 @@ using namespace std;
  * Input:  Particle class                                                     *
  * Output: None                                                               *
  ******************************************************************************/
-EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight, Bool_t useLeptonSFs, Bool_t usebTagReshape, Bool_t verbose,Bool_t useWSF,Bool_t useTopPtreweight):
+EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLOEvents,const std::string& MCtype, Bool_t pileup, Bool_t bWeight, Bool_t useLeptonSFs, Bool_t usebTagReshape, Bool_t verbose,Bool_t useWSF,Bool_t useToptagging,Bool_t useTopPtreweight):
   _useLeptonSFs(useLeptonSFs),
   _usebTagReshape(usebTagReshape),
   _verbose(verbose),
   _useWSF(useWSF),
+  _useToptagging(useToptagging),
   _useTopPtreweight(useTopPtreweight)
 {
   //pileup is NOT applied by default.  Instead it is applied by the user, and stored in the tree for later application
@@ -56,21 +57,7 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
   TEnv* conf = EventContainerObj -> GetConfig();
   Int_t  _bstar = conf -> GetValue("ifbstar",0);
   Int_t  _ele = conf -> GetValue("ifelechannel",0);
-  /**
-  if(MCtype.find("PileUpWgt")<=MCtype.size()){
-    cout<<"EventWeight: This version of pileup weights is based on primary vertex number and no longer used!!!"<<endl;
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV0", 1.));
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV1", 1.));
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV2", 1.));
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV3", 1.));
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV4", 1.));
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV5", 1.));
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV6", 1.));
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV7", 1.));
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV8", 1.));
-    vecPileUpWgt.push_back(conf->GetValue("Weight.Source.nPvtx.NPV9", 1.));
-  }
-  **/
+  Int_t  _dataEra=       conf -> GetValue("_dataEra",2017);
   // Set Particle object
   _totalMCatNLOEvents = 0;
 
@@ -86,59 +73,60 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
     setPileUpWgt(false);
   }
  **/
-  SetEventContainer(EventContainerObj);
-  if(MCtype.find("UseTotalEvtFromFile")<=MCtype.size()){
-    Int_t sNumber = EventContainerObj -> GetSourceNumber();
-    stringstream strNumber;
-    strNumber<<"Events.Source."<<sNumber;
-    Double_t totMCnloEvt = conf -> GetValue(strNumber.str().c_str(), -1.);
 
-    SetTotalMCatNLOEvents(totMCnloEvt);
-  } else {
-    SetTotalMCatNLOEvents(TotalMCatNLOEvents);
-  }
-  setPileUpSyst(false);
-  if(pileup){
-    setPileUpWgt(true);
-    TFile* dataPVFile = TFile::Open(conf -> GetValue("Include.dataPVFile","null"),"READ");
-    _dataPV = (TH1F*)dataPVFile->Get("pileup");
-    _dataPV->SetDirectory(0);
-    _dataPV->Scale(1./_dataPV->Integral());
-    dataPVFile->Close();
-    delete dataPVFile;
-    
-    TFile* mcPVFile = TFile::Open(conf -> GetValue("Include.mcPVFile","null"),"READ");
-    _mcPV = (TH1F*)mcPVFile->Get("pileup");
-    _mcPV->SetDirectory(0);
-    _mcPV->Scale(1./_mcPV->Integral());
-    mcPVFile->Close();
-    delete mcPVFile;
+ SetEventContainer(EventContainerObj);
+ TString pileupHistName=" ";
+ if(MCtype.find("UseTotalEvtFromFile")<=MCtype.size()){ // please keep this to be true so that we can read pileup histograms
+	 Int_t sNumber = EventContainerObj -> GetSourceNumber();
+	 stringstream strNumber, puName;
+	 strNumber<<"Events.Source."<<sNumber;
+	 puName <<"PileUp.Source."<<sNumber;
+	 Double_t totMCnloEvt = conf -> GetValue(strNumber.str().c_str(), -1.);
+	 pileupHistName=conf -> GetValue(puName.str().c_str(),"null");
+	SetTotalMCatNLOEvents(totMCnloEvt);
+ } else {
+	 SetTotalMCatNLOEvents(TotalMCatNLOEvents);
+ }
 
-    //Load in the pileup distributions with the min bias x-section altered for systematic studies
-    string minBiasFileName = conf -> GetValue("Include.minBiasUp","null");
-    if (minBiasFileName != "null"){
-      TFile* minBiasUpFile = TFile::Open(minBiasFileName.c_str(),"READ");
-      setPileUpSyst(true);
-      _minBiasUpPV = (TH1F*)minBiasUpFile->Get("pileup");
-      _minBiasUpPV->SetDirectory(0);
-      _minBiasUpPV->Scale(1./_minBiasUpPV->Integral());
-      minBiasUpFile->Close();
-      delete minBiasUpFile;
-    }
 
-    string minBiasDownFileName = conf -> GetValue("Include.minBiasDown","null");
-    if (minBiasDownFileName != "null"){    
-      TFile* minBiasDownFile = TFile::Open(minBiasDownFileName.c_str(),"READ");
-      _minBiasDownPV = (TH1F*)minBiasDownFile->Get("pileup");
-      _minBiasDownPV->SetDirectory(0);
-      _minBiasDownPV->Scale(1./_minBiasDownPV->Integral());
-      minBiasDownFile->Close();
-      delete minBiasDownFile;
-    }
 
-  }
-  else setPileUpWgt(false);
-  string bTagEfficFileName ;
+
+ setPileUpSyst(false);
+ if(_dataEra==2017){
+	 if(pileup){
+		 setPileUpWgt(true);
+		 TFile* dataPVFile = TFile::Open(conf -> GetValue("Include.dataPVFile","null"),"READ");
+		 _dataPV = (TH1D*)dataPVFile->Get("pileup");
+		 _dataPV->SetDirectory(0);
+		 _dataPV->Scale(1./_dataPV->Integral());
+		 //dataPVFile->Close();
+		 // delete dataPVFile;
+
+		 setPileUpSyst(true);
+		 _minBiasUpPV = (TH1D*)dataPVFile->Get("pileup_plus");
+		 _minBiasUpPV->SetDirectory(0);
+		 _minBiasUpPV->Scale(1./_minBiasUpPV->Integral());
+
+		 _minBiasDownPV = (TH1D*)dataPVFile->Get("pileup_minus");
+		 _minBiasDownPV->SetDirectory(0);
+		 _minBiasDownPV->Scale(1./_minBiasDownPV->Integral());
+		 dataPVFile->Close();
+		 delete dataPVFile;
+
+		 TFile* mcPVFile = TFile::Open(conf -> GetValue("Include.mcPVFile","null"),"READ");
+		 //_mcPV = (TH1F*)mcPVFile->Get("pileup");
+
+		 _mcPV = (TH1D*)mcPVFile->Get(pileupHistName);
+		 _mcPV->SetDirectory(0);
+		 _mcPV->Scale(1./_mcPV->Integral());
+		 mcPVFile->Close();
+		 delete mcPVFile;
+
+	 }
+	 else setPileUpWgt(false);
+ }
+ else {if(pileup){setPileUpWgt(true);}}
+ 	string bTagEfficFileName ;
   if (_bstar){
   	string bTagEfficDir = conf -> GetValue("Include.bTagEfficFile","null");
 	if(bTagEfficDir== "null")bTagEfficFileName="null";
@@ -176,6 +164,9 @@ EventWeight::EventWeight(EventContainer *EventContainerObj,Double_t TotalMCatNLO
 
   if (useWSF) setWSF(true);
   else setWSF(false);
+
+  if (useToptagging) setToptagging(true);
+  else setToptagging(false);
 
   if (useTopPtreweight) setTopPtreweight(true);
   else setTopPtreweight(false);
@@ -264,6 +255,9 @@ void EventWeight::BookHistogram()
   _hWSF -> SetXAxisTitle("W_tagging Weight");
   _hWSF -> SetYAxisTitle("Events");
 
+ _hToptagging=  DeclareTH1F("Toptagging","Event Weight for Top tagging",100,0.,10.);
+  _hToptagging -> SetXAxisTitle("Toptagging Weight");
+  _hToptagging -> SetYAxisTitle("Events");
 
   // Histogram of lepton weight
   _hLeptonSFWeight =  DeclareTH1F("leptonSFWeight","Event Weight for lepton SFs",100,0.,2.);
@@ -343,22 +337,21 @@ void EventWeight::BookHistogram()
     //	 << sName << " ("<<sNumber<<") is " << EventContainerObj -> GetGlobalEventWeight() << endl;
   } //if
 
-  //Set up the lepton efficiency SF histograms
+  //cout<<"Set up the lepton efficiency SF histograms"<<endl;
   //if (_useLeptonSFs) setLeptonHistograms(conf->GetValue("Include.MuonIDSFsFile","null"),conf->GetValue("LeptonID.MuonIDSFHistName","null"),conf->GetValue("Include.MuonISOSFsFile","null"),conf->GetValue("LeptonID.MuonIsoSFHistName","null"),conf->GetValue("Include.MuonTrigSFsFile","null"),conf->GetValue("LeptonID.MuonTrigSHHistName","null"),conf->GetValue("Include.MuonTKSFsFile","null"),conf->GetValue("Include.EleRecoFileName","null"),conf->GetValue("LeptonID.EleRecoHistName","null"),conf->GetValue("Include.EleIDFileName","null"),conf->GetValue("LeptonID.EleIDHistName","null"));
     if (_useLeptonSFs) setLeptonHistograms(conf->GetValue("Include.MuonIDSFsFile","null"),conf->GetValue("LeptonID.MuonIDSFHistName","null"),conf->GetValue("Include.MuonISOSFsFile","null"),conf->GetValue("LeptonID.MuonIsoSFHistName","null"),conf->GetValue("Include.MuonTrigSFsFile","null"),conf->GetValue("LeptonID.MuonTrigSHHistName","null"),conf->GetValue("Include.MuonTKSFsFile","null"),conf->GetValue("Include.EleRecoFileName","null"),conf->GetValue("LeptonID.EleRecoHistName","null"),conf->GetValue("Include.EleIDFileName","null"),conf->GetValue("LeptonID.EleIDHistName","null"),conf->GetValue("Include.EleTrigFileName","null"),conf->GetValue("LeptonID.EleTrigHistName","null"));
-
   if (_usebTagReshape){
     _bTagCalib = BTagCalibration(conf->GetValue("BTaggerAlgo","CSVv2"),conf->GetValue("Include.BTagCSVFile","null"));
-   // _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central",_bTagSystNames);
-    _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_TIGHT, "central",_bTagSystNames);
+    //_bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_RESHAPING, "central",_bTagSystNames);
+    _bTagCalibReader = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",_bTagSystNames);
     _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"incl");
     _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"comb");
     _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"comb");
     //_bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_UDSG,"iterativefit");
-   // _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
-   // _bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
+    //_bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_C,"iterativefit");
+    //_bTagCalibReader.load(_bTagCalib, BTagEntry::FLAV_B,"iterativefit");
   }
-
+  if(_useToptagging)setToptaggingHistograms(conf->GetValue("Include.ToptaggintSFsFile","null"));
 } //BookHistogram()
 
 /******************************************************************************
@@ -378,6 +371,7 @@ Bool_t EventWeight::Apply()
      EventTree* tree = EventContainerObj->GetEventTree();
     TEnv* config = EventContainerObj -> GetConfig();
   Int_t  _TT_CR = config -> GetValue("TT_CR",0);
+Int_t  _dataEra= config -> GetValue("_dataEra",2017);
   Double_t wgt = EventContainerObj -> GetGlobalEventWeight();
  Double_t mnwgt = 1;
   //EventContainerObj->SeteventReweight(1.); //Reset the reweighting variable
@@ -411,33 +405,11 @@ Bool_t EventWeight::Apply()
  float pileupMinBiasUpWeight(-1.0);
  float pileupMinBiasDownWeight(-1.0);
  float mu = 1; //(float)EventContainerObj -> GetEventTree() -> lbn;
- //eventInfo->event_ID()->lumi_block();
- 
- // Get the pileup weight for this event
- //int isGood = PileupReweighting->getPileupWeight( mu, pileupEventWeight );
- 
- //if ( isGood == 0 )
- //  {
- //    // Printout message
- //    // cout << "Event has a mu of " << mu 
- //    //	    << " and a resulting pileup weight of " << pileupEventWeight<<endl;;
- //  }
- //else if ( isGood == -1 )
- //  {
- //    cout << "Data histogram pointer got lost"<<endl;;
- //  }
- //else if ( isGood == -2 )
- //  {
- //    cout << "MC histogram pointer got lost"<<endl;;
- //  }
- //else {
- //  cout<<"unknown error"<<endl;
- //}
- //Adjust by the total uncut event yield over total pileup weighted uncut event yield 
- //pileupEventWeight = pileupEventWeight*PileupAdjust(EventContainerObj ->eventNumber, EventContainerObj ->runNumber);
 
  //only apply pileup weight if specified
- if(isPileUpWgt()) {
+ 
+if(isPileUpWgt()) {
+   if(_dataEra==2017){
    Int_t binOfInterest = _mcPV->GetXaxis()->FindBin(tree->trueInteractions);
    if (_mcPV->GetBinContent(binOfInterest) > 0){
      pileupEventWeight = _dataPV->GetBinContent(binOfInterest) / _mcPV->GetBinContent(binOfInterest);
@@ -450,12 +422,20 @@ Bool_t EventWeight::Apply()
        //       std::cout << tree->trueInteractions << " " << binOfInterest << " " << pileupEventWeight << " up: " << pileupMinBiasUpWeight << " down: " << pileupMinBiasDownWeight << std::endl;
        //       std::cout << tree->trueInteractions << " " << binOfInterest << " nominal: " << pileupEventWeight << " up: " << pileupMinBiasUpWeight << " down: " << pileupMinBiasDownWeight <<  " old: " << pileupEventWeightDebug << " up: " << pileupMinBiasUpWeightDebug << " down: " << pileupMinBiasDownWeightDebug << std::endl;
      }
-   }
+ }
    else {
      pileupEventWeight = 1.;
      pileupMinBiasUpWeight = 1.;
      pileupMinBiasDownWeight = 1.;
    }
+}
+else {
+     pileupEventWeight = tree->PUWeight;
+     pileupMinBiasUpWeight =  tree->MinBiasUpWeight;
+     pileupMinBiasDownWeight =  tree->MinBiasDownWeight;
+
+
+}
    wgt *= pileupEventWeight;
    //cout<<"Pile up Weight is :"<<pileupEventWeight<<endl;
  }
@@ -464,7 +444,7 @@ Bool_t EventWeight::Apply()
  float bEventWeight(1.0);
  
  if (isbWeight()){
-   bEventWeight = tree->bWeight;
+   bEventWeight = 1;
    wgt *= bEventWeight;
    //cout<<"b Event Weight is:"<<bEventWeight<<endl;
  }
@@ -480,20 +460,18 @@ Bool_t EventWeight::Apply()
  //cout<<"lepSF Weight is :"<<lepSFWeight<<"  ;trigSF Weight is :"<<trigSFWeight<<endl;
  }
 
- Double_t w_WJet_=1.0,w_WJetUp_=1.0, w_WJetDown_=1.0;
-
-  if(_useWSF){
-	  //cout<<"if is ttbar CR :"<<_TT_CR<<endl;
+   float w_Toptagging_=1.0,w_ToptaggingUp_=1.0, w_ToptaggingDown_=1.0;
   //in TT_CR , we used toptagging instead of WSF
-  if(_TT_CR){
-	  std::tie(w_WJet_,w_WJetUp_,w_WJetDown_) = TopSF(EventContainerObj);
-  	  wgt *= w_WJet_;
+  if(_useToptagging){
+	  std::tie(w_Toptagging_,w_ToptaggingUp_,w_ToptaggingDown_) = TopSF(EventContainerObj);
+  	  wgt *= w_Toptagging_;
 	  //cout<<"Top SF is :"<<w_WJet_<<endl;
   }
-  else{
+ Double_t w_WJet_=1.0,w_WJetUp_=1.0, w_WJetDown_=1.0;
+  if(_useWSF){
    std::tie(w_WJet_,w_WJetUp_,w_WJetDown_) = getWSF(EventContainerObj);
    // cout<<"W tagging SF is "<<w_WJet_<<endl;
-   wgt *= w_WJet_;}
+   wgt *= w_WJet_;
  }
  Double_t w_TopPt_=1.0,w_TopPtUp_=1.0, w_TopPtDown_=1.0;
 if(_useTopPtreweight){
@@ -520,19 +498,6 @@ if(_useTopPtreweight){
  //PDF weights
  
 
- // if(isPileUpWgt()) {
-    //This version is based on primary vertex number and no longer used
-    /**
-    if(EventContainerObj->DoFastSim()){
-      mnwgt = 1;
-    }else{
-      int n = EventContainerObj -> nPvtx;
-      if(n>9) n=9; // Number of vertex >9 use the weight of nPvtx = 9  
-      mnwgt = vecPileUpWgt.at(n);
-    }
-    wgt *= mnwgt;
-    _hPileUpWgtWeight->FillWithoutWeight(mnwgt);
-    **/
  // 
  // cout << wgt << endl;
   EventContainerObj -> SetOutputEventWeight(wgt);
@@ -545,6 +510,7 @@ if(_useTopPtreweight){
   EventContainerObj -> SetEventTrigSFWeight(trigSFWeight);
   EventContainerObj -> SetGenWeight(genWeight);
   EventContainerObj -> SetEventWSF(w_WJet_);
+  EventContainerObj -> SetEventToptagging(w_Toptagging_);
   EventContainerObj -> SetEventTopptreweight(w_TopPt_);
   
   for (auto const bSystName: _bTagSystNames) {
@@ -555,6 +521,9 @@ if(_useTopPtreweight){
     EventContainerObj -> SetEventWSFUp(w_WJetUp_);
     EventContainerObj -> SetEventWSFDown(w_WJetDown_);
 
+    EventContainerObj -> SetEventToptaggingUp(w_ToptaggingUp_);
+    EventContainerObj -> SetEventToptaggingDown(w_ToptaggingDown_);
+    
     EventContainerObj -> SetEventTopptreweightUp(w_TopPtUp_);
     EventContainerObj -> SetEventTopptreweightDown(w_TopPtDown_);
   EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
@@ -575,6 +544,7 @@ if(_useTopPtreweight){
   _hPileUpWeight   -> FillWithoutWeight(EventContainerObj -> GetEventPileupWeight());
   _hbWeight	   -> FillWithoutWeight(EventContainerObj -> GetEventbWeight());
   _hWSF 	   -> FillWithoutWeight(EventContainerObj -> GetEventWSF());
+  _hToptagging		-> FillWithoutWeight(EventContainerObj -> GetEventToptagging());
   _hLeptonSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventLepSFWeight());
   _hTriggerSFWeight -> FillWithoutWeight(EventContainerObj -> GetEventTrigSFWeight());
   _hGenWeight	   -> FillWithoutWeight(EventContainerObj -> GetGenWeight());
@@ -602,16 +572,16 @@ void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHist
   if (muonIsoFileName == "null" || muonIDFileName == "null"){
     std::cout << "You want lepton SFs included in the weight but you haven't specified files for this! Fix your config!" << std::endl;
   }
-  
   TFile* muonIDFile = TFile::Open(muonIDFileName,"READ");
   if (!muonIDFile) std::cout << "Muon ID file not found!" << std::endl;
-  _muonIDSF = (TH2F*)muonIDFile->Get(muonIDHistName+"/pt_abseta_ratio");
-  _muonIDSF->SetDirectory(0);
+  //_muonIDSF = (TH2F*)muonIDFile->Get(muonIDHistName+"/pt_abseta_ratio");
+  _muonIDSF = (TH2D*)muonIDFile->Get(muonIDHistName)->Clone();
+ _muonIDSF->SetDirectory(0);
   muonIDFile->Close();
 
   TFile* muonIsoFile = TFile::Open(muonIsoFileName,"READ");
   if (!muonIsoFile) std::cout << "Muon iso file not found!" << std::endl;
-  _muonIsoSF = (TH2F*)muonIsoFile->Get(muonIsoHistName+"/pt_abseta_ratio")->Clone();
+  _muonIsoSF = (TH2D*)muonIsoFile->Get(muonIsoHistName)->Clone();
   _muonIsoSF->SetDirectory(0);
   muonIsoFile->Close();
 
@@ -647,6 +617,29 @@ void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHist
   delete muonIsoFile,muonIDFile,muonTrigFile,muonTkFile,eleRecoFile,eleIDFile,eleTrigFile;
 
 }
+/********************************************************************
+ *void EventWeight::setToptaggingHistograms(TString ToptaggingFileName)
+ *Setting histrogram will used to get toptagging scale factor 
+ *
+ * *******************************************************************
+*/
+void EventWeight::setToptaggingHistograms(TString ToptaggingFileName){
+if (ToptaggingFileName == "null"){
+    std::cout << "You want Toptagging  SFs included in the weight but you haven't specified files for this! Fix your config!" << std::endl;
+  }
+
+ TFile* ToptaggingFile = TFile::Open(ToptaggingFileName,"READ");
+  if (!ToptaggingFile) std::cout << "Toptagging file not found!" << std::endl;
+	ToptaggingSF =(TH1F*)ToptaggingFile->Get("CHS_wp4/sf_mergedTop_nominal")->Clone();
+	ToptaggingSFUp =(TH1F*)ToptaggingFile->Get("CHS_wp4/sf_mergedTop_up")->Clone();
+	ToptaggingSFDown =(TH1F*)ToptaggingFile->Get("CHS_wp4/sf_mergedTop_down")->Clone();
+	ToptaggingSF->SetDirectory(0);
+	ToptaggingSFUp->SetDirectory(0);
+	ToptaggingSFDown->SetDirectory(0);
+ 
+      ToptaggingFile->Close();
+     delete ToptaggingFile;
+}
 /****************************************************************************** 
  *  * Bool_t EventWeight::getWSF()                                      * 
  * *                                                                            * 
@@ -658,11 +651,13 @@ void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHist
  * ******************************************************************************/
 std::tuple<Double_t,Double_t,Double_t> EventWeight::getWSF(EventContainer* EventContainerObj){
 Double_t WJet_=1.0,WJetUp_=1.0, WJetDown_=1.0,WJet_phi=0.0,WJet_eta=0.0,WJet_pt=0.0;//, WJet2Up_=1.0,WJet2Down_=1.0;
+Double_t JMS=0, JMR =0,SF=0,JMS_Unc=0, JMR_Unc =0,SF_Unc=0,X=0;
 TEnv* config = EventContainerObj -> GetConfig();
 int _jesUp =        config -> GetValue("Systs.doJESUp",0);
 int _jesDown =      config -> GetValue("Systs.doJESDown",0);
 int _jerUp =        config -> GetValue("Systs.doJERUp",0);
 int _jerDown =      config -> GetValue("Systs.doJERDown",0);
+int _dataEra= 	    config -> GetValue("_dataEra",2017);
  EventTree* evtr = EventContainerObj->GetEventTree();
 //  for (auto const & boostedjet : *EventContainerObj->boostedjetsToUsePtr){
 for(int i=0;i<EventContainerObj->boostedjetsToUsePtr->size();i++){
@@ -670,18 +665,47 @@ WJet_phi =  EventContainerObj->boostedjetsToUsePtr->at(i).Phi();//boostedjet.Phi
 WJet_eta =  EventContainerObj->boostedjetsToUsePtr->at(i).Eta();//boostedjet.Eta(); 
 WJet_pt = EventContainerObj->boostedjetsToUsePtr->at(i).Pt();//boostedjet.Pt(); 
  bool matched = false;
+if( _dataEra==2016){
+	JMS=1;JMS_Unc=0.0094;
+	JMR=1;JMR_Unc=0.20;
+	SF =1.03;SF_Unc=0.14;	
+	X=0.041;
+}
+else if(_dataEra==2017){
+	JMS=0.982;JMS_Unc=0.004; 
+        JMR=1.09 ;JMR_Unc=0.05;
+        SF =0.97;SF_Unc=0.06;
+	X=0.041;
+}
+else if(_dataEra==2018){
+        JMS=0.982;JMS_Unc=0.004;
+        JMR=1.09 ;JMR_Unc=0.05;
+        SF =0.98;SF_Unc=0.027;
+        X=0.041;
+}
+
  std::tie(matched) = GenWBoson(EventContainerObj,WJet_phi,WJet_eta);
  if(matched){
-	 WJet_ = 1.0*1.23*1.11;
-	 if(_jesUp) WJet_ = 1.00*1.23*1.11 + sqrt(pow( evtr->Jet_JesSFup->at(i)/evtr->Jet_JesSF->at(i)-1  ,2) + 0.023*0.023);
-	 if(_jesDown) WJet_ = 1.00*1.23*1.11 - sqrt(1-pow(evtr->Jet_JesSFdown->at(i)/evtr->Jet_JesSF->at(i),2) + 0.023*0.023);
-	 if(_jerUp) WJet_ = 1.00*1.23*1.11 + sqrt(pow(evtr->Jet_JerSFup->at(i)/evtr->Jet_JerSF->at(i)-1  ,2) + 0.018*0.018);
-	 if(_jerDown) WJet_ = 1.00*1.23*1.11 - sqrt(pow(1-evtr->Jet_JerSFdown->at(i)/evtr->Jet_JerSF->at(i),2) + 0.018*0.018);
-	 WJetUp_   = 1.00*1.23*1.11 + (0.08);
-	 WJetDown_ = 1.00*1.23*1.11 - (0.08);
-	 if(WJet_pt>200){
-		 WJetUp_   = 1.00*1.23*1.11 + (0.08 + 0.054*log(WJet_pt/200));
-		 WJetDown_ = 1.00*1.23*1.11 - (0.08 + 0.054*log(WJet_pt/200));
+	 WJet_ = JMS*JMR*SF;
+	 if(_jesUp) WJet_ = JMS*JMR*SF+ sqrt(pow( evtr->Jet_JesSFup->at(i)/evtr->Jet_JesSF->at(i)-1  ,2) + JMS_Unc*JMS_Unc);
+	 if(_jesDown) WJet_ = JMS*JMR*SF- sqrt(1-pow(evtr->Jet_JesSFdown->at(i)/evtr->Jet_JesSF->at(i),2) + JMS_Unc*JMS_Unc);
+	 if(_jerUp) WJet_ =  JMS*JMR*SF+ sqrt(pow(evtr->Jet_JerSFup->at(i)/evtr->Jet_JerSF->at(i)-1  ,2) + JMR_Unc*JMR_Unc);
+	 if(_jerDown) WJet_ = JMS*JMR*SF - sqrt(pow(1-evtr->Jet_JerSFdown->at(i)/evtr->Jet_JerSF->at(i),2) + JMR_Unc*JMR_Unc);
+	 WJetUp_   =  JMS*JMR*SF+ SF_Unc;
+	 WJetDown_ =  JMS*JMR*SF- SF_Unc;
+	if( _dataEra==2016){ 
+		if(WJet_pt>200){
+			 WJetUp_   = JMS*JMR*SF + (SF_Unc + X*log(WJet_pt/200));
+		 	WJetDown_ = JMS*JMR*SF - (SF_Unc + X*log(WJet_pt/200));
+		}
+	}
+	else{
+		if(WJet_pt>200&&WJet_pt<250){WJetUp_ =JMS*JMR*SF +0.07;WJetDown_=JMS*JMR*SF -0.07;}
+		if(WJet_pt>250&&WJet_pt<300){WJetUp_ =JMS*JMR*SF +0.06;WJetDown_=JMS*JMR*SF -0.06;}
+		if(WJet_pt>300&&WJet_pt<350){WJetUp_ =JMS*JMR*SF +0.09;WJetDown_=JMS*JMR*SF -0.09;}
+		if(WJet_pt>350&&WJet_pt<600){WJetUp_ =JMS*JMR*SF +0.13;WJetDown_=JMS*JMR*SF -0.13;}
+		if(WJet_pt>600){WJetUp_ =JMS*JMR*SF +(SF_Unc + X*log(WJet_pt/200));WJetDown_=JMS*JMR*SF -(SF_Unc + X*log(WJet_pt/200));}
+
 	}
 }else{
 	 WJet_ = 1.0;
@@ -725,12 +749,22 @@ std::tuple<bool> EventWeight::GenWBoson(EventContainer* EventContainerObj,Double
  *        * * Output: Double_t weight to be applied to the event weight                  * 
  *         * ******************************************************************************/
 std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventContainerObj){
-	Double_t w_topJet_=1.0,w_topJetUp_=1.0, w_topJetDown_=1.0;
-	w_topJet_     = 1.06;
-	w_topJetUp_   = 1.06+0.08;
-	w_topJetDown_ = 1.06-0.04;
+	float  w_topJet_=1.0,w_topJetUp_=1.0, w_topJetDown_=1.0,TopJet_pt=0.0;
+	TString supported_wps[19] = { "PUPPI_wp1", "PUPPI_wp2", "PUPPI_wp3", "PUPPI_wp4", "PUPPI_wp5", 
+                                  "PUPPI_wp1_btag", "PUPPI_wp2_btag", "PUPPI_wp3_btag", "PUPPI_wp4_btag", "PUPPI_wp5_btag", 
+                                  "CHS_wp2", "CHS_wp3", "CHS_wp4", "CHS_wp5", 
+                                  "CHS_wp2_btag", "CHS_wp3_btag", "CHS_wp4_btag", "CHS_wp5_btag", 
+                                  "HOTVR"};
+	for(int i=0;i<EventContainerObj->boostedjetsToUsePtr->size();i++){
+		TopJet_pt = EventContainerObj->boostedjetsToUsePtr->at(i).Pt();
+		int bin = ToptaggingSF->FindFixBin(TopJet_pt);
+		if(TopJet_pt >= 5000.) bin = ToptaggingSF->GetNbinsX();
+		w_topJet_ =ToptaggingSF->GetBinContent(bin);
+		w_topJetUp_=ToptaggingSFUp->GetBinContent(bin);
+		w_topJetDown_=ToptaggingSFDown->GetBinContent(bin);
+	
 	return std::make_tuple(w_topJet_,w_topJetUp_,w_topJetDown_);
-
+}
 }
 
 
@@ -765,22 +799,33 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
 
   Double_t leptonWeight = 1.0, leptonWeightUp = 1.0, leptonWeightDown = 1.0;
   Double_t triggerWeight = 1.0, triggerWeightUp = 1.0, triggerWeightDown = 1.0;
+  Float_t tkSF =1;
+  Int_t xAxisBin=0.0,yAxisBin=0.0;
   TEnv* config = EventContainerObj -> GetConfig();
   Int_t  _bstar = config -> GetValue("ifbstar",0);
   Int_t  _ele = config -> GetValue("ifelechannel",0);
-
+  Int_t  _dataEra= config -> GetValue("_dataEra",2017);
   for (auto const & muon : *EventContainerObj->muonsToUsePtr){
-    //Get the bin shared by iso and id SFs
-    Int_t xAxisBin = _muonIsoSF->GetXaxis()->FindBin(muon.Pt());
-    if (muon.Pt() > 120.) xAxisBin = _muonIsoSF->GetXaxis()->FindBin(119.);
-    Int_t yAxisBin = _muonIsoSF->GetYaxis()->FindBin(std::fabs(muon.Eta()));
-    if (std::fabs(muon.Eta()) > 2.4) yAxisBin = _muonIsoSF->GetYaxis()->FindBin(2.39);
-    //And now get the iso and id SFs/uncs
-    Float_t isoSF = _muonIsoSF->GetBinContent(xAxisBin,yAxisBin);
-    Float_t isoUnc = _muonIsoSF->GetBinError(xAxisBin,yAxisBin);
-    Float_t idSF = _muonIDSF->GetBinContent(xAxisBin,yAxisBin);
-    Float_t idUnc = _muonIDSF->GetBinError(xAxisBin,yAxisBin);
-    
+	  //Get the bin shared by iso and id SFs
+	if(_dataEra==2016){
+		xAxisBin = _muonIDSF->GetXaxis()->FindBin(muon.Eta());
+		if (std::fabs(muon.Eta()) > 2.4) xAxisBin = _muonIDSF->GetXaxis()->FindBin(2.39);
+		yAxisBin = _muonIDSF->GetYaxis()->FindBin(muon.Pt());
+		if (muon.Pt() > 120.) yAxisBin = _muonIDSF->GetYaxis()->FindBin(119.);
+	 }
+	else{
+		 xAxisBin = _muonIDSF->GetXaxis()->FindBin(muon.Pt());
+                if (muon.Pt() > 120.) xAxisBin = _muonIDSF->GetXaxis()->FindBin(119.);
+                yAxisBin = _muonIDSF->GetYaxis()->FindBin(std::fabs(muon.Eta()));
+                if (std::fabs(muon.Eta()) > 2.4) yAxisBin = _muonIDSF->GetYaxis()->FindBin(2.39);
+
+	}
+ //And now get the iso and id SFs/uncs
+	  Double_t isoSF = _muonIsoSF->GetBinContent(xAxisBin,yAxisBin);
+	  Double_t isoUnc = _muonIsoSF->GetBinError(xAxisBin,yAxisBin);
+	  Double_t idSF = _muonIDSF->GetBinContent(xAxisBin,yAxisBin);
+	  Double_t idUnc = _muonIDSF->GetBinError(xAxisBin,yAxisBin);
+
     //Get the bin for trigger SF
     Int_t xAxisBinTrig = _muonTrigSF->GetXaxis()->FindBin(muon.Pt());
     if (muon.Pt() > 500.) xAxisBinTrig = _muonTrigSF->GetXaxis()->FindBin(499.);
@@ -792,12 +837,12 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
     Float_t trigUnc = _muonTrigSF->GetBinError(xAxisBinTrig,yAxisBinTrig);
 
     //Evaluate muon tk
-    Float_t tkSF = _muonTkSF->Eval(std::fabs(muon.Eta()));
+     tkSF = _muonTkSF->Eval(std::fabs(muon.Eta()));
     //cout<<"if is bstar :"<<_bstar<<endl;
     if(_bstar){
-	leptonWeight = idSF* tkSF;
-	leptonWeightUp = (idSF + idUnc)* tkSF;
-	leptonWeightDown = (idSF - idUnc)* tkSF;
+	leptonWeight = idSF;
+	leptonWeightUp = (idSF + idUnc);
+	leptonWeightDown = (idSF - idUnc);
 	}
     else{
     leptonWeight *= isoSF * idSF * tkSF;

@@ -62,6 +62,7 @@ ClassImp(Muon)
   _chi2			(0.0),
   _dxy			(0.0),
   _dz			(0.0),
+  _index      		 (0),
   _validHits		(0.0),
   _validHitsInner	(0.0),
   _matchedStat		(0.0),
@@ -112,6 +113,7 @@ Muon::Muon(const Muon& other): Particle(other),
   _chi2(other.Getchi2()),
   _dxy(other.Getdxy()),
   _dz(other.Getdz()),
+   _index(other.Getindex()),
   _validHits(other.GetvalidHits()),
   _validHitsInner(other.GetvalidHitsInner()),
   _matchedStat(other.GetmatchedStat()),
@@ -149,6 +151,8 @@ Muon::Muon(const Particle& other): Particle(other),
   _chi2			(0.0),
   _dxy			(0.0),
   _dz			(0.0),
+  _index		(0),
+  
   _validHits		(0.0),
 	_validHitsInner	(0.0),
 	_matchedStat		(0.0),
@@ -217,6 +221,7 @@ Muon& Muon::operator=(const Particle& other)
   Setchi2		(0.0);
   Setdxy		(0.0);
   Setdz			(0.0);
+  Setindex		(0.0);
   SetvalidHits		(0.0);
   SetvalidHitsInner	(0.0);
   SetmatchedStat	(0.0);
@@ -255,6 +260,7 @@ Muon& Muon::operator=(const Muon& other)
   Setchi2(other.Getchi2());
   Setdxy(other.Getdxy());
   Setdz(other.Getdz());
+  Setindex(other.Getindex());
   SetvalidHits(other.GetvalidHits());
   SetvalidHitsInner(other.GetvalidHitsInner());
   SetmatchedStat(other.GetmatchedStat());
@@ -293,6 +299,7 @@ Muon& Muon::operator=(Muon& other)
   Setchi2(other.Getchi2());
   Setdxy(other.Getdxy());
   Setdz(other.Getdz());
+  Setindex(other.Getindex());
   SetvalidHits(other.GetvalidHits());
   SetvalidHitsInner(other.GetvalidHitsInner());
   SetmatchedStat(other.GetmatchedStat());
@@ -356,9 +363,8 @@ Bool_t Muon::Fill(EventTree *evtr,std::vector<Jet>& selectedjets,int iE,TString 
   Double_t muPhi    = evtr -> Muon_phi      -> operator[](iE);
   Double_t muE      = evtr -> Muon_energy   -> operator[](iE);
   Double_t muCharge = evtr -> Muon_charge   -> operator[](iE);
-//  Double_t miniIsoRel= evtr -> Muon_miniIsoRel   -> operator[](iE);
-  //Double_t murelpt= evtr -> Muon_ptrel-> operator[](iE);
-  int trigger       = evtr -> HLT_Mu50 ||evtr -> HLT_TkMu50    ; 
+ // Double_t miniIsoRel= evtr -> Muon_miniIsoRel   -> operator[](iE);
+ // Double_t murelpt= evtr -> Muon_ptrel-> operator[](iE);
   SetPtEtaPhiE(muPt, muEta, muPhi, muE);
 
   SetpassTightId	(evtr -> Muon_tight   		-> operator[](iE));
@@ -375,6 +381,7 @@ Bool_t Muon::Fill(EventTree *evtr,std::vector<Jet>& selectedjets,int iE,TString 
   Setchi2		(evtr -> Muon_chi2   		-> operator[](iE));
   Setdxy		(evtr -> Muon_dxy_pv   		-> operator[](iE));
   Setdz			(evtr -> Muon_dz_pv   		-> operator[](iE));
+  Setindex		(iE);
   SetvalidHits		(evtr -> Muon_validHits   	-> operator[](iE));
   SetvalidHitsInner	(evtr -> Muon_validHitsInner   	-> operator[](iE));
   SetmatchedStat	(evtr -> Muon_matchedStat   	-> operator[](iE));
@@ -384,25 +391,12 @@ Bool_t Muon::Fill(EventTree *evtr,std::vector<Jet>& selectedjets,int iE,TString 
   SetminiIsoR		(evtr -> Muon_miniIsoRel-> operator[](iE));
   //SetminiIsoR		((evtr -> Muon_miniIsoRel-> operator[](iE))*(evtr -> Muon_pt-> operator[](iE)));
   Setptrel		(evtr -> Muon_ptrel		-> operator[](iE));
-  Setdr		(evtr -> Muon_jetdr		-> operator[](iE));
+  Setdr			(evtr -> Muon_jetdr		-> operator[](iE));
   Setndof		(evtr -> Muon_ndof		-> operator[](iE));
   SetCharge		(evtr -> Muon_charge		-> operator[](iE));
  
 
 
-
-
-
-
-  // **************************************************************
-  // Run 2 relative isolation cuts
-  // **************************************************************
-  Bool_t passRelIso = kTRUE;
-  Bool_t passMiniIso = kTRUE;
-
-
-  if (relIsoR04() > _maxRelIsoCuts[muonType]) {passRelIso = kFALSE;}
-  if (miniIsoR() > _maxMiniIsoCuts[muonType]) {passMiniIso = kFALSE;}
 
   
   // **************************************************************
@@ -416,13 +410,11 @@ Bool_t Muon::Fill(EventTree *evtr,std::vector<Jet>& selectedjets,int iE,TString 
 
   Bool_t passCustomID = kTRUE;
   
-  Bool_t passtrigger= kTRUE;
   Bool_t passMuonclosetJetDeatR = kTRUE;
   TVector3 Muon(muPx,muPy,muPz);
   Double_t muonMag = 0.0;
   Double_t muonAngle = 0.0 ;
   muonMag=Muon.Mag();
- int i =0;	
 	for (auto const & jet : selectedjets){
 	  if (jet.DeltaR(*this) < closestJetDetaR) {
 		  closestJetDetaR = jet.DeltaR(*this);
@@ -450,7 +442,6 @@ if (chi2()/ndof() 	>= 10  ||
   
   // Test Requirements
   if(muPt <= _minPtCuts[muonType])               passMinPt  = kFALSE;
-//  if(trigger == 0)                		 passtrigger  = kFALSE;
    //cout<<"if it pass Pt cut :"<<passMinPt<<endl;
   if(TMath::Abs(muEta) >= _maxEtaCuts[muonType]) passMaxEta = kFALSE;
   
@@ -466,9 +457,9 @@ if (chi2()/ndof() 	>= 10  ||
 }
   else{ 
 
-  	if(     "Tight"      == muonType) return (passMinPt && passMaxEta  && passTightId() && passCustomID && passRelIso);
+  	if(     "Tight"      == muonType) return (passMinPt && passMaxEta  && passTightId() && passCustomID);
   	else if("Veto"       == muonType) return (passMinPt && passMaxEta);//no isolation req. or inner det or jet overlap.
- 	else if("UnIsolated" == muonType) return (passMinPt && passMaxEta  && passTightId() && passCustomID && ! passRelIso); //The same as tight muons, but with an inverted isolation requirement
+ 	else if("UnIsolated" == muonType) return (passMinPt && passMaxEta  && passTightId() && passCustomID); //The same as tight muons, but with an inverted isolation requirement
 }
 
   return kTRUE;

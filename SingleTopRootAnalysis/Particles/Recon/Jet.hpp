@@ -172,18 +172,21 @@ class Jet: public Particle
   Double_t _uncorrPt;  
   Int_t _tagged;
   Double_t _closestLep;
-  Double_t _closestLeptonCutfor2D;
 
   // Cuts applied to the jet objects
   Double_t _maxEtaCut;
   Double_t _minPtCut;
   Double_t _bMaxEtaCut;
   Double_t _bMinPtCut;
-  Double_t _bTagCut;
+  Double_t _bTagCut2016;
+  Double_t _bTagCut2017;
+  Double_t _bTagCut2018;
   Double_t _closestLeptonCut;
   Double_t _minMuonJetDetaR;
   Double_t _minBoostedJetDetaR;
+  Double_t _MaxLepJetDeltaR;
   Int_t    _bstar;
+  Int_t    _dataEra;
   Int_t    _Elechannel;
   Int_t    _TT_CR;
   Int_t    _QCD_CR;
