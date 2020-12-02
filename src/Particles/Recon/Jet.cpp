@@ -450,7 +450,8 @@ Bool_t Jet::Fill( double myJESCorr, double myJERCorr, std::vector<BoostedJet>& s
 for (auto const & boostedjet :selectedboostedjets ){
 	    if (boostedjet.DeltaR(*this) < closestBoostJet) closestBoostJet= boostedjet.DeltaR(*this);
 	      }
-if(closestBoostJet<_minBoostedJetDetaR)passBoostedJet = kFALSE ;
+//if(closestBoostJet<_minBoostedJetDetaR)passBoostedJet = kFALSE ;
+if(closestBoostJet<0.8)passBoostedJet = kFALSE ;
 
 Bool_t passDetaRleptonJet = kTRUE;
 for (auto const & mu : selectedMuons){
@@ -475,13 +476,15 @@ for (auto const & ele : selectedElectrons){
 
 
   if(_bstar){
+		  if("jetleptonclean"== jetType) return pass2Dcut;
+		  else {
 		  if (passTagCut) {SetTagged(1);}//cout<<"btag number: "<<jet_DeepJet<<endl;}
 		  else SetTagged(0);
-		  if("jetleptonclean"== jetType) return pass2Dcut;
-		  else if ("beforejetoverlap"== jetType)return (passPt && passEta&& passesJetID);
-		  else {if (passPt && passEta&& passesJetID && passBoostedJet) return kTRUE;} 
-		  //if (passPt && passEta&& passesJetID && passBoostedJet) return kTRUE;
-  }
+		  //else if ("beforejetoverlap"== jetType)return (passPt && passEta&& passesJetID);
+		  //else {if (passPt && passEta&& passesJetID && passBoostedJet && passDetaRleptonJet) return kTRUE;} 
+		  if (passPt && passEta&& passesJetID && passBoostedJet&& passDetaRleptonJet) return kTRUE;
+} 
+ }
 else{
 	if (passbPt && passbEta && passTagCut) SetTagged(1);
 	else SetTagged(0);

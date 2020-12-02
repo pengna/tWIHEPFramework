@@ -516,8 +516,9 @@ if(closestBJet<_minBJetDetaR)passBJetOverlap= kFALSE ;
   }
 
   //if (passPt && passEta  && passmasswindow && passtau &&passesJetID &&passBJetOverlap) return kTRUE;
-   if("Baseline"== BoostedjetType) return (passPt && passEta  && passesJetID);
-   else return (passPt && passEta  && passmasswindow && passtau &&passesJetID &&passBJetOverlap);
+  if (passPt && passEta  && passmasswindow && passtau &&passesJetID ) return kTRUE;
+//   if("Baseline"== BoostedjetType) return (passPt && passEta  && passesJetID);
+  // else return (passPt && passEta  && passmasswindow && passtau &&passesJetID &&passBJetOverlap);
   return kFALSE;
 
 } //Fill()
