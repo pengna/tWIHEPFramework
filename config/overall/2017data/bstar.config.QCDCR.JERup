@@ -1,0 +1,114 @@
+###############################################################################
+#
+# Configuration file for the single top analysis.
+#
+# Modifications:
+###############################################################################
+#
+#
+_dataEra: 2017
+# Set the debug level: the higher, the more printout
+DebugLevel: 10
+#
+# Mass set to MC value for this study.
+# If we are optimizing for some top mass, set that mass here:
+TopMass: 172.5
+#
+#
+# Read in a file listing cuts we want to make (electron channel):
+Include.CutsFile: macros/wt-channel/LP/config/cuts/bstar.cuts
+#
+#
+# Read in a file listing the event weight:
+Include.WeightsFile: config/weights/2017data/MCInformation.bstar.weights
+#
+#
+# Read in a file listing the object ID definitions:
+Include.ObjectIDFile: macros/wt-channel/LP/config/objects/bstar.config.QCD
+#
+# Output file with topological variables
+Topology.SkimFile: topovars.root
+#
+#
+# Events files 
+Include.MCTotEventNumberFile: config/weights/2017data/MCInformation.bstar.weights
+#
+#
+# pile up vtx reweighting 
+#Include.pileUpReWeightingFile: config/weights/2017data/SingleTopWeights.PileUpReWeight.156.weights
+#
+#
+#muonID SFs
+Include.MuonIDSFsFile: config/weights/2017data/muon/RunBCDEF_SF_ID_syst.root
+LeptonID.MuonIDSFHistName: NUM_TightID_DEN_genTracks_pt_abseta
+#NUM_TightID_DEN_genTracks_pt_abseta_syst
+#Include.MuonIDSFsFile: config/weights/2017data/muon/MuonID_all_bstar.root
+#LeptonID.MuonIDSFHistName: MC_NUM_TightID_DEN_genTracks_PAR_pt_eta
+
+
+
+#
+#
+#muonISO SFs
+Include.MuonISOSFsFile: config/weights/2017data/muon/RunBCDEF_SF_ISO_syst.root
+LeptonID.MuonIsoSFHistName: NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta_syst
+#
+#
+#muonTk SFs
+Include.MuonTKSFsFile: config/weights/2017data/muon/MuonTK_BtoH.root
+#
+#
+#muonTrig SFs
+Include.MuonTrigSFsFile: config/weights/2017data/muon/EfficienciesAndSF_RunBtoF_Nov17Nov2017.root
+LeptonID.MuonTrigSHHistName:Mu50_PtEtaBins
+#Include.MuonTrigSFsFile: config/weights/2017data/muon/SLTrg_all.root
+#LeptonID.MuonTrigSHHistName:Mu50_OR_TkMu50_PtEtaBins
+
+
+#electron ID SFs
+Include.EleIDFileName: config/weights/2017data/electron/2017_ElectronTight.root
+LeptonID.EleIDHistName: EGamma_SF2D
+#
+#
+#electron reco SFs
+Include.EleRecoFileName: config/weights/2017data/electron/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root
+LeptonID.EleRecoHistName: EGamma_SF2D
+
+Include.EleTrigFileName: config/weights/2017data/electron/2017Trigger.root 
+LeptonID.EleEndcapTrigHistName: SF_TH2F_EndCap
+LeptonID.EleBarrelTrigHistName: SF_TH2F_Barrel
+
+#Include Toptagging SF file 
+Include.ToptaggintSFsFile: config/weights/2017data/2017TopTaggingScaleFactors.root
+
+#
+#
+#b tag reshaping csv file and tagger name
+Include.BTagCSVFile: config/weights/2017data/DeepFlavour_94XSF_WP_V3_B_F.csv
+BTaggerAlgo: DeepFlavour
+#
+#
+#pileup reweighting files
+Include.dataPVFile: config/weights/2017data/PileupData_ReRecoJSON_Full2017.root
+Include.mcPVFile: config/weights/2017data/mypileup.root
+#
+#
+#bTag efficiencies
+#Include.bTagEfficFile: config/weights/2017data/bTagEfficiencies.root
+Include.bTagEfficFile: config/weights/2017data/BTag_eff_MuonQCDCR/
+
+#Jec source
+Systs.JecSourceFile: config/weights/2017data/Regrouped_Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt
+
+#Jer file
+Systs.JerResFile: config/weights/2017data/Fall17_V3_MC_PtResolution_AK4PFchs.txt
+Systs.JerSFFile: config/weights/2017data/Fall17_V3_MC_SF_AK4PFchs.txt
+
+Systs.AK8JerResFile: config/weights/2017data/Fall17_V3_MC_PtResolution_AK8PFchs.txt
+Systs.AK8JerSFFile: config/weights/2017data/Fall17_V3_MC_SF_AK8PFchs.txt
+
+#Systematic uncertainty
+#Systs.doJESUp:1
+#Systs.doJESDown:1
+Systs.doJERUp:1
+#Systs.doJERDown:1
