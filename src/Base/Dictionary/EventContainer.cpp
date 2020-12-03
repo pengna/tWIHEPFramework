@@ -613,28 +613,26 @@ Int_t EventContainer::ReadEvent()
 
 
 
-/*
 for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
         newBoostedJet.Clear();
+      allboostedjets.push_back(newBoostedJet); 
         useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtrBoostedjetoverlap, _eventTree, io, &missingEtVec, isSimulation,"Baseline");
        if(useObj)basedboostedjets.push_back(newBoostedJet);
         
 }
-*/
 
 
- ///////////////////////////////////////////
- // //  BoostedJets
- ///////////////////////////////////////////////
-    // std::cout << "Before newBoostedJet Loop" << std::endl;
- for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
-        newBoostedJet.Clear();
-        //useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtrBoostedjetoverlap, _eventTree, io, &missingEtVec, isSimulation,"skim");
-      allboostedjets.push_back(newBoostedJet); 
-        useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtr, _eventTree, io, &missingEtVec, isSimulation,"skim");
-       if(useObj)boostedjets.push_back(newBoostedJet);
-        
-}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -656,17 +654,17 @@ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
 		/////////////////////////////////////
 		useObj = newJet.Fill(1.0,1.0, *boostedjetsToUsePtrjetaverlap,*muonsToUsePtr2D, *electronsToUsePtr2D, _eventTree, io, &missingEtVec, isSimulation,"jetleptonclean");
 		if(useObj) {alljets.push_back(newJet);Nalljets++;}
+/*
 		newJet.Clear();
-/*	
 	useObj = newJet.Fill(1.0,1.0, *boostedjetsToUsePtrjetaverlap,*muonsToUsePtr2D, *electronsToUsePtr2D, _eventTree, io, &missingEtVec, isSimulation,"beforejetoverlap");
 		if(useObj) {
 			Beforeak8jetcleanjets.push_back(newJet);
 			if(newJet.IsTagged()) taggedBeforeak8jetcleanjets.push_back(newJet);
 			else untaggedBeforeak8jetcleanjets.push_back(newJet);
 }
-
-	 newJet.Clear();*/
-	 useObj = newJet.Fill(1.0,1.0, *boostedjetsToUsePtr,*muonsToUsePtr2D, *electronsToUsePtr2D, _eventTree, io, &missingEtVec, isSimulation,"skim");
+*/
+	 newJet.Clear();
+	 useObj = newJet.Fill(1.0,1.0, *boostedjetsToUsePtrjetaverlap,*muonsToUsePtr2D, *electronsToUsePtr2D, _eventTree, io, &missingEtVec, isSimulation,"skim");
 	 if(useObj) {
   		 jets.push_back(newJet);
   		 if(newJet.IsTagged()) taggedJets.push_back(newJet);
@@ -680,17 +678,17 @@ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+ ///////////////////////////////////////////
+ // //  BoostedJets
+ ///////////////////////////////////////////////
+    // std::cout << "Before newBoostedJet Loop" << std::endl;
+ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
+        newBoostedJet.Clear();
+        //useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtrBoostedjetoverlap, _eventTree, io, &missingEtVec, isSimulation,"skim");
+        useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtr, _eventTree, io, &missingEtVec, isSimulation,"skim");
+       if(useObj)boostedjets.push_back(newBoostedJet);
+        
+}
 
 
 

@@ -485,7 +485,6 @@ for (auto const & bjet :selectedBjets ){
             if (bjet.DeltaR(*this) < closestBJet) closestBJet= bjet.DeltaR(*this);
               }
 if(closestBJet<_minBJetDetaR)passBJetOverlap= kFALSE ;
-//if(closestBJet< 0.8)passBJetOverlap= kFALSE ;
 
 
 
@@ -515,10 +514,10 @@ if(closestBJet<_minBJetDetaR)passBJetOverlap= kFALSE ;
 	  if(_dataEra==2018){   passtau	= tau21<_tau21_2018;}
   }
 
-  //if (passPt && passEta  && passmasswindow && passtau &&passesJetID &&passBJetOverlap) return kTRUE;
-  if (passPt && passEta  && passmasswindow && passtau &&passesJetID ) return kTRUE;
-//   if("Baseline"== BoostedjetType) return (passPt && passEta  && passesJetID);
-  // else return (passPt && passEta  && passmasswindow && passtau &&passesJetID &&passBJetOverlap);
+ // if (passPt && passEta  && passmasswindow && passtau &&passesJetID ) return kTRUE;
+ // if("Baseline"== BoostedjetType) return (passPt && passEta  && passesJetID);
+  if("Baseline"== BoostedjetType) return (passPt && passEta  && passesJetID  );
+  else return (passPt && passEta  && passmasswindow && passtau &&passesJetID &&passBJetOverlap);
   return kFALSE;
 
 } //Fill()
