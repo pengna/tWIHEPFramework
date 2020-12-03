@@ -9,18 +9,14 @@
 
 ################# Electron Cuts #########################
 # Number of Electrons
-#Cut.Electron.Tight.Number.Min:  999
-#Cut.Electron.Tight.Number.Max: 999
-Cut.Electron.Tight.Number.Min: 0  
-Cut.Electron.Tight.Number.Max: 0
+Cut.Electron.Tight.Number.Min:  999
+Cut.Electron.Tight.Number.Max: 999
 Cut.Electron.Tight.LeadingPt:  50
 Cut.Electron.Tight.SubLeadingPt:  50
 ################# Veto Electron Cuts #########################
 # Number of Electrons
-#Cut.Electron.Veto.Number.Min:  0
-#Cut.Electron.Veto.Number.Max:  0
-Cut.Electron.Veto.Number.Min:  999
-Cut.Electron.Veto.Number.Max:  99
+Cut.Electron.Veto.Number.Min:  0
+Cut.Electron.Veto.Number.Max:  0
 ################# Muon Cuts #########################
 # Number of  Muons
 Cut.Muon.Tight.Number.Min:  1

@@ -250,8 +250,8 @@ int main(int argc, char **argv)
   // ******** Cuts and Histograms applied to all studies ********
 
   mystudy.AddCut(new EventWeight(particlesObj,mystudy.GetTotalMCatNLOEvents(), mcStr, doPileup, dobWeight, useLeptonSFs, usebTagReweight,verbose,useWSF,useToptagging,useTopPtreweight));
-  //mystudy.AddCut(new CutElectronN(particlesObj, ElectronTypeToSelect));
-  mystudy.AddCut(new CutElectronN(particlesObj, "Tight"));
+  mystudy.AddCut(new CutElectronN(particlesObj, ElectronTypeToSelect));
+  //mystudy.AddCut(new CutElectronN(particlesObj, "Tight"));
   mystudy.AddCut(new CutMuonN(particlesObj, MuonTypeToSelect));     //require that lepton to be isolated, central, high pt
   mystudy.AddCut(new CutBoostedJetN(particlesObj,nBoostedJets));
   mystudy.AddCut(new CutTaggedJetN(particlesObj,nbJets));
