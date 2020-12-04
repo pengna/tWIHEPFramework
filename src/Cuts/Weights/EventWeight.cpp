@@ -632,21 +632,39 @@ void EventWeight::setLeptonHistograms(TString muonIDFileName, TString muonIDHist
  * *******************************************************************
 */
 void EventWeight::setToptaggingHistograms(TString ToptaggingFileName){
-if (ToptaggingFileName == "null"){
-    std::cout << "You want Toptagging  SFs included in the weight but you haven't specified files for this! Fix your config!" << std::endl;
-  }
+	if (ToptaggingFileName == "null"){
+		std::cout << "You want Toptagging  SFs included in the weight but you haven't specified files for this! Fix your config!" << std::endl;
+	}
 
- TFile* ToptaggingFile = TFile::Open(ToptaggingFileName,"READ");
-  if (!ToptaggingFile) std::cout << "Toptagging file not found!" << std::endl;
-	ToptaggingSF =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_mergedTop_nominal")->Clone();
-	ToptaggingSFUp =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_mergedTop_up")->Clone();
-	ToptaggingSFDown =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_mergedTop_down")->Clone();
-	ToptaggingSF->SetDirectory(0);
-	ToptaggingSFUp->SetDirectory(0);
-	ToptaggingSFDown->SetDirectory(0);
- 
-      ToptaggingFile->Close();
-     delete ToptaggingFile;
+	TFile* ToptaggingFile = TFile::Open(ToptaggingFileName,"READ");
+	if (!ToptaggingFile) std::cout << "Toptagging file not found!" << std::endl;
+	ToptaggingSFmergedTop =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_mergedTop_nominal")->Clone();
+	ToptaggingSFmergedTopUp =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_mergedTop_up")->Clone();
+	ToptaggingSFmergedTopDown =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_mergedTop_down")->Clone();
+	ToptaggingSFmergedTop->SetDirectory(0);
+	ToptaggingSFmergedTopUp->SetDirectory(0);
+	ToptaggingSFmergedTopDown->SetDirectory(0);
+
+
+	ToptaggingSFnotmerged =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_notmerged_nominal")->Clone();
+	ToptaggingSFnotmergedUp =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_notmerged_up")->Clone();
+	ToptaggingSFnotmergedDown =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_notmerged_down")->Clone();
+	ToptaggingSFnotmerged->SetDirectory(0);
+	ToptaggingSFnotmergedUp->SetDirectory(0);
+	ToptaggingSFnotmergedDown->SetDirectory(0);
+
+
+	ToptaggingSFsemimerged =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_semimerged_nominal")->Clone();
+	ToptaggingSFsemimergedUp =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_semimerged_up")->Clone();
+	ToptaggingSFsemimergedDown =(TH1F*)ToptaggingFile->Get("PUPPI_wp4/sf_semimerged_down")->Clone();
+	ToptaggingSFsemimerged->SetDirectory(0);
+	ToptaggingSFsemimergedUp->SetDirectory(0);
+	ToptaggingSFsemimergedDown->SetDirectory(0);
+
+
+
+	ToptaggingFile->Close();
+	delete ToptaggingFile;
 }
 /****************************************************************************** 
  *  * Bool_t EventWeight::getWSF()                                      * 
@@ -767,14 +785,23 @@ std::tuple<bool> EventWeight::GenWBoson(EventContainer* EventContainerObj,Double
  *        * * Output: Double_t weight to be applied to the event weight                  * 
  *         * ******************************************************************************/
 std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventContainerObj){
-	float  w_topJet_=1.0,w_topJetUp_=1.0, w_topJetDown_=1.0,TopJet_pt=0.0;
+	float  w_topJet_=1.0,w_topJetUp_=1.0, w_topJetDown_=1.0,TopJet_pt=0.0,TopJet_eta=0.0,TopJet_phi=0.0;
 	TString supported_wps[19] = { "PUPPI_wp1", "PUPPI_wp2", "PUPPI_wp3", "PUPPI_wp4", "PUPPI_wp5", 
                                   "PUPPI_wp1_btag", "PUPPI_wp2_btag", "PUPPI_wp3_btag", "PUPPI_wp4_btag", "PUPPI_wp5_btag", 
                                   "CHS_wp2", "CHS_wp3", "CHS_wp4", "CHS_wp5", 
                                   "CHS_wp2_btag", "CHS_wp3_btag", "CHS_wp4_btag", "CHS_wp5_btag", 
                                   "HOTVR"};
+	TString catname= "notmerged";
+	cout<<"Boostedjet size:"<<EventContainerObj->boostedjetsToUsePtr->size()<<endl;
 	for(int i=0;i<EventContainerObj->boostedjetsToUsePtr->size();i++){
 		TopJet_pt = EventContainerObj->boostedjetsToUsePtr->at(i).Pt();
+		TopJet_eta = EventContainerObj->boostedjetsToUsePtr->at(i).Eta();
+		TopJet_phi = EventContainerObj->boostedjetsToUsePtr->at(i).Phi();
+		std::tie(catname) = getTopTaggingMatch( EventContainerObj,TopJet_phi,TopJet_eta);
+		cout<<"cat name:"<<catname<<endl;
+		if(catname=="mergedTop"){ ToptaggingSF=ToptaggingSFmergedTop;ToptaggingSFUp=ToptaggingSFmergedTopUp;ToptaggingSFDown=ToptaggingSFmergedTopDown;}
+		else if(catname=="semimerged") {ToptaggingSF=ToptaggingSFsemimerged;ToptaggingSFUp=ToptaggingSFsemimergedUp;ToptaggingSFDown=ToptaggingSFsemimergedDown;}
+		else if(catname=="notmerged") {ToptaggingSF=ToptaggingSFnotmerged;ToptaggingSFUp=ToptaggingSFnotmergedUp;ToptaggingSFDown=ToptaggingSFnotmergedDown;}
 		int bin = ToptaggingSF->FindFixBin(TopJet_pt);
 		if(TopJet_pt >= 5000.) bin = ToptaggingSF->GetNbinsX();
 		w_topJet_ =ToptaggingSF->GetBinContent(bin);
@@ -784,6 +811,51 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventC
 	return std::make_tuple(w_topJet_,w_topJetUp_,w_topJetDown_);
 }
 }
+
+std::tuple<TString> EventWeight::getTopTaggingMatch(EventContainer* EventContainerObj,Double_t Topjet_phi,Double_t Topjet_eta){
+
+	double dr1=99; double dr2=99; double dr3=99; double dr4=99; double dr5=99; double dr6=99;
+	EventTree* tree = EventContainerObj->GetEventTree();
+	TString cat = "notmerged";
+		int Nmatch = 0;
+		int numberoftop=0,numberofantitop=0;
+	std::vector<double>* gen_pt = tree->Gen_pt;
+	for (uint j = 0; j < gen_pt->size(); ++j){
+		double rGen_phi = tree->Gen_phi->at(j);
+		double rGen_eta = tree->Gen_eta->at(j);
+		double rGen_pdg_id = tree->Gen_pdg_id->at(j);
+		double rGen_motherpdg_id = tree->Gen_motherpdg_id->at(j);
+		if(abs(rGen_motherpdg_id)==6) numberoftop=numberoftop+1;
+		if(abs(rGen_motherpdg_id)==-6) numberofantitop=numberofantitop+1;
+		if((abs(rGen_pdg_id)==11 || abs(rGen_pdg_id)==13) && abs(rGen_motherpdg_id)==6){Nmatch = Nmatch; cout<<"decay to lepton"<<endl;continue ;}
+		if(abs(rGen_pdg_id)==-5 && abs(rGen_motherpdg_id)==6 && deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta)<0.8)){Nmatch=Nmatch+1;cout<<"sub bjet matched"<<endl;}
+
+		if(abs(rGen_pdg_id)==1 && abs(rGen_motherpdg_id)==6) dr1 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==2 && abs(rGen_motherpdg_id)==6) dr2 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==3 && abs(rGen_motherpdg_id)==6) dr3 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==4 && abs(rGen_motherpdg_id)==6) dr4 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==5 && abs(rGen_motherpdg_id)==6) dr5 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
+		if(abs(rGen_pdg_id)==6 && abs(rGen_motherpdg_id)==6) dr6 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
+	if((dr2<0.8 && dr1<0.8) || (dr2<0.8 && dr3<0.8) || (dr2<0.8 && dr5<0.8)) {Nmatch=Nmatch+1;cout<<"W production 1 matched"<<endl;} //W -> ud/us/ub
+	if((dr4<0.8 && dr1<0.8) || (dr4<0.8 && dr3<0.8) || (dr4<0.8 && dr5<0.8)) {Nmatch=Nmatch+1;cout<<"W production 2 matched"<<endl;} //W -> cd/cs/cb
+}
+
+	if(Nmatch == 3) cat = "mergedTop";
+ 	else if(Nmatch == 2) cat = "semimerged";
+	else cat = "notmerged";
+	cout <<"Nmatch : "<<Nmatch<<"cat: "<<cat<<endl;
+	cout <<"Ntop : "<< numberoftop <<"N antitop: "<<numberofantitop<<endl;
+
+	return std::make_tuple(cat);
+
+
+
+}
+
+
+
+
+
 
 
 std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::TopPtReweight(EventContainer* EventContainerObj){
