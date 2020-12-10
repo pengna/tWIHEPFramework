@@ -127,6 +127,8 @@
 #include "SingleTopRootAnalysis/Particles/Truth/MCJet.hpp"
 #include "SingleTopRootAnalysis/Particles/Truth/MCTop.hpp"
 #include "SingleTopRootAnalysis/Particles/Truth/MCW.hpp"
+#include "SingleTopRootAnalysis/Particles/Truth/MCZ.hpp"
+#include "SingleTopRootAnalysis/Particles/Truth/MCPhoton.hpp"
 #include "SingleTopRootAnalysis/Particles/Truth/MCNeutrino.hpp"
 #include "SingleTopRootAnalysis/Particles/Truth/MCBQuark.hpp"
 #include "SingleTopRootAnalysis/Particles/Truth/MCCQuark.hpp"
@@ -613,7 +615,11 @@ class EventContainer
   std::vector<Jet> * taggedjetsToUsePtrBoostedjetoverlap;
 
   std::vector<TLorentzVector>      jetmsSpecial;//MET tool
-  
+ 
+ std::vector<MCParticle> * mcParticlesPtr;
+ std::vector<MCTop> * mcTopsPtr;
+
+ 
   // also store MET
   Double_t missingEt;
   Double_t missingEx;
@@ -654,8 +660,12 @@ class EventContainer
   std::vector<MCJet> MCBJets;             // MC B Jets
   std::vector<MCJet> MCCJets;             // MC C Jets
   std::vector<MCJet> MCLightQuarkJets;    // U, D, S Jets
+std::vector<MCJet> MCLightJets;           // U, D, S, G Jets
   std::vector<MCTop> MCTops;              // MC Tops
   std::vector<MCW> MCWs;                  // MC Ws
+std::vector<MCZ> MCZs;                  // MC Zs
+  std::vector<MCPhoton> MCPhotons;                  // MC Photons
+
   std::vector<MCNeutrino> MCNeutrinos;    // MC Neutrinos
   std::vector<MCBQuark>  MCBQuarks;       // MC B Quarks
   std::vector<MCCQuark>  MCCQuarks;       // MC C Quarks
@@ -796,7 +806,7 @@ private:
   Electron newElectron;
   Jet newJet;
   BoostedJet newBoostedJet;
-
+  MCParticle newMCParticle;
   ////////////////////////////////////////////////////////////////////////////////
   // Integrate classes into the Root system
   // Must come at end of class definition

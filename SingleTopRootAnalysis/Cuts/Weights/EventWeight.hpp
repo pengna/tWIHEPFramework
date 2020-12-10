@@ -135,6 +135,15 @@ private:
   TH1F* ToptaggingSF;
   TH1F* ToptaggingSFUp;
   TH1F* ToptaggingSFDown;
+  TH1F* ToptaggingSFmergedTop;
+  TH1F* ToptaggingSFmergedTopUp;
+  TH1F* ToptaggingSFmergedTopDown;
+  TH1F* ToptaggingSFsemimerged;
+  TH1F* ToptaggingSFsemimergedUp;
+  TH1F* ToptaggingSFsemimergedDown;
+  TH1F* ToptaggingSFnotmerged;
+  TH1F* ToptaggingSFnotmergedUp;
+  TH1F* ToptaggingSFnotmergedDown;
 
   //b-tagging efficiency plots
   Bool_t _runEfficiencyBasedbTag;
@@ -157,6 +166,9 @@ private:
   std::tuple<bool> GenWBoson(EventContainer* EventContainerObj,Double_t Wjet_phi,Double_t Wjet_eta);
   std::tuple<Double_t,Double_t,Double_t> getWSF(EventContainer* EventContainerObj);
   std::tuple<Double_t,Double_t,Double_t> TopSF(EventContainer* EventContainerObj);
+  std::tuple<TString> getTopTaggingMatch(EventContainer* EventContainerObj, BoostedJet& BoostedJet);
+  std::tuple<Int_t>CheckWCase(EventContainer* EventContainerObj,Int_t Nwfromt,Int_t Nwfromtbar,Double_t Topjet_phi,Double_t Topjet_eta);
+  std::tuple<TString> getGenTop(EventContainer* EventContainerObj);
   std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t> TopPtReweight(EventContainer* EventContainerObj);
   Double_t getJetSF(Jet jet, std::string syst);
   Double_t getJetEffic(Jet jet);

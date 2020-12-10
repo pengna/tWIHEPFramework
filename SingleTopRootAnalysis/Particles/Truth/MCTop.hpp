@@ -49,8 +49,14 @@ public:
 
   // Fill the MCTop from a TruthTree
   void FillTop(TruthTree *trtr, Int_t iE);
+ Bool_t TopIsHadronicDecay(const MCTop Ptemp, std::vector<MCParticle>& MCParticles)const;
+// const MCParticles bquark(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const; 
+ const MCParticle  bquark(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const; 
+ const MCParticle  WBoson(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const; 
 
-  // Getters and Setters
+const std::vector<MCParticle> Wjets(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const;
+
+ // Getters and Setters
 
 
   // Overloaded operators:

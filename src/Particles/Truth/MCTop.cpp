@@ -25,6 +25,8 @@
  *****************************************************************************/
 
 #include "SingleTopRootAnalysis/Particles/Truth/MCTop.hpp"
+#include "SingleTopRootAnalysis/Particles/Truth/MCW.hpp"
+#include "SingleTopRootAnalysis/Particles/Truth/MCParticle.hpp"
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -171,20 +173,78 @@ MCTop& MCTop::operator=(MCTop& other)
  ******************************************************************************/
 void MCTop::FillTop(TruthTree *trtr, int iE)
 {
-  /**
-  //MCParticle::Fill(trtr, iE);
 
-  Double_t pPt     = trtr -> TopDecay_pt    -> operator[](iE)/1000.;
-  Double_t pEta    = trtr -> TopDecay_eta    -> operator[](iE);
-  Double_t pPhi    = trtr -> TopDecay_phi    -> operator[](iE);
-  Double_t pM      = trtr -> TopDecay_m      -> operator[](iE)/1000.;
-  Double_t pCharge = trtr -> TopDecay_charge -> operator[](iE);
-  
-  _PdgId   = static_cast<Int_t>(trtr -> TopDecay_pdgId  -> operator[](iE));
-  _Status  = static_cast<Int_t>(trtr -> TopDecay_status -> operator[](iE));
-  _BarCode = trtr -> TopDecay_barcode->operator[](iE);
- SetPtEtaPhiM(pPt,pEta,pPhi,pM);
-    SetCharge(pCharge);
-  **/
+  MCParticle::Fill(trtr, iE);
 
 } //Fill()
+
+
+Bool_t MCTop::TopIsHadronicDecay(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const
+{
+	//cout<<"Ptemp.Status() = "<<Ptemp.Status()<<endl;
+	//if(Ptemp.Status()==2){
+		for(int d_index=0; d_index< Ptemp.BdaughtIndices().size(); d_index++){
+			const MCParticle daught = MCParticles.at(Ptemp.BdaughtIndices().at(d_index));
+			int daughtid = daught.AbsPdgId();
+		//	cout<<"daughtid ="<<daughtid<<endl;
+			if ( daughtid == 24 && IsHadronicDecay(daught,MCParticles) )return true;
+		}
+		return false;
+
+//}
+// return false;
+
+}
+
+
+//Find bquark from  gen top particle decay final states
+const MCParticle MCTop::bquark(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const
+{
+
+
+	 for(int d_index=0; d_index< Ptemp.BdaughtIndices().size(); d_index++){
+                        const MCParticle daught = MCParticles.at(Ptemp.BdaughtIndices().at(d_index));
+                        int daughtid = daught.AbsPdgId();
+			if(daughtid==5) return daught;
+}
+
+return Ptemp;
+
+}
+
+const MCParticle MCTop::WBoson(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const
+{
+
+
+         for(int d_index=0; d_index< Ptemp.BdaughtIndices().size(); d_index++){
+                        const MCParticle daught = MCParticles.at(Ptemp.BdaughtIndices().at(d_index));
+                        int daughtid = daught.AbsPdgId();
+                        if(daughtid==24 ) return daught;
+}
+
+return Ptemp;
+
+}
+
+//Find jets from W 
+
+const std::vector<MCParticle>  MCTop::Wjets(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const
+{
+std::vector<MCParticle> Wdecayjets;
+Wdecayjets.clear();
+ const MCW WfromTop= WBoson(Ptemp,MCParticles);       
+ const MCW W= GetGenPartcileNoFsr(WfromTop,MCParticles);       
+         for(int d_index=0; d_index< W.BdaughtIndices().size(); d_index++){
+                        const MCParticle daught = MCParticles.at(W.BdaughtIndices().at(d_index));
+			Wdecayjets.push_back(daught);
+}
+return Wdecayjets;
+
+}
+
+
+
+
+
+
+

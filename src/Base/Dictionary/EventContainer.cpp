@@ -368,6 +368,8 @@ void EventContainer::SetUseUnisolatedLeptons(const Bool_t& useUnisolatedLeptons,
     muonsToUsePtr = &unIsolatedMuons;
   }
 
+mcParticlesPtr = &MCParticles;
+mcTopsPtr = &MCTops;
   //For the synch excercise we want it to always be tight leptons, so I'm gonna add here the ability to just make it all tight.
   //  if (GetChannelName() == "ee" || GetChannelName() == "emu" || GetChannelName() == "mumu"){
   // }
@@ -458,6 +460,21 @@ Int_t EventContainer::ReadEvent()
   tauLabeledJets.clear();
   lightQuarkLabeledJets.clear();
   neutrinos.clear();
+
+ MCParticles.clear();
+  MCMuons.clear();
+  MCElectrons.clear();
+  MCTaus.clear();
+  MCJets.clear();
+  MCBJets.clear();
+  MCCJets.clear();
+  MCLightQuarkJets.clear();
+  MCLightJets.clear();
+  MCTops.clear();
+  MCWs.clear();
+  MCZs.clear();
+  MCPhotons.clear();
+  MCNeutrinos.clear();
 
   ////////////////////////////////////////////////////
   // Fill objects
@@ -623,25 +640,6 @@ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     ///////////////////////////////////////////
     // Jets
     ///////////////////////////////////////////
@@ -725,8 +723,31 @@ for(Int_t io = 0; io < _eventTree->patElectron_pt->size(); io++) {
   newNeutrino.Fill(tightMuons, tightElectrons,missingEx,missingEy);
   neutrinos.push_back(newNeutrino);
   
+
+
+
+
+
+
+//Fill Gen event
+ if(isSimulation){
+  int motherIndex =0;
+  int daughtIndex =0;
+  // Gen particles 
+  for(Int_t io = 0;io < _eventTree -> Gen_pt->size(); io++) {
+	  newMCParticle.Clear();
+	  newMCParticle.Fill(_eventTree, io, motherIndex, daughtIndex);
+	  MCParticles.push_back(newMCParticle);
+	  if(newMCParticle.isTop()){
+		  MCTops.push_back(newMCParticle);
+	  }
+	  if(newMCParticle.isW()){
+		  MCWs.push_back(newMCParticle);
+	  } 
+
+  }
+}
   return 0;
-  
 } //ReadEvent
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -792,13 +792,14 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventC
                                   "CHS_wp2_btag", "CHS_wp3_btag", "CHS_wp4_btag", "CHS_wp5_btag", 
                                   "HOTVR"};
 	TString catname= "notmerged";
-	cout<<"Boostedjet size:"<<EventContainerObj->boostedjetsToUsePtr->size()<<endl;
+	//cout<<"Boostedjet size:"<<EventContainerObj->boostedjetsToUsePtr->size()<<endl;
 	for(int i=0;i<EventContainerObj->boostedjetsToUsePtr->size();i++){
+		BoostedJet boostedjet = EventContainerObj->boostedjetsToUsePtr->at(i); 
 		TopJet_pt = EventContainerObj->boostedjetsToUsePtr->at(i).Pt();
 		TopJet_eta = EventContainerObj->boostedjetsToUsePtr->at(i).Eta();
 		TopJet_phi = EventContainerObj->boostedjetsToUsePtr->at(i).Phi();
-		std::tie(catname) = getTopTaggingMatch( EventContainerObj,TopJet_phi,TopJet_eta);
-		cout<<"cat name:"<<catname<<endl;
+		std::tie(catname) = getTopTaggingMatch( EventContainerObj,boostedjet);
+	//	cout<<"cat name:"<<catname<<endl;
 		if(catname=="mergedTop"){ ToptaggingSF=ToptaggingSFmergedTop;ToptaggingSFUp=ToptaggingSFmergedTopUp;ToptaggingSFDown=ToptaggingSFmergedTopDown;}
 		else if(catname=="semimerged") {ToptaggingSF=ToptaggingSFsemimerged;ToptaggingSFUp=ToptaggingSFsemimergedUp;ToptaggingSFDown=ToptaggingSFsemimergedDown;}
 		else if(catname=="notmerged") {ToptaggingSF=ToptaggingSFnotmerged;ToptaggingSFUp=ToptaggingSFnotmergedUp;ToptaggingSFDown=ToptaggingSFnotmergedDown;}
@@ -811,46 +812,48 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventC
 	return std::make_tuple(w_topJet_,w_topJetUp_,w_topJetDown_);
 }
 }
+/////////////////////////////////////////////////////////
+//Because we don't have gen daughter information in Ntuples.
+//Add top tagging for different cause (no top, one top , ttbar and tW)
+//
+///////////////////////////////////////////////////////////
 
-std::tuple<TString> EventWeight::getTopTaggingMatch(EventContainer* EventContainerObj,Double_t Topjet_phi,Double_t Topjet_eta){
 
-	double dr1=99; double dr2=99; double dr3=99; double dr4=99; double dr5=99; double dr6=99;
+
+std::tuple<TString> EventWeight::getTopTaggingMatch(EventContainer* EventContainerObj, BoostedJet& tagged_jet ){
+	TString test="";
 	EventTree* tree = EventContainerObj->GetEventTree();
 	TString cat = "notmerged";
+	double drW1=99,drW2=99;
+	//cout<<"MCTOp size:" << EventContainerObj->mcTopsPtr->size()<<endl ;
+	int NHadtop = 0,Nnohadtop=0;
+	for (auto const & mctop : *EventContainerObj->mcTopsPtr){      
+		if (!mctop.TopIsHadronicDecay(mctop, *EventContainerObj->mcParticlesPtr)) {
+			//cout<<"leptonic decay"<<endl;
+			Nnohadtop=Nnohadtop+1;	continue;}
 		int Nmatch = 0;
-		int numberoftop=0,numberofantitop=0;
-	std::vector<double>* gen_pt = tree->Gen_pt;
-	for (uint j = 0; j < gen_pt->size(); ++j){
-		double rGen_phi = tree->Gen_phi->at(j);
-		double rGen_eta = tree->Gen_eta->at(j);
-		double rGen_pdg_id = tree->Gen_pdg_id->at(j);
-		double rGen_motherpdg_id = tree->Gen_motherpdg_id->at(j);
-		if(abs(rGen_motherpdg_id)==6) numberoftop=numberoftop+1;
-		if(abs(rGen_motherpdg_id)==-6) numberofantitop=numberofantitop+1;
-		if((abs(rGen_pdg_id)==11 || abs(rGen_pdg_id)==13) && abs(rGen_motherpdg_id)==6){Nmatch = Nmatch; cout<<"decay to lepton"<<endl;continue ;}
-		if(abs(rGen_pdg_id)==-5 && abs(rGen_motherpdg_id)==6 && deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta)<0.8)){Nmatch=Nmatch+1;cout<<"sub bjet matched"<<endl;}
+		NHadtop =NHadtop+1;
+		if(( tagged_jet.DeltaR( mctop.bquark(mctop, *EventContainerObj->mcParticlesPtr)) ) < 0.8){ ++Nmatch;}//cout<<"b matched"<<endl;	}
 
-		if(abs(rGen_pdg_id)==1 && abs(rGen_motherpdg_id)==6) dr1 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
-		if(abs(rGen_pdg_id)==2 && abs(rGen_motherpdg_id)==6) dr2 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
-		if(abs(rGen_pdg_id)==3 && abs(rGen_motherpdg_id)==6) dr3 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
-		if(abs(rGen_pdg_id)==4 && abs(rGen_motherpdg_id)==6) dr4 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
-		if(abs(rGen_pdg_id)==5 && abs(rGen_motherpdg_id)==6) dr5 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
-		if(abs(rGen_pdg_id)==6 && abs(rGen_motherpdg_id)==6) dr6 = deltaR(deltaPhi(Topjet_phi,rGen_phi),deltaEta(Topjet_eta,rGen_eta));
-	if((dr2<0.8 && dr1<0.8) || (dr2<0.8 && dr3<0.8) || (dr2<0.8 && dr5<0.8)) {Nmatch=Nmatch+1;cout<<"W production 1 matched"<<endl;} //W -> ud/us/ub
-	if((dr4<0.8 && dr1<0.8) || (dr4<0.8 && dr3<0.8) || (dr4<0.8 && dr5<0.8)) {Nmatch=Nmatch+1;cout<<"W production 2 matched"<<endl;} //W -> cd/cs/cb
-}
+		std::vector<MCParticle> allWjets =  mctop.Wjets(mctop, *EventContainerObj->mcParticlesPtr);
+		for (auto const & mcjets : allWjets){
+		//	cout<<" jets from W :"<<mcjets.AbsPdgId()<<endl;
+			if(mcjets.AbsPdgId()==2 || mcjets.AbsPdgId()==4) drW1=tagged_jet.DeltaR(mcjets); 
+			else drW2=tagged_jet.DeltaR( mcjets); 
 
-	if(Nmatch == 3) cat = "mergedTop";
- 	else if(Nmatch == 2) cat = "semimerged";
-	else cat = "notmerged";
-	cout <<"Nmatch : "<<Nmatch<<"cat: "<<cat<<endl;
-	cout <<"Ntop : "<< numberoftop <<"N antitop: "<<numberofantitop<<endl;
+		}
+		//	cout<<" wJets size :"<<allWjets.size()<<endl;
+		if (drW1< 0.8){++Nmatch;}//cout<<"W1 matched"<<endl;}
+		if (drW2< 0.8){++Nmatch;}// cout<<"W2 matched"<<endl;}
+		if(Nmatch == 3) cat = "mergedTop";
+		if(Nmatch == 2) cat = "semimerged";
+		//	cout<<"b R= "<<tagged_jet.DeltaR( mctop.bquark(mctop, *EventContainerObj->mcParticlesPtr))<<"  W1 R = "<<drW1<<"  W2 R : "<<drW2<<endl;
+	}
+	//		cout<<"Top case: NHadtop = "<<NHadtop<<"  Nnohadtop= "<<Nnohadtop<<endl;
 
 	return std::make_tuple(cat);
+}	
 
-
-
-}
 
 
 
