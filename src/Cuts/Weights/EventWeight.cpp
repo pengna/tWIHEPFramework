@@ -466,7 +466,7 @@ else {
   if(_useToptagging){
 	  std::tie(w_Toptagging_,w_ToptaggingUp_,w_ToptaggingDown_) = TopSF(EventContainerObj);
   	  wgt *= w_Toptagging_;
-	  //cout<<"Top SF is :"<<w_Toptagging_<<endl;
+	 //cout<<"Top SF is :"<<w_Toptagging_<<"Top Up : "<<w_ToptaggingUp_<<"Top Down : "<<w_ToptaggingDown_<<endl;
   }
  Double_t w_WJet_=1.0,w_WJetUp_=1.0, w_WJetDown_=1.0;
   if(_useWSF){
@@ -792,6 +792,7 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventC
                                   "CHS_wp2_btag", "CHS_wp3_btag", "CHS_wp4_btag", "CHS_wp5_btag", 
                                   "HOTVR"};
 	TString catname= "notmerged";
+//	TString catname= "semimerged";
 	//cout<<"Boostedjet size:"<<EventContainerObj->boostedjetsToUsePtr->size()<<endl;
 	for(int i=0;i<EventContainerObj->boostedjetsToUsePtr->size();i++){
 		BoostedJet boostedjet = EventContainerObj->boostedjetsToUsePtr->at(i); 
@@ -799,7 +800,7 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventC
 		TopJet_eta = EventContainerObj->boostedjetsToUsePtr->at(i).Eta();
 		TopJet_phi = EventContainerObj->boostedjetsToUsePtr->at(i).Phi();
 		std::tie(catname) = getTopTaggingMatch( EventContainerObj,boostedjet);
-	//	cout<<"cat name:"<<catname<<endl;
+		cout<<"cat name:"<<catname<<endl;
 		if(catname=="mergedTop"){ ToptaggingSF=ToptaggingSFmergedTop;ToptaggingSFUp=ToptaggingSFmergedTopUp;ToptaggingSFDown=ToptaggingSFmergedTopDown;}
 		else if(catname=="semimerged") {ToptaggingSF=ToptaggingSFsemimerged;ToptaggingSFUp=ToptaggingSFsemimergedUp;ToptaggingSFDown=ToptaggingSFsemimergedDown;}
 		else if(catname=="notmerged") {ToptaggingSF=ToptaggingSFnotmerged;ToptaggingSFUp=ToptaggingSFnotmergedUp;ToptaggingSFDown=ToptaggingSFnotmergedDown;}
@@ -867,8 +868,11 @@ Double_t topPtWeight = 1.0,topPtWeight_a_Up = 1.0,topPtWeight_a_Down = 1.0,topPt
 std::vector<double>* gen_pt = tree->Gen_pt;
         for (uint j = 0; j < gen_pt->size(); ++j){
 	double rGen_pdg_id = tree->Gen_pdg_id->at(j);	
-	if(rGen_pdg_id==6)pt1 =gen_pt->at(j);
-	if(rGen_pdg_id==-6)pt2 = gen_pt->at(j);
+	double rGen_num_daught = tree->Gen_numDaught->at(j);	
+	if(rGen_pdg_id==6&&rGen_num_daught==2)pt1 =gen_pt->at(j);
+	if(rGen_pdg_id==-6&&rGen_num_daught==2)pt2 =gen_pt->at(j);
+//	if(rGen_pdg_id==6)pt1 = gen_pt->at(j);
+//	if(rGen_pdg_id==-6)pt2 = gen_pt->at(j);
 	if(pt1 != -99.9&&pt2 != -99.9)break;
 	}
 	SF1 = exp(0.0615-0.0005*pt1);
@@ -886,7 +890,7 @@ std::vector<double>* gen_pt = tree->Gen_pt;
 	topPtWeight_b_Up   = sqrt(SF1bUp*SF2bUp) ;
 	topPtWeight_a_Down = sqrt(SF1aDown*SF2aDown);
 	topPtWeight_b_Down = sqrt(SF1bDown*SF2bDown);
-	 //cout<<"Top pt is :"<<pt1<<"Anti Top pt is:"<<pt2<<"topPtWeight ="<<topPtWeight<<"topPtWeightUp="<<topPtWeightUp<<"topPtWeightDown="<<topPtWeightDown<<endl;
+	// cout<<"Top pt is :"<<pt1<<"Anti Top pt is:"<<pt2<<"topPtWeight ="<<topPtWeight<<"topPtWeight_a_Up="<<topPtWeight_a_Up<<"topPtWeight_a_Down="<<topPtWeight_a_Down<<"topPtWeight_b_Up="<<topPtWeight_b_Up<<"topPtWeight_b_Down="<<topPtWeight_b_Down<<endl;
 	  return std::make_tuple(topPtWeight,topPtWeight_a_Up,topPtWeight_b_Up,topPtWeight_a_Down ,topPtWeight_b_Down );
 }
 /****************************************************************************** 
