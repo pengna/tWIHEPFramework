@@ -466,7 +466,7 @@ else {
   if(_useToptagging){
 	  std::tie(w_Toptagging_,w_ToptaggingUp_,w_ToptaggingDown_) = TopSF(EventContainerObj);
   	  wgt *= w_Toptagging_;
-	 //cout<<"Top SF is :"<<w_Toptagging_<<"Top Up : "<<w_ToptaggingUp_<<"Top Down : "<<w_ToptaggingDown_<<endl;
+	 cout<<"Top SF is :"<<w_Toptagging_<<"Top Up : "<<w_ToptaggingUp_<<"Top Down : "<<w_ToptaggingDown_<<endl;
   }
  Double_t w_WJet_=1.0,w_WJetUp_=1.0, w_WJetDown_=1.0;
   if(_useWSF){
@@ -478,6 +478,7 @@ else {
 if(_useTopPtreweight){
 	std::tie(w_TopPt_,w_TopPt_a_Up_,w_TopPt_b_Up_,w_TopPt_a_Down_,w_TopPt_b_Down_) = TopPtReweight(EventContainerObj);
 	wgt *= w_TopPt_;
+	 cout<<"ToppT is :"<<w_TopPt_<<endl;
 	}
  std::map<std::string,float> bTagReshape;
  std::map<std::string,float> misTagReshape;
@@ -793,7 +794,7 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventC
                                   "HOTVR"};
 	TString catname= "notmerged";
 //	TString catname= "semimerged";
-	//cout<<"Boostedjet size:"<<EventContainerObj->boostedjetsToUsePtr->size()<<endl;
+	cout<<"Boostedjet size:"<<EventContainerObj->boostedjetsToUsePtr->size()<<endl;
 	for(int i=0;i<EventContainerObj->boostedjetsToUsePtr->size();i++){
 		BoostedJet boostedjet = EventContainerObj->boostedjetsToUsePtr->at(i); 
 		TopJet_pt = EventContainerObj->boostedjetsToUsePtr->at(i).Pt();
@@ -809,6 +810,7 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventC
 		w_topJet_ =ToptaggingSF->GetBinContent(bin);
 		w_topJetUp_=ToptaggingSFUp->GetBinContent(bin);
 		w_topJetDown_=ToptaggingSFDown->GetBinContent(bin);
+		cout<<"Top tag:"<<w_topJet_<<endl;
 	
 	return std::make_tuple(w_topJet_,w_topJetUp_,w_topJetDown_);
 }
@@ -866,7 +868,12 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::TopPtRewei
 EventTree* tree = EventContainerObj->GetEventTree();
 Double_t topPtWeight = 1.0,topPtWeight_a_Up = 1.0,topPtWeight_a_Down = 1.0,topPtWeight_b_Up = 1.0,topPtWeight_b_Down = 1.0,pt1 = -99.9,pt2 = -99.9,SF1=1.0,SF1aUp=1.0,SF1aDown=1.0,SF1bUp=1.0,SF1bDown=1.0,SF2=1.0,SF2aUp=1.0,SF2aDown=1.0,SF2bUp=1.0,SF2bDown=1.0,SF=1.0;
 std::vector<double>* gen_pt = tree->Gen_pt;
-        for (uint j = 0; j < gen_pt->size(); ++j){
+int Ntop=0,Nantitop=0;
+double DeltaPtTop=0,DeltaPtantiTop=0;
+//if(EventContainerObj->boostedjetsToUsePtr->size()==1)N1BoostedJet==N1BoostedJet+1;
+      //  for(int i=0;i<EventContainerObj->boostedjetsToUsePtr->size();i++){      
+//  for (auto boostedjet : EventContainerObj->boostedjets){
+	 for (uint j = 0; j < gen_pt->size(); j++){
 	double rGen_pdg_id = tree->Gen_pdg_id->at(j);	
 	double rGen_num_daught = tree->Gen_numDaught->at(j);	
 	if(rGen_pdg_id==6&&rGen_num_daught==2)pt1 =gen_pt->at(j);
@@ -875,6 +882,14 @@ std::vector<double>* gen_pt = tree->Gen_pt;
 //	if(rGen_pdg_id==-6)pt2 = gen_pt->at(j);
 	if(pt1 != -99.9&&pt2 != -99.9)break;
 	}
+     // for (auto const & mctop : *EventContainerObj->mcTopsPtr){
+///	if( mctop.TopIsDecay(mctop,*EventContainerObj->mcParticlesPtr)&&mctop.PdgId()==6) { pt1 =mctop.Pt();Ntop=Ntop+1;}
+//	if( mctop.TopIsDecay(mctop,*EventContainerObj->mcParticlesPtr)&&mctop.PdgId()==-6) { pt2 =mctop.Pt();Nantitop=Nantitop+1;}
+
+//	}
+//	DeltaPtTop=pt1-EventContainerObj->boostedjetsToUsePtr->at(i).Pt();
+//	DeltaPtantiTop=pt2-EventContainerObj->boostedjetsToUsePtr->at(i).Pt();
+//	cout<<"Delta Pt Top = "<<DeltaPtTop<<"DeltaPtantiTop = "<<DeltaPtantiTop<<endl;
 	SF1 = exp(0.0615-0.0005*pt1);
 	SF1aUp = exp((0.0615+0.0615*0.5)-0.0005*pt1);
 	SF1aDown = exp((0.0615-0.0615*0.5)-0.0005*pt1);
@@ -890,7 +905,8 @@ std::vector<double>* gen_pt = tree->Gen_pt;
 	topPtWeight_b_Up   = sqrt(SF1bUp*SF2bUp) ;
 	topPtWeight_a_Down = sqrt(SF1aDown*SF2aDown);
 	topPtWeight_b_Down = sqrt(SF1bDown*SF2bDown);
-	// cout<<"Top pt is :"<<pt1<<"Anti Top pt is:"<<pt2<<"topPtWeight ="<<topPtWeight<<"topPtWeight_a_Up="<<topPtWeight_a_Up<<"topPtWeight_a_Down="<<topPtWeight_a_Down<<"topPtWeight_b_Up="<<topPtWeight_b_Up<<"topPtWeight_b_Down="<<topPtWeight_b_Down<<endl;
+//}
+	 cout<<"Top pt is :"<<pt1<<"Anti Top pt is:"<<pt2<<"topPtWeight ="<<topPtWeight<<"topPtWeight_a_Up="<<topPtWeight_a_Up<<"topPtWeight_a_Down="<<topPtWeight_a_Down<<"topPtWeight_b_Up="<<topPtWeight_b_Up<<"topPtWeight_b_Down="<<topPtWeight_b_Down<<endl;
 	  return std::make_tuple(topPtWeight,topPtWeight_a_Up,topPtWeight_b_Up,topPtWeight_a_Down ,topPtWeight_b_Down );
 }
 /****************************************************************************** 

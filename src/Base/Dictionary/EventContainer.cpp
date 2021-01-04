@@ -356,6 +356,7 @@ void EventContainer::SetUseUnisolatedLeptons(const Bool_t& useUnisolatedLeptons,
   //electronsToUsePtr = &electrons;
  // muonsToUsePtr = &muons;
   boostedjetsToUsePtr = &boostedjets;
+  allboostedjetsToUsePtr = &allboostedjets;
   boostedjetsToUsePtrjetaverlap = &basedboostedjets;
   jetsToUsePtr = &alljets;
   //jetsToUsePtr = &taggedJets;
@@ -679,7 +680,7 @@ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
  ///////////////////////////////////////////
  // //  BoostedJets
  ///////////////////////////////////////////////
-    // std::cout << "Before newBoostedJet Loop" << std::endl;
+    //std::cout << "Before newBoostedJet Loop" << _eventTree -> BoostedJet_pt->size()<<std::endl;
  for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
         newBoostedJet.Clear();
         //useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtrBoostedjetoverlap, _eventTree, io, &missingEtVec, isSimulation,"skim");

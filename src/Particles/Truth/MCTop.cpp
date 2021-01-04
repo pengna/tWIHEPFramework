@@ -196,6 +196,16 @@ Bool_t MCTop::TopIsHadronicDecay(const MCTop Ptemp, std::vector<MCParticle>& MCP
 
 }
 
+Bool_t MCTop::TopIsDecay(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const
+{
+                   if ( Ptemp.isFromTop(Ptemp,MCParticles,6) && Ptemp.numDaught()==2 )return true;
+                else return false;
+
+}
+
+
+
+
 
 //Find bquark from  gen top particle decay final states
 const MCParticle MCTop::bquark(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const

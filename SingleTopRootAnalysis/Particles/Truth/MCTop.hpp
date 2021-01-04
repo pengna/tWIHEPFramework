@@ -50,6 +50,7 @@ public:
   // Fill the MCTop from a TruthTree
   void FillTop(TruthTree *trtr, Int_t iE);
  Bool_t TopIsHadronicDecay(const MCTop Ptemp, std::vector<MCParticle>& MCParticles)const;
+ Bool_t TopIsDecay(const MCTop Ptemp, std::vector<MCParticle>& MCParticles)const;
 // const MCParticles bquark(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const; 
  const MCParticle  bquark(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const; 
  const MCParticle  WBoson(const MCTop Ptemp, std::vector<MCParticle>& MCParticles) const; 

@@ -32,6 +32,8 @@ public :
    std::vector<double>  *Gen_p;
    std::vector<double>  *Gen_energy;
    std::vector<double>  *Gen_charge;
+   std::vector<double>  *Gen_isDirectPromptTauDecayProductFinalState;
+   std::vector<double>  *Gen_isPromptFinalState;
    std::vector<double>  *Gen_vx;
    std::vector<double>  *Gen_vy;
    std::vector<double>  *Gen_vz;
@@ -588,6 +590,8 @@ public :
    TBranch        *b_Gen_p;   //!
    TBranch        *b_Gen_energy;   //!
    TBranch        *b_Gen_charge;   //!
+   TBranch        *b_Gen_isPromptFinalState;   //!
+   TBranch        *b_Gen_isDirectPromptTauDecayProductFinalState;   //!
    TBranch        *b_Gen_vx;   //!
    TBranch        *b_Gen_vy;   //!
    TBranch        *b_Gen_vz;   //!
@@ -1194,6 +1198,8 @@ void EventTree::Init(TTree *tree)
    Gen_p = 0;
    Gen_energy = 0;
    Gen_charge = 0;
+   Gen_isPromptFinalState= 0;
+   Gen_isDirectPromptTauDecayProductFinalState= 0;
    Gen_vx = 0;
    Gen_vy = 0;
    Gen_vz = 0;
@@ -1674,6 +1680,8 @@ void EventTree::Init(TTree *tree)
    fChain->SetBranchAddress("Gen_p", &Gen_p, &b_Gen_p);
    fChain->SetBranchAddress("Gen_energy", &Gen_energy, &b_Gen_energy);
    fChain->SetBranchAddress("Gen_charge", &Gen_charge, &b_Gen_charge);
+   fChain->SetBranchAddress("Gen_isPromptFinalState", &Gen_isPromptFinalState, &b_Gen_isPromptFinalState);
+   fChain->SetBranchAddress("Gen_isDirectPromptTauDecayProductFinalState", &Gen_isDirectPromptTauDecayProductFinalState, &b_Gen_isDirectPromptTauDecayProductFinalState);
    fChain->SetBranchAddress("Gen_vx", &Gen_vx, &b_Gen_vx);
    fChain->SetBranchAddress("Gen_vy", &Gen_vy, &b_Gen_vy);
    fChain->SetBranchAddress("Gen_vz", &Gen_vz, &b_Gen_vz);

@@ -89,6 +89,7 @@ bstarVars::bstarVars(bool makeHistos){
         _floatVecVars["M_Eta_AllBoostedJet"] ;
         _floatVecVars["M_Phi_AllBoostedJet"] ; 
         _floatVecVars["M_Mass_AllBoostedJet"];
+        _floatVecVars["M_Pt_MCTop"] ;
 
 
 	//W Vars
@@ -466,6 +467,7 @@ void bstarVars::FillBranches(EventContainer * evtObj){
 		TLorentzVector bstarleadjet(0,0,0,0);
 		 TLorentzVector BoostedJet(0,0,0,0);
 		// TLorentzVector Top_p4(0,0,0,0);
+	//	cout<<"BoostedJet size is:" <<evtObj->boostedjetsToUsePtr->size()<<endl;
 		for(int i=0;i<evtObj->boostedjetsToUsePtr->size();i++){
 		BoostedJet.SetPtEtaPhiM(evtObj->boostedjetsToUsePtr->at(i).Pt(),evtObj->boostedjetsToUsePtr->at(i).Eta(),evtObj->boostedjetsToUsePtr->at(i).Phi(),evtObj->boostedjetsToUsePtr->at(i).M());
 			//  BoostedJet.Setprunedmass(evtObj->boostedjetsToUsePtr->at(i).prunedmass());
@@ -519,7 +521,9 @@ void bstarVars::FillBranches(EventContainer * evtObj){
 	_intVars["M_nBoostedJet"] = Boostedjetnumber;
 
 
-
+		for (auto const & mctop : *evtObj->mcTopsPtr){
+	if(mctop.TopIsDecay(mctop,*evtObj->mcParticlesPtr)&&mctop.PdgId()==6)	 _floatVecVars["M_Pt_MCTop"].push_back(mctop.Pt());
+}
 
 }
 }

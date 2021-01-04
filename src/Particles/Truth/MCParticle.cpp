@@ -324,7 +324,7 @@ Bool_t MCParticle::isFromTop(const MCParticle Ptemp, std::vector<MCParticle>& MC
     const MCParticle mother = MCParticles.at(Ptemp.BmotherIndices().at(m_index));
     int momid = mother.AbsPdgId();
     if (momid / 1000 == topid ||  momid/100 == topid || momid == topid)return true;
-    else if (mother.Status()==2 && isFromB(mother, MCParticles, topid))return true;
+    else if (mother.Status()==2 && isFromTop(mother, MCParticles, topid))return true;
   }
   return false;
 }
