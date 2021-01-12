@@ -395,12 +395,16 @@ Int_t  _dataEra= config -> GetValue("_dataEra",2017);
     wgt *= mnwgt;
     _hMCatNLOWeight->FillWithoutWeight(mnwgt);
   }
-  
+   float eventnumber=0,eventrun=0;
+eventnumber=tree->EVENT_event;
+eventrun=tree->EVENT_run;
+cout << setprecision(8);
+cout<<"Event run ="<<eventrun<<"Event number = "<<eventnumber<<endl; 
   float genWeight(1.0);
   if (tree->EVENT_genWeight < 0.) genWeight = -1.;
 
   wgt *= genWeight;
-
+ cout<<"gen Weight ="<<genWeight<<endl;
   // multiply by PileUpWgt weight if desired.
  float pileupEventWeight(-1.0);
  float pileupMinBiasUpWeight(-1.0);
@@ -438,7 +442,7 @@ else {
 
 }
    wgt *= pileupEventWeight;
-   //cout<<"Pile up Weight is :"<<pileupEventWeight<<endl;
+   cout<<"Pile up Weight is :(EventWeight.cpp)"<<pileupEventWeight<<endl;
  }
 
 //cout<<"print out for check : before b weight everything is fine !"<<endl;
@@ -447,7 +451,7 @@ else {
  if (isbWeight()){
    bEventWeight = 1;
    wgt *= bEventWeight;
-  // cout<<"b Event Weight is:"<<bEventWeight<<endl;
+   cout<<"b Event Weight is:(EventWeight.cpp)"<<bEventWeight<<endl;
  }
   
  
@@ -458,7 +462,7 @@ else {
    std::tie(lepSFWeight,lepSFWeightUp,lepSFWeightDown,trigSFWeight,trigSFWeightUp,trigSFWeightDown) = getLeptonWeight(EventContainerObj);
    wgt *= lepSFWeight;
    wgt *= trigSFWeight;
- //cout<<"lepSF Weight is :"<<lepSFWeight<<"  ;trigSF Weight is :"<<trigSFWeight<<endl;
+ cout<<"(EventWeight.cpp)lepSF Weight is :"<<lepSFWeight<<"  ;trigSF Weight is :"<<trigSFWeight<<endl;
  }
 
    float w_Toptagging_=1.0,w_ToptaggingUp_=1.0, w_ToptaggingDown_=1.0;
@@ -466,19 +470,19 @@ else {
   if(_useToptagging){
 	  std::tie(w_Toptagging_,w_ToptaggingUp_,w_ToptaggingDown_) = TopSF(EventContainerObj);
   	  wgt *= w_Toptagging_;
-	 cout<<"Top SF is :"<<w_Toptagging_<<"Top Up : "<<w_ToptaggingUp_<<"Top Down : "<<w_ToptaggingDown_<<endl;
+	 cout<<"(EventWeight.cpp)Top SF is :"<<w_Toptagging_<<"Top Up : "<<w_ToptaggingUp_<<"Top Down : "<<w_ToptaggingDown_<<endl;
   }
  Double_t w_WJet_=1.0,w_WJetUp_=1.0, w_WJetDown_=1.0;
   if(_useWSF){
    std::tie(w_WJet_,w_WJetUp_,w_WJetDown_) = getWSF(EventContainerObj);
-   // cout<<"W tagging SF is "<<w_WJet_<<endl;
+    cout<<"(EventWeight.cpp)W tagging SF is "<<w_WJet_<<endl;
    wgt *= w_WJet_;
  }
  Double_t w_TopPt_=1.0,w_TopPt_a_Up_=1.0, w_TopPt_a_Down_=1.0,w_TopPt_b_Up_=1.0, w_TopPt_b_Down_=1.0;
 if(_useTopPtreweight){
 	std::tie(w_TopPt_,w_TopPt_a_Up_,w_TopPt_b_Up_,w_TopPt_a_Down_,w_TopPt_b_Down_) = TopPtReweight(EventContainerObj);
 	wgt *= w_TopPt_;
-	 cout<<"ToppT is :"<<w_TopPt_<<endl;
+	 cout<<"(EventWeight.cpp)ToppT is :"<<w_TopPt_<<endl;
 	}
  std::map<std::string,float> bTagReshape;
  std::map<std::string,float> misTagReshape;
@@ -493,15 +497,14 @@ if(_useTopPtreweight){
    wgt *= bTagReshape["central"];
    wgt *= misTagReshape["central"];
  //cout<<" jet SF is :"<<bTagReshape["central"]<<endl;
- // cout<<"btag weight is :"<<bTagReshape["central"]<<"  ;mistag weight is :"<<misTagReshape["central"]<<endl;
- //  cout<<"the total weight is :"<<wgt<<endl;
+  cout<<"(EventWeight.cpp)btag weight is :"<<bTagReshape["central"]<<"  ;mistag weight is :"<<misTagReshape["central"]<<endl;
+   cout<<"(EventWeight.cpp)the total weight is :"<<wgt<<endl;
  }
   
  //PDF weights
  
 
- // 
- // cout << wgt << endl;
+  cout << "(EventWeight.cpp)Before set weight in event:"<<wgt <<"PileUp weight ="<<pileupEventWeight<<"Top pT weigth = "<< w_TopPt_<< endl;
   EventContainerObj -> SetOutputEventWeight(wgt);
   EventContainerObj -> SetEventPileupWeight(pileupEventWeight);
   //Save systematic pileup weights
@@ -541,6 +544,8 @@ if(_useTopPtreweight){
   //EventContainerObj -> SetEventLepSFWeightDown(lepSFWeightDown);
   //  cout<<"weight "<<EventContainerObj -> GetOutputEventWeight()<<endl;;
   // Fill Histograms
+  cout << "Check Get  weight function(EventWeight.cpp): event ID = "<<EventContainerObj ->GetEventTree()->EVENT_event<<EventContainerObj -> GetEventWeight()<<"PileUp weight ="<<EventContainerObj -> GetEventPileupWeight()<<"Top pT weigth = "<< EventContainerObj -> GetEventTopptreweight()<< endl;
+
 
   _hTreeWeight     -> FillWithoutWeight(EventContainerObj -> GetTreeEventWeight());
   _hGlobalWeight   -> FillWithoutWeight(EventContainerObj -> GetGlobalEventWeight());
@@ -556,6 +561,7 @@ if(_useTopPtreweight){
     _hbTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventbTagReshape(bSystName));
     _hMisTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventMisTagReshape(bSystName));
   }
+  cout << "After Fill histogram Check Get  weight function(EventWeight.cpp): event ID = "<<EventContainerObj ->GetEventTree()->EVENT_event<<EventContainerObj -> GetEventWeight()<<"PileUp weight ="<<EventContainerObj -> GetEventPileupWeight()<<"Top pT weigth = "<< EventContainerObj -> GetEventTopptreweight()<< endl;
 
   return kTRUE;
   
@@ -792,16 +798,17 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventC
                                   "CHS_wp2", "CHS_wp3", "CHS_wp4", "CHS_wp5", 
                                   "CHS_wp2_btag", "CHS_wp3_btag", "CHS_wp4_btag", "CHS_wp5_btag", 
                                   "HOTVR"};
-	TString catname= "notmerged";
-//	TString catname= "semimerged";
-	cout<<"Boostedjet size:"<<EventContainerObj->boostedjetsToUsePtr->size()<<endl;
+//	TString catname= "notmerged";
+	TString catname= "semimerged";
+	cout<<"Boostedjet size:(EventWeight.cpp)"<<EventContainerObj->boostedjetsToUsePtr->size()<<endl;
 	for(int i=0;i<EventContainerObj->boostedjetsToUsePtr->size();i++){
-		BoostedJet boostedjet = EventContainerObj->boostedjetsToUsePtr->at(i); 
+		BoostedJet boostedjet = EventContainerObj->boostedjetsToUsePtr->at(i);
+		cout<<"BoostedJet pT =(EventWeight.cpp)"<< boostedjet.Pt()<<endl; 
 		TopJet_pt = EventContainerObj->boostedjetsToUsePtr->at(i).Pt();
 		TopJet_eta = EventContainerObj->boostedjetsToUsePtr->at(i).Eta();
 		TopJet_phi = EventContainerObj->boostedjetsToUsePtr->at(i).Phi();
-		std::tie(catname) = getTopTaggingMatch( EventContainerObj,boostedjet);
-		cout<<"cat name:"<<catname<<endl;
+		//std::tie(catname) = getTopTaggingMatch( EventContainerObj,boostedjet);
+		cout<<"cat name:(EventWeight.cpp)"<<catname<<endl;
 		if(catname=="mergedTop"){ ToptaggingSF=ToptaggingSFmergedTop;ToptaggingSFUp=ToptaggingSFmergedTopUp;ToptaggingSFDown=ToptaggingSFmergedTopDown;}
 		else if(catname=="semimerged") {ToptaggingSF=ToptaggingSFsemimerged;ToptaggingSFUp=ToptaggingSFsemimergedUp;ToptaggingSFDown=ToptaggingSFsemimergedDown;}
 		else if(catname=="notmerged") {ToptaggingSF=ToptaggingSFnotmerged;ToptaggingSFUp=ToptaggingSFnotmergedUp;ToptaggingSFDown=ToptaggingSFnotmergedDown;}
@@ -810,7 +817,7 @@ std::tuple<Double_t,Double_t,Double_t> EventWeight::TopSF(EventContainer* EventC
 		w_topJet_ =ToptaggingSF->GetBinContent(bin);
 		w_topJetUp_=ToptaggingSFUp->GetBinContent(bin);
 		w_topJetDown_=ToptaggingSFDown->GetBinContent(bin);
-		cout<<"Top tag:"<<w_topJet_<<endl;
+		cout<<"Top tag:(EventWeight.cpp)"<<w_topJet_<<endl;
 	
 	return std::make_tuple(w_topJet_,w_topJetUp_,w_topJetDown_);
 }
@@ -906,7 +913,7 @@ double DeltaPtTop=0,DeltaPtantiTop=0;
 	topPtWeight_a_Down = sqrt(SF1aDown*SF2aDown);
 	topPtWeight_b_Down = sqrt(SF1bDown*SF2bDown);
 //}
-	 cout<<"Top pt is :"<<pt1<<"Anti Top pt is:"<<pt2<<"topPtWeight ="<<topPtWeight<<"topPtWeight_a_Up="<<topPtWeight_a_Up<<"topPtWeight_a_Down="<<topPtWeight_a_Down<<"topPtWeight_b_Up="<<topPtWeight_b_Up<<"topPtWeight_b_Down="<<topPtWeight_b_Down<<endl;
+//	 cout<<"Top pt is :"<<pt1<<"Anti Top pt is:"<<pt2<<"topPtWeight ="<<topPtWeight<<"topPtWeight_a_Up="<<topPtWeight_a_Up<<"topPtWeight_a_Down="<<topPtWeight_a_Down<<"topPtWeight_b_Up="<<topPtWeight_b_Up<<"topPtWeight_b_Down="<<topPtWeight_b_Down<<endl;
 	  return std::make_tuple(topPtWeight,topPtWeight_a_Up,topPtWeight_b_Up,topPtWeight_a_Down ,topPtWeight_b_Down );
 }
 /****************************************************************************** 

@@ -56,6 +56,7 @@ void WeightVars::FillBranches(EventContainer * evtObj){
    _floatVars["WSF"] = evtObj->GetEventWSF();
    _floatVars["Toptag"] = evtObj->GetEventToptagging();
    _floatVars["Topptreweight"] = evtObj->GetEventTopptreweight();
+  cout<<"(WeightVars.cpp)Check weight Vaule when fill Branches : Add Event ID Inf:"<< evtObj->GetEventTree()->EVENT_event<<"tatal weight :"<<_floatVars["EventWeight"]<<" Pile Up : "<<_floatVars["puWeight"]<<" TopPt : "<<_floatVars["Topptreweight"]<<endl;
   //Get the systematic variations
   _floatVars["lepSF_SysUp"] = evtObj->GetEventLepSFWeightUp();
   _floatVars["lepSF_SysDown"] = evtObj->GetEventLepSFWeightDown();

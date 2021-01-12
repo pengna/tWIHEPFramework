@@ -428,6 +428,10 @@ Int_t EventContainer::ReadEvent()
     safejeteventup= -999;
     safejeteventdown= -999;
   }
+
+
+cout<<"(Eventcontainer.cpp)Check From Event Container loop : Event number(C) is "<<eventNumber<<"Event Weight = "<<GetEventWeight()<<"Pile Up Weight ="<<GetEventPileupWeight()<<" Top pT Weigth = "<<GetEventTopptreweight()<<endl;
+//cout<<"(Eventcontainer.cpp)Check From Event Container loop : Event number(C) is "<<eventNumber<<"Event Weight = "<<EventWeight()<<"Pile Up Weight ="<<EventPileupWeight()<<" Top pT Weigth = "<<EventTopptreweight()<<endl;
   //  isSimulation = kTRUE;
   _badJetEvent = kFALSE;
 
@@ -627,16 +631,18 @@ Int_t EventContainer::ReadEvent()
       if(useObj) {
         unIsolatedElectrons.push_back(newElectron);
       }
-    } //for
+    } //for Electron loop
 
 
-
+//Fill BoostedJet without remove jetoverlap
 for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
         newBoostedJet.Clear();
       allboostedjets.push_back(newBoostedJet); 
         useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtrBoostedjetoverlap, _eventTree, io, &missingEtVec, isSimulation,"Baseline");
-       if(useObj)basedboostedjets.push_back(newBoostedJet);
-        
+       if(useObj){basedboostedjets.push_back(newBoostedJet);}
+   newBoostedJet.Clear();
+ useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtr, _eventTree, io, &missingEtVec, isSimulation,"skim");
+       if(useObj){boostedjets.push_back(newBoostedJet);}        
 }
 
 
@@ -676,7 +682,7 @@ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
 
 
 
-
+/*
  ///////////////////////////////////////////
  // //  BoostedJets
  ///////////////////////////////////////////////
@@ -685,12 +691,12 @@ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
         newBoostedJet.Clear();
         //useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtrBoostedjetoverlap, _eventTree, io, &missingEtVec, isSimulation,"skim");
         useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtr, _eventTree, io, &missingEtVec, isSimulation,"skim");
-       if(useObj)boostedjets.push_back(newBoostedJet);
+       if(useObj){boostedjets.push_back(newBoostedJet);}
         
 }
 
 
-
+*/
 
 ////////////////////////////////////////////
 //Lepton defined for preselection
@@ -714,20 +720,6 @@ for(Int_t io = 0; io < _eventTree->patElectron_pt->size(); io++) {
 	                       }
   
   
-  
-  
-  } // end of else: filling from reco tree
-  
-  //
-  // Create a neutrino, including nu_pzn calculation
-  Neutrino newNeutrino;
-  newNeutrino.Fill(tightMuons, tightElectrons,missingEx,missingEy);
-  neutrinos.push_back(newNeutrino);
-  
-
-
-
-
 
 
 //Fill Gen event
@@ -748,6 +740,22 @@ for(Int_t io = 0; io < _eventTree->patElectron_pt->size(); io++) {
 
   }
 }
+
+
+
+  
+  
+  } // end of else: filling from reco tree
+  
+  //
+  // Create a neutrino, including nu_pzn calculation
+  Neutrino newNeutrino;
+  newNeutrino.Fill(tightMuons, tightElectrons,missingEx,missingEy);
+  neutrinos.push_back(newNeutrino);
+  
+
+
+
   return 0;
 } //ReadEvent
 
