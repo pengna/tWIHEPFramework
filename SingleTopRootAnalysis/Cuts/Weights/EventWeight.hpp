@@ -165,8 +165,8 @@ private:
   std::tuple<Double_t,Double_t> getEfficBTagReshape(EventContainer * EventContainerObj, std::string systName = "central");
   std::tuple<bool> GenWBoson(EventContainer* EventContainerObj,Double_t Wjet_phi,Double_t Wjet_eta);
   std::tuple<Double_t,Double_t,Double_t> getWSF(EventContainer* EventContainerObj);
-  std::tuple<Double_t,Double_t,Double_t> TopSF(EventContainer* EventContainerObj);
-  std::tuple<TString> getTopTaggingMatch(EventContainer* EventContainerObj, BoostedJet& BoostedJet);
+  std::tuple<Double_t,Double_t,Double_t,int> TopSF(EventContainer* EventContainerObj);
+  std::tuple<Int_t,TString> getTopTaggingMatch(EventContainer* EventContainerObj, BoostedJet& BoostedJet);
   std::tuple<Int_t>CheckWCase(EventContainer* EventContainerObj,Int_t Nwfromt,Int_t Nwfromtbar,Double_t Topjet_phi,Double_t Topjet_eta);
   std::tuple<TString> getGenTop(EventContainer* EventContainerObj);
   std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t> TopPtReweight(EventContainer* EventContainerObj);

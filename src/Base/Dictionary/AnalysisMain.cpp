@@ -971,8 +971,8 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
   SetDirectory (_histogramFile);
   // Add this information to the additional variable processor
   SetVariableHistogramDirectory (_histogramFile);
-  SetVariableEventContainer(GetEventContainer());
   //Set the number of cuts
+  SetVariableEventContainer(GetEventContainer());
   SetNCuts(GetNumberOfCuts());
   // Book Histograms
   cout << "<AnalysisMain::Loop::BookHistogram Start> " << endl;
@@ -1015,6 +1015,8 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
     eventCounter++;
     if( 0 == (eventInChain%10000) ) cout << "<AnalysisMain::Loop> " << "Processing event " << eventInChain << endl;
 
+
+
     //If we're only doing specific events, check them here.
     if (_eventsToRunOn.size() > 0){
       bool skipEvent = true;
@@ -1031,15 +1033,45 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
       std::cout << "Running on event: " << this->eventNumber << std::endl;
     }
 
-    AdditionalVarsProcessor::ResetBranches();
+
+
+    writeThisEvent = CutListProcessor::Apply(this);
+     AdditionalVarsProcessor::ResetBranches();
     AdditionalVarsProcessor::FillBranches(this);
 
     // Fill the histograms
-    writeThisEvent = CutListProcessor::Apply(this);
+
+    if (writeThisEvent) { 
+      if (!firstEventWritten) {
+	firstEventWritten = kTRUE;
+	if (DoSkim()){
+	  if( NULL != _skimEventTree) {
+	    _HFORb = -999;
+	  }
+	}
+      }
+   if(DoSkim()) {
+	if(NULL != _skimEventTree) {
+	  _EventNBeforePreselb   = _totalMCatNLOEvents;
+	  _skimEventTree          -> Fill();
+	}
+      } //if
+   }
+    // Read the next event in the chain
+    //     //cout << "<AnalysisMain::Loop> " << "Getting next event in chain " << eventInChain<<endl;
+    //         // cout<<GetHFOR()<<endl;
+       eventInChain = GetNextEvent();
+  } // while
+  
+
+
+
+
+/*
     // Fill Trees for Skim Events
     //
     //
-    /*
+	  writeThisEvent = CutListProcessor::Apply(this);
     if(DoSkim() && writeThisEvent) {
       if (!firstEventWritten) {
 	firstEventWritten = kTRUE;
@@ -1069,30 +1101,6 @@ Int_t AnalysisMain::ParseCmdLine(int argc, char **argv, TChain *chainEV0, TChain
   } // while
   
 */
-
-    if (writeThisEvent) { 
-      if (!firstEventWritten) {
-	firstEventWritten = kTRUE;
-	if (DoSkim()){
-	  if( NULL != _skimEventTree) {
-	    _HFORb = -999;
-	  }
-	}
-      }
-   if(DoSkim()) {
-	if(NULL != _skimEventTree) {
-	  _EventNBeforePreselb   = _totalMCatNLOEvents;
-	  _skimEventTree          -> Fill();
-	}
-      } //if
-   }
-    // Read the next event in the chain
-    //     //cout << "<AnalysisMain::Loop> " << "Getting next event in chain " << eventInChain<<endl;
-    //         // cout<<GetHFOR()<<endl;
-       eventInChain = GetNextEvent();
-  } // while
-  
-
 
 
 

@@ -353,6 +353,15 @@ class EventContainer
   inline void SetEventToptagging(const Double_t& w_Toptagging_) {_EventToptagging = w_Toptagging_;}; //tagging prob per event
   inline Double_t GetEventToptagging() const {return _EventToptagging;};
   inline Double_t EventToptagging() const {return GetEventToptagging();};
+
+  inline void SetEventToptaggingNmatch(const Int_t& ToptaggingNmatch_) {_EventToptaggingNmatch = ToptaggingNmatch_;}; //taggingNmatch prob per event
+  inline Int_t GetEventToptaggingNmatch() const {return _EventToptaggingNmatch;};
+  inline Int_t EventToptaggingNmatch() const {return GetEventToptaggingNmatch();};
+
+
+
+
+
 // W_tagging weight up per event 
     inline void SetEventToptaggingUp(const Double_t& w_ToptaggingUp_) {_EventToptaggingUp = w_ToptaggingUp_;}; //tagging prob per event
     inline Double_t GetEventToptaggingUp() const {return _EventToptaggingUp;};
@@ -508,6 +517,7 @@ class EventContainer
   Float_t _EventbWeight; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventWSF; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventToptagging; // this may be the same as the tagging weight, but I'm making it different anyway
+  Int_t _EventToptaggingNmatch; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventTopptreweight; 
   Float_t _EventLepSFWeight;
   Float_t _EventTrigSFWeight;
@@ -609,6 +619,7 @@ class EventContainer
   std::vector<Muon>     * muonsToUsePtr;
   std::vector<Muon>     * muonsToUsePtr2D;
   std::vector<BoostedJet> * boostedjetsToUsePtr;
+  std::vector<BoostedJet> * allboostedjetsToUsePtr;
   std::vector<BoostedJet> * boostedjetsToUsePtrjetaverlap;
   std::vector<Jet> * jetsToUsePtr;
   std::vector<Jet> * taggedjetsToUsePtr;

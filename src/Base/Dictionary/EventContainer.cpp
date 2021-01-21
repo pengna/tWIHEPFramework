@@ -430,7 +430,7 @@ Int_t EventContainer::ReadEvent()
   }
 
 
-cout<<"(Eventcontainer.cpp)Check From Event Container loop : Event number(C) is "<<eventNumber<<"Event Weight = "<<GetEventWeight()<<"Pile Up Weight ="<<GetEventPileupWeight()<<" Top pT Weigth = "<<GetEventTopptreweight()<<endl;
+//cout<<"(Eventcontainer.cpp)Check From Event Container loop : Event number(C) is "<<eventNumber<<"Event Weight = "<<GetEventWeight()<<"Pile Up Weight ="<<GetEventPileupWeight()<<" Top pT Weigth = "<<GetEventTopptreweight()<<endl;
 //cout<<"(Eventcontainer.cpp)Check From Event Container loop : Event number(C) is "<<eventNumber<<"Event Weight = "<<EventWeight()<<"Pile Up Weight ="<<EventPileupWeight()<<" Top pT Weigth = "<<EventTopptreweight()<<endl;
   //  isSimulation = kTRUE;
   _badJetEvent = kFALSE;
@@ -640,9 +640,9 @@ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
       allboostedjets.push_back(newBoostedJet); 
         useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtrBoostedjetoverlap, _eventTree, io, &missingEtVec, isSimulation,"Baseline");
        if(useObj){basedboostedjets.push_back(newBoostedJet);}
-   newBoostedJet.Clear();
- useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtr, _eventTree, io, &missingEtVec, isSimulation,"skim");
-       if(useObj){boostedjets.push_back(newBoostedJet);}        
+//   newBoostedJet.Clear();
+// useObj = newBoostedJet.Fill(1.0,1.0, *muonsToUsePtr2D, *electronsToUsePtr2D,*taggedjetsToUsePtr, _eventTree, io, &missingEtVec, isSimulation,"skim");
+ //      if(useObj){boostedjets.push_back(newBoostedJet);}        
 }
 
 
@@ -682,7 +682,6 @@ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
 
 
 
-/*
  ///////////////////////////////////////////
  // //  BoostedJets
  ///////////////////////////////////////////////
@@ -696,7 +695,6 @@ for(Int_t io = 0;io < _eventTree -> BoostedJet_pt->size(); io++) {
 }
 
 
-*/
 
 ////////////////////////////////////////////
 //Lepton defined for preselection

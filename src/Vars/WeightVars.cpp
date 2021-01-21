@@ -20,6 +20,7 @@ WeightVars::WeightVars(){
   _floatVars["trigSF"] = 0.;
    _floatVars["WSF"] = 0.;
    _floatVars["Toptag"] = 0.;
+   _intVars["ToptagNmatch"] = 0.;
    _floatVars["Topptreweight"] = 0.;
   //_bTagSystNames = {"central","up_jes","down_jes","up_lf","down_lf","up_hfstats1","down_hfstats1","up_hfstats2","down_hfstats2","up_cferr1","down_cferr1","up_cferr2","down_cferr2"};
   _bTagSystNames = {"central","up","down"};
@@ -55,8 +56,10 @@ void WeightVars::FillBranches(EventContainer * evtObj){
   _floatVars["trigSF"] = evtObj->GetEventTrigSFWeight();
    _floatVars["WSF"] = evtObj->GetEventWSF();
    _floatVars["Toptag"] = evtObj->GetEventToptagging();
+   _intVars["ToptagNmatch"] = evtObj->GetEventToptaggingNmatch();
    _floatVars["Topptreweight"] = evtObj->GetEventTopptreweight();
-  cout<<"(WeightVars.cpp)Check weight Vaule when fill Branches : Add Event ID Inf:"<< evtObj->GetEventTree()->EVENT_event<<"tatal weight :"<<_floatVars["EventWeight"]<<" Pile Up : "<<_floatVars["puWeight"]<<" TopPt : "<<_floatVars["Topptreweight"]<<endl;
+ // cout<<"(WeightVars.cpp)Check weight Vaule when fill Branches :Toptag =" << _floatVars["Toptag"]<<"Toptagmatch ="<<_floatVars["ToptagNmatch"]<<endl;  
+//cout<<"(WeightVars.cpp)Check weight Vaule when fill Branches : Add Event ID Inf:"<< evtObj->GetEventTree()->EVENT_event<<"tatal weight :"<<_floatVars["EventWeight"]<<" Pile Up : "<<_floatVars["puWeight"]<<" TopPt : "<<_floatVars["Topptreweight"]<<endl;
   //Get the systematic variations
   _floatVars["lepSF_SysUp"] = evtObj->GetEventLepSFWeightUp();
   _floatVars["lepSF_SysDown"] = evtObj->GetEventLepSFWeightDown();
