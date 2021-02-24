@@ -17,6 +17,8 @@ WeightVars::WeightVars(){
   _floatVars["bWeight"] = 0.;
   _floatVars["puWeight"] = 0.;
   _floatVars["lepSF"] = 0.;
+  _floatVars["lepIDSF"] = 0.;
+  _floatVars["lepRecoSF"] = 0.;
   _floatVars["trigSF"] = 0.;
    _floatVars["WSF"] = 0.;
    _floatVars["Toptag"] = 0.;
@@ -29,11 +31,17 @@ WeightVars::WeightVars(){
   for (auto const bSystName: _bTagSystNames) {
     _floatVars["bWeight_"+bSystName] = 0.;
     _floatVars["misTagWeight_"+bSystName] = 0.;
+    _floatVars["bWeight_bc_"+bSystName] = 0.;
+    _floatVars["bWeight_udsg_"+bSystName] = 0.;
   }
   _floatVars["puWeight_SysUp"] = 0.;
   _floatVars["puWeight_SysDown"] = 0.;
   _floatVars["lepSF_SysUp"] = 0.;
   _floatVars["lepSF_SysDown"] = 0.;
+  _floatVars["lepIDSF_SysUp"] = 0.;
+  _floatVars["lepIDSF_SysDown"] = 0.;
+  _floatVars["lepRecoSF_SysUp"] = 0.;
+  _floatVars["lepRecoSF_SysDown"] = 0.;
   _floatVars["trigSF_SysUp"] = 0.;
   _floatVars["trigSF_SysDown"] = 0.;
   _floatVars["WSF_SysUp"] = 0.;
@@ -53,6 +61,8 @@ void WeightVars::FillBranches(EventContainer * evtObj){
   _floatVars["bWeight"] = evtObj->GetEventbTagReshape();
   _floatVars["puWeight"] = evtObj->GetEventPileupWeight();
   _floatVars["lepSF"] = evtObj->GetEventLepSFWeight();
+  _floatVars["lepIDSF"] = evtObj->GetEventLepIDSFWeight();
+  _floatVars["lepRecoSF"] = evtObj->GetEventLepRecoSFWeight();
   _floatVars["trigSF"] = evtObj->GetEventTrigSFWeight();
    _floatVars["WSF"] = evtObj->GetEventWSF();
    _floatVars["Toptag"] = evtObj->GetEventToptagging();
@@ -63,6 +73,10 @@ void WeightVars::FillBranches(EventContainer * evtObj){
   //Get the systematic variations
   _floatVars["lepSF_SysUp"] = evtObj->GetEventLepSFWeightUp();
   _floatVars["lepSF_SysDown"] = evtObj->GetEventLepSFWeightDown();
+  _floatVars["lepIDSF_SysUp"] = evtObj->GetEventLepIDSFWeightUp();
+  _floatVars["lepIDSF_SysDown"] = evtObj->GetEventLepIDSFWeightDown();
+  _floatVars["lepRecoSF_SysUp"] = evtObj->GetEventLepRecoSFWeightUp();
+  _floatVars["lepRecoSF_SysDown"] = evtObj->GetEventLepRecoSFWeightDown();
   _floatVars["trigSF_SysUp"] = evtObj->GetEventTrigSFWeightUp();
   _floatVars["trigSF_SysDown"] = evtObj->GetEventTrigSFWeightDown();
    _floatVars["WSF_SysUp"] = evtObj->GetEventWSFUp();
@@ -80,6 +94,8 @@ void WeightVars::FillBranches(EventContainer * evtObj){
   for (auto const bSystName: _bTagSystNames) {
     _floatVars["bWeight_"+bSystName] = evtObj->GetEventbTagReshape(bSystName);
     _floatVars["misTagWeight_"+bSystName] = evtObj->GetEventMisTagReshape(bSystName);
+    _floatVars["bWeight_bc_"+bSystName] = evtObj->GetEventbTag_bc_Reshape(bSystName);
+    _floatVars["bWeight_udsg_"+bSystName] = evtObj->GetEventbTag_udsg_Reshape(bSystName);
   }
 
 }

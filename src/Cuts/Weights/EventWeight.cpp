@@ -456,10 +456,12 @@ else {
   
  
  float lepSFWeight(1.0), lepSFWeightUp(1.0), lepSFWeightDown(1.0);
+ float lepIDSFWeight(1.0), lepIDSFWeightUp(1.0), lepIDSFWeightDown(1.0);
+ float lepRecoSFWeight(1.0), lepRecoSFWeightUp(1.0), lepRecoSFWeightDown(1.0);
  float trigSFWeight(1.0), trigSFWeightUp(1.0), trigSFWeightDown(1.0);
 //cout<<"print out for check : before lepsf everything is fine !"<<endl;
  if(_useLeptonSFs){
-   std::tie(lepSFWeight,lepSFWeightUp,lepSFWeightDown,trigSFWeight,trigSFWeightUp,trigSFWeightDown) = getLeptonWeight(EventContainerObj);
+   std::tie(lepSFWeight,lepSFWeightUp,lepSFWeightDown,trigSFWeight,trigSFWeightUp,trigSFWeightDown,lepIDSFWeight,lepIDSFWeightUp,lepIDSFWeightDown,lepRecoSFWeight,lepRecoSFWeightUp,lepRecoSFWeightDown) = getLeptonWeight(EventContainerObj);
    wgt *= lepSFWeight;
    wgt *= trigSFWeight;
  //cout<<"(EventWeight.cpp)lepSF Weight is :"<<lepSFWeight<<"  ;trigSF Weight is :"<<trigSFWeight<<endl;
@@ -486,17 +488,23 @@ if(_useTopPtreweight){
 	 //cout<<"(EventWeight.cpp)ToppT is :"<<w_TopPt_<<endl;
 	}
  std::map<std::string,float> bTagReshape;
+ std::map<std::string,float> bTag_bc_Reshape;
+ std::map<std::string,float> bTag_udsg_Reshape;
  std::map<std::string,float> misTagReshape;
 
  if (_usebTagReshape){
    if (!isEfficbTag()) {
      for (auto const bSystName: _bTagSystNames) std::tie(bTagReshape[bSystName],misTagReshape[bSystName]) = getBTagReshape(EventContainerObj,bSystName);
-   }
-   else {
-     for (auto const bSystName: _bTagSystNames) std::tie(bTagReshape[bSystName],misTagReshape[bSystName]) = getEfficBTagReshape(EventContainerObj,bSystName);
-   }
    wgt *= bTagReshape["central"];
    wgt *= misTagReshape["central"];
+   }
+   else {
+     for (auto const bSystName: _bTagSystNames) std::tie(bTag_bc_Reshape[bSystName],bTag_udsg_Reshape[bSystName],bTagReshape[bSystName],misTagReshape[bSystName]) = getEfficBTagReshape(EventContainerObj,bSystName);
+   //wgt *= bTag_bc_Reshape["central"];
+   //wgt *= bTag_udsg_Reshape["central"];
+     wgt *= bTagReshape["central"];
+   wgt *= misTagReshape["central"];
+   }
  //cout<<" jet SF is :"<<bTagReshape["central"]<<endl;
   //cout<<"(EventWeight.cpp)btag weight is :"<<bTagReshape["central"]<<"  ;mistag weight is :"<<misTagReshape["central"]<<endl;
    //cout<<"(EventWeight.cpp)the total weight is :"<<wgt<<endl;
@@ -513,6 +521,8 @@ if(_useTopPtreweight){
   EventContainerObj -> SetEventPileupMinBiasDownWeight(pileupMinBiasDownWeight);
   EventContainerObj -> SetEventbWeight(bEventWeight);
   EventContainerObj -> SetEventLepSFWeight(lepSFWeight);
+  EventContainerObj -> SetEventLepIDSFWeight(lepIDSFWeight);
+  EventContainerObj -> SetEventLepRecoSFWeight(lepRecoSFWeight);
   EventContainerObj -> SetEventTrigSFWeight(trigSFWeight);
   EventContainerObj -> SetGenWeight(genWeight);
   EventContainerObj -> SetEventWSF(w_WJet_);
@@ -524,6 +534,8 @@ if(_useTopPtreweight){
   for (auto const bSystName: _bTagSystNames) {
     EventContainerObj -> SetEventbTagReshape(bTagReshape[bSystName],bSystName);
     EventContainerObj -> SetEventMisTagReshape(misTagReshape[bSystName],bSystName);
+    EventContainerObj -> SetEventbTag_bc_Reshape(bTag_bc_Reshape[bSystName],bSystName);
+    EventContainerObj -> SetEventbTag_udsg_Reshape(bTag_udsg_Reshape[bSystName],bSystName);
   }
     
     EventContainerObj -> SetEventWSFUp(w_WJetUp_);
@@ -537,7 +549,11 @@ if(_useTopPtreweight){
     EventContainerObj -> SetEventTopptreweight_a_Down(w_TopPt_a_Down_);
     EventContainerObj -> SetEventTopptreweight_b_Down(w_TopPt_b_Down_);
   EventContainerObj -> SetEventLepSFWeightUp(lepSFWeightUp);
+  EventContainerObj -> SetEventLepIDSFWeightUp(lepIDSFWeightUp);
+  EventContainerObj -> SetEventLepRecoSFWeightUp(lepRecoSFWeightUp);
   EventContainerObj -> SetEventLepSFWeightDown(lepSFWeightDown);
+  EventContainerObj -> SetEventLepIDSFWeightDown(lepIDSFWeightDown);
+  EventContainerObj -> SetEventLepRecoSFWeightDown(lepRecoSFWeightDown);
 
   EventContainerObj -> SetEventTrigSFWeightUp(trigSFWeightUp);
   EventContainerObj -> SetEventTrigSFWeightDown(trigSFWeightDown);
@@ -563,6 +579,8 @@ if(_useTopPtreweight){
   for (auto const bSystName: _bTagSystNames) {
     _hbTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventbTagReshape(bSystName));
     _hMisTagReshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventMisTagReshape(bSystName));
+   // _hbTag_bc_Reshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventbTag_bc_Reshape(bSystName));
+    //_hbTag_udsg_Reshape[bSystName] -> FillWithoutWeight(EventContainerObj -> GetEventbTag_udsg_Reshape(bSystName));
   }
   //cout << "After Fill histogram Check Get  weight function(EventWeight.cpp): event ID = "<<EventContainerObj ->GetEventTree()->EVENT_event<<EventContainerObj -> GetEventWeight()<<"PileUp weight ="<<EventContainerObj -> GetEventPileupWeight()<<"Top pT weigth = "<< EventContainerObj -> GetEventTopptreweight()<< endl;
 
@@ -931,10 +949,12 @@ double DeltaPtTop=0,DeltaPtantiTop=0;
  * Input:  None                                                               * 
  * Output: Double_t weight to be applied to the event weight                  * 
  ******************************************************************************/
-std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContainer* EventContainerObj){
+std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t,Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::getLeptonWeight(EventContainer* EventContainerObj){
 
   Double_t leptonWeight = 1.0, leptonWeightUp = 1.0, leptonWeightDown = 1.0;
   Double_t triggerWeight = 1.0, triggerWeightUp = 1.0, triggerWeightDown = 1.0;
+  Double_t IDWeight = 1.0, IDWeightUp = 1.0, IDWeightDown = 1.0;
+  Double_t RecoWeight = 1.0, RecoWeightUp = 1.0, RecoWeightDown = 1.0;
   Float_t tkSF =1;
   Int_t xAxisBin=0.0,yAxisBin=0.0;
   TEnv* config = EventContainerObj -> GetConfig();
@@ -976,9 +996,13 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
      tkSF = _muonTkSF->Eval(std::fabs(muon.Eta()));
     //cout<<"if is bstar :"<<_bstar<<endl;
     if(_bstar){
-	leptonWeight = idSF;
-	leptonWeightUp = (idSF + idUnc);
-	leptonWeightDown = (idSF - idUnc);
+	leptonWeight *= idSF;
+	leptonWeightUp *= (idSF + idUnc);
+	leptonWeightDown *= (idSF - idUnc);
+        IDWeight *= idSF;
+        IDWeightUp *= (idSF + idUnc);
+        IDWeightDown *= (idSF - idUnc);
+
 	}
     else{
     leptonWeight *= isoSF * idSF * tkSF;
@@ -1041,6 +1065,16 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
 	leptonWeight *= recoSF * idSF;
     	leptonWeightUp *= (recoSF + recoUnc) * (idSF + idUnc);
     	leptonWeightDown *= (recoSF - recoUnc) * (idSF - idUnc);
+
+	IDWeight *= idSF;
+        IDWeightUp *= (idSF + idUnc);
+        IDWeightDown *= (idSF - idUnc);
+
+	RecoWeight *= recoSF;
+        RecoWeightUp *= (recoSF + recoUnc);
+        RecoWeightDown *= (recoSF - recoUnc);
+
+
   }
   else{
 	leptonWeight *=1; 
@@ -1051,7 +1085,7 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t> EventWeight::g
   	//cout<<"leptonWeight = "<<leptonWeight<<"leptonWeightUp = "<<leptonWeightUp<<"leptonWeightDown = "<<leptonWeightDown<<endl;
 
 }
-  return std::make_tuple(leptonWeight,leptonWeightUp,leptonWeightDown,triggerWeight,triggerWeightUp,triggerWeightDown);
+  return std::make_tuple(leptonWeight,leptonWeightUp,leptonWeightDown,triggerWeight,triggerWeightUp,triggerWeightDown,IDWeight,IDWeightUp,IDWeightDown,RecoWeight,RecoWeightUp,RecoWeightDown);
 }
 
 /******************************************************************************  
@@ -1112,14 +1146,22 @@ std::tuple<Double_t,Double_t> EventWeight::getBTagReshape(EventContainer * Event
  * Input:  EventContainer of the event                                        *  
  * Output: Double_t weight to be applied to the event weight                  *  
  ******************************************************************************/ 
-std::tuple<Double_t,Double_t> EventWeight::getEfficBTagReshape(EventContainer * EventContainerObj, std::string syst){
+std::tuple<Double_t,Double_t,Double_t,Double_t> EventWeight::getEfficBTagReshape(EventContainer * EventContainerObj, std::string syst){
 
   
   Double_t bTagWeight = 1.0;
+  Double_t bTagWeightinbc = 1.0;
+  Double_t bTagWeightinudsg = 1.0;
   Double_t mistagWeight = 1.0;
+  Double_t bTag_bc_Weight = 1.0;
+  Double_t bTag_udsg_Weight = 1.0;
 
   Double_t mcNoTag = 1.;
+  Double_t mcNoTaginbc = 1.;
+  Double_t mcNoTaginudsg = 1.;
   Double_t dataNoTag = 1.;
+  Double_t dataNoTaginbc = 1.;
+  Double_t dataNoTaginudsg = 1.;
   int n = 0;
   float jetSF = 1.;
   float jetEffic = 1.;
@@ -1127,21 +1169,65 @@ std::tuple<Double_t,Double_t> EventWeight::getEfficBTagReshape(EventContainer * 
 
     jetSF = getJetSF(jet,syst);
     jetEffic = getJetEffic(jet);
-	//cout<<"if jet is tagged :"<<jet.IsTagged()<<"jet flavour"<<abs(jet.GethadronFlavour())<<"jet SF is :"<<jetSF<<"; jet effic is :"<<jetEffic<<endl;
+ if (jet.GethadronFlavour() == 5 ||jet.GethadronFlavour() == 4){
+
+   if (jet.IsTagged()||jetEffic==1){
+      bTagWeightinbc *= jetSF;
+    } else {
+
+      mcNoTaginbc *= (1 - jetEffic);
+      dataNoTaginbc *= (1 - (jetEffic*jetSF));
+    }
+	bTag_bc_Weight=bTagWeightinbc*(dataNoTaginbc/mcNoTaginbc);
+	 bTag_udsg_Weight=1.0;
+}
+
+else {
+   if (jet.IsTagged()||jetEffic==1){
+      bTagWeightinudsg *= jetSF;
+    } else {
+
+      mcNoTaginudsg *= (1 - jetEffic);
+      dataNoTaginudsg *= (1 - (jetEffic*jetSF));
+    }
+        bTag_udsg_Weight=bTagWeightinudsg*(dataNoTaginudsg/mcNoTaginudsg);
+
+	 bTag_bc_Weight=1.0;
+}
+
+
+
     if (jet.IsTagged()||jetEffic==1){
       bTagWeight *= jetSF;
     } else {
- //     if(jetEffic==1){cout<<"not tag jet eff =1;something wrong in here";break;}	
       
       mcNoTag *= (1 - jetEffic);
       dataNoTag *= (1 - (jetEffic*jetSF));
     }
-//	cout<<"jet flavour: "<<abs(jet.GethadronFlavour())<<";if jet is tagged :"<<jet.IsTagged()<<"jet SF is :"<<jetSF<<"; jet effic is :"<<jetEffic<<";bTagWeight is:"<<bTagWeight<<";mcNoTag :"<<mcNoTag<<";dataNoTag :"<<dataNoTag<<"mistag weight is :"<<dataNoTag/mcNoTag<<endl;
-//	cout<<"jet pT: "<<jet.Pt()<<"jet Eta: "<<jet.Eta()<<endl; 
+}
+
+
+
+   return std::make_tuple(bTag_bc_Weight,bTag_udsg_Weight,bTagWeight,dataNoTag/mcNoTag);
+
+
+} 
+
+
+/*
+
+    if (jet.IsTagged()||jetEffic==1){
+      bTagWeight *= jetSF;
+    } else {
+      
+      mcNoTag *= (1 - jetEffic);
+      dataNoTag *= (1 - (jetEffic*jetSF));
+    }
 }
 	return std::make_tuple(bTagWeight,dataNoTag/mcNoTag);
 
 }
+*/
 
 Double_t EventWeight::getJetEffic(Jet jet){
   TH1F* efficiencyPlot;
