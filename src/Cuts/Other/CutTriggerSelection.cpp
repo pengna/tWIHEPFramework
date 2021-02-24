@@ -166,8 +166,10 @@ Bool_t CutTriggerSelection::Apply()
   else if(_DataEra==2017){
  	   bstarmuonTrigger = EventContainerObj->HLT_Mu50 ||EventContainerObj->HLT_OldMu100 || EventContainerObj->HLT_TkMu100 ;
            bstarelectronTrigger =EventContainerObj->HLT_Ele35_WPTight_Gsf || EventContainerObj->HLT_Photon200 ||EventContainerObj->HLT_Ele115_CaloIdVT_GsfTrkIdT; 
+//           bstarelectronTrigger =EventContainerObj->HLT_Ele35_WPTight_Gsf || EventContainerObj->HLT_Photon200; 
 	  if (_whichtrigger == 2) {triggerBit = EventContainerObj->HLT_Mu50||EventContainerObj->HLT_OldMu100 || EventContainerObj->HLT_TkMu100;}
 	  if (_whichtrigger == 3) {triggerBit = EventContainerObj->HLT_Ele35_WPTight_Gsf || EventContainerObj->HLT_Photon200 ||EventContainerObj->HLT_Ele115_CaloIdVT_GsfTrkIdT;}
+//	  if (_whichtrigger == 3) {triggerBit = EventContainerObj->HLT_Ele35_WPTight_Gsf || EventContainerObj->HLT_Photon200;}
   }
   else if(_DataEra==2018){
  	   bstarmuonTrigger = EventContainerObj->HLT_Mu50 ||EventContainerObj->HLT_OldMu100 || EventContainerObj->HLT_TkMu100;

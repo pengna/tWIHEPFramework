@@ -101,7 +101,7 @@
  * History                                                                    *
  *      16 June 2015 - Created by Huaqiao ZHANG(zhanghq@ihep.ac.cn) for CMS   *
  *****************************************************************************/
-
+#include "SingleTopRootAnalysis/Base/Dictionary/MET_XYCorrection.h"
 #include "SingleTopRootAnalysis/Base/Dictionary/EventContainer.hpp"
 #include <iostream>
 #include <string>
@@ -527,7 +527,7 @@ Int_t EventContainer::ReadEvent()
     missingEx = _eventTree->Met_type1PF_px;
     missingPhi = _eventTree->Met_type1PF_phi;
     missingEy = _eventTree->Met_type1PF_py;
-
+	
     missingEt_xy = _eventTree->Met_type1PF_pt;
     missingEx_xy = _eventTree->Met_type1PF_px;
     missingPhi_xy = _eventTree->Met_type1PF_phi;
@@ -539,7 +539,12 @@ Int_t EventContainer::ReadEvent()
     nPvtx = _eventTree->nBestVtx;
     trueInteractions = _eventTree->trueInteractions;
     npuVertices = _eventTree->npuVertices;
-    
+     era=                    _config.GetValue("_dataEra",0); 
+//xy corrections applied
+ TLorentzVector met_xy;
+met_xy.SetPxPyPzE(_eventTree->Met_type1PF_px,_eventTree->Met_type1PF_py,_eventTree->Met_type1PF_pz,_eventTree->Met_type1PF_sumEt);
+std::tie(missingEt_xy_corr,missingPhi_xy_corr) = METXYCorr_Met_MetPhi(missingEt_xy,missingPhi_xy,runNumber,era,isSimulation,npuVertices,false,false);
+ 
     // Systematic variations on met to be re-calculated here.
     if (_metShift != 0){
       float oldEt = missingEt;
@@ -555,7 +560,7 @@ Int_t EventContainer::ReadEvent()
     }
 
     missingEtVec.SetPtEtaPhiE(missingEt,0.,missingPhi,missingEt);
-    missingEtVec_xy.SetPtEtaPhiE(missingEt_xy,0.,missingPhi_xy,missingEt_xy);
+    missingEtVec_xy.SetPtEtaPhiE(missingEt_xy_corr,0.,missingPhi_xy_corr,missingEt_xy_corr);
 
    //cout << " In EventContainer isSimulation? "<< isSimulation << endl;
 

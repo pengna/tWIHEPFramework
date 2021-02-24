@@ -415,6 +415,40 @@ class EventContainer
   inline Double_t GetEventLepSFWeightDown() const {return _EventLepSFWeightDown;};
   inline Double_t EventLepSFWeightDown() const {return GetEventLepSFWeightDown();};
 
+
+  inline void SetEventLepIDSFWeight(const Double_t& lepIDSFweight) {_EventLepIDSFWeight = lepIDSFweight;};
+  inline Double_t GetEventLepIDSFWeight() const {return _EventLepIDSFWeight;};
+  inline Double_t EventLepIDSFWeight() const {return GetEventLepIDSFWeight();};
+
+  //lepton SF weight up variation per event
+  inline void SetEventLepIDSFWeightUp(const Double_t& lepIDSFweight) {_EventLepIDSFWeightUp = lepIDSFweight;};
+  inline Double_t GetEventLepIDSFWeightUp() const {return _EventLepIDSFWeightUp;};
+  inline Double_t EventLepIDSFWeightUp() const {return GetEventLepIDSFWeightUp();};
+
+  //lepIDton SF weight down variation per event
+  inline void SetEventLepIDSFWeightDown(const Double_t& lepIDSFweight) {_EventLepIDSFWeightDown = lepIDSFweight;};
+  inline Double_t GetEventLepIDSFWeightDown() const {return _EventLepIDSFWeightDown;};
+  inline Double_t EventLepIDSFWeightDown() const {return GetEventLepIDSFWeightDown();};
+
+
+  inline void SetEventLepRecoSFWeight(const Double_t& lepRecoSFweight) {_EventLepRecoSFWeight = lepRecoSFweight;};
+  inline Double_t GetEventLepRecoSFWeight() const {return _EventLepRecoSFWeight;};
+  inline Double_t EventLepRecoSFWeight() const {return GetEventLepRecoSFWeight();};
+
+  //lepRecoton SF weight up variation per event
+  inline void SetEventLepRecoSFWeightUp(const Double_t& lepRecoSFweight) {_EventLepRecoSFWeightUp = lepRecoSFweight;};
+  inline Double_t GetEventLepRecoSFWeightUp() const {return _EventLepRecoSFWeightUp;};
+  inline Double_t EventLepRecoSFWeightUp() const {return GetEventLepRecoSFWeightUp();};
+
+  //lepRecoton SF weight down variation per event
+  inline void SetEventLepRecoSFWeightDown(const Double_t& lepRecoSFweight) {_EventLepRecoSFWeightDown = lepRecoSFweight;};
+  inline Double_t GetEventLepRecoSFWeightDown() const {return _EventLepRecoSFWeightDown;};
+  inline Double_t EventLepRecoSFWeightDown() const {return GetEventLepRecoSFWeightDown();};
+
+
+
+
+
   //lepton SF weight per event
   inline void SetEventTrigSFWeight(const Double_t& lepSFweight) {_EventTrigSFWeight = lepSFweight;};
   inline Double_t GetEventTrigSFWeight() const {return _EventTrigSFWeight;};
@@ -435,6 +469,18 @@ class EventContainer
   inline void SetEventbTagReshape(const Double_t& lepSFweight, std::string systName = "central" ) {_EventbTagReshape[systName] = lepSFweight;};
   inline Double_t GetEventbTagReshape(std::string systName = "central") {return _EventbTagReshape[systName];};
   inline Double_t EventbTagReshape() {return GetEventbTagReshape();};
+
+inline void SetEventbTag_bc_Reshape(const Double_t& lepSFweight, std::string systName = "central" ) {_EventbTag_bc_Reshape[systName] = lepSFweight;};
+inline Double_t GetEventbTag_bc_Reshape(std::string systName = "central") {return _EventbTag_bc_Reshape[systName];};
+inline Double_t EventbTag_bc_Reshape() {return GetEventbTag_bc_Reshape();};
+
+inline void SetEventbTag_udsg_Reshape(const Double_t& lepSFweight, std::string systName = "central" ) {_EventbTag_udsg_Reshape[systName] = lepSFweight;};
+inline Double_t GetEventbTag_udsg_Reshape(std::string systName = "central") {return _EventbTag_udsg_Reshape[systName];};
+inline Double_t EventbTag_udsg_Reshape() {return GetEventbTag_udsg_Reshape();};
+
+
+
+
 
   //set and get btag weights for central and systematics
   inline void SetEventMisTagReshape(const Double_t& lepSFweight, std::string systName = "central" ) {_EventMisTagReshape[systName] = lepSFweight;};
@@ -520,14 +566,22 @@ class EventContainer
   Int_t _EventToptaggingNmatch; // this may be the same as the tagging weight, but I'm making it different anyway
   Float_t _EventTopptreweight; 
   Float_t _EventLepSFWeight;
+  Float_t _EventLepIDSFWeight;
+  Float_t _EventLepRecoSFWeight;
   Float_t _EventTrigSFWeight;
   Float_t _EventGenWeight;
   std::map<std::string,Float_t> _EventbTagReshape;
+  std::map<std::string,Float_t> _EventbTag_bc_Reshape;
+  std::map<std::string,Float_t> _EventbTag_udsg_Reshape;
   std::map<std::string,Float_t> _EventMisTagReshape;
 
   //Add in the systematic variations to the SFs
   Float_t _EventLepSFWeightUp;
+  Float_t _EventLepIDSFWeightUp;
+  Float_t _EventLepRecoSFWeightUp;
   Float_t _EventLepSFWeightDown;
+  Float_t _EventLepIDSFWeightDown;
+  Float_t _EventLepRecoSFWeightDown;
   Float_t _EventTrigSFWeightUp;
   Float_t _EventTrigSFWeightDown;
   Float_t _EventWSFUp;
@@ -550,6 +604,7 @@ class EventContainer
   // Information for partons
   Int_t runNumber;              // run number from the root tree
   Int_t eventNumber;            // event number from the root tree
+  Int_t era;            // event number from the root tree
   Bool_t larError;
   Float_t actualIntPerXing;
   Float_t averageIntPerXing;
@@ -645,7 +700,8 @@ class EventContainer
   Double_t missingEy_xy;
   Double_t missingPhi_xy;
   TLorentzVector missingEtVec_xy;
-
+ double missingPhi_xy_corr;
+ double missingEt_xy_corr;
   //Track whterh it passes the MET filters
   Int_t passesMETFilters;
 

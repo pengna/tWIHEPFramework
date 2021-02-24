@@ -120,16 +120,102 @@ bstarVars::bstarVars(bool makeHistos){
 	_floatVars["M_Eta_bstarleadjet"]        = -999.;
 	_floatVars["M_Phi_bstarleadjet"]        = -999.;
 	_floatVars["M_Mass_bstarleadjet"] = -999.;          
+//met Vars
 
+	_floatVars["M_MET"] = -999.;          
+	_floatVars["M_MET_Phi"] = -999.;          
+	_floatVars["M_MET_xy"] = -999.;          
+	_floatVars["M_MET_xy_Phi"] = -999.;          
 
 
 	SetDoHists(makeHistos);
 }
 
+void bstarVars::ResetVars(){
 
+
+        _intVars["M_nLepton"] = -999.;
+        _floatVars["M_E_Lepton"]   =-999.;
+        _floatVars["M_Pt_Lepton"]  = -999.;
+        _floatVars["M_Eta_Lepton"] = -999.;
+        _floatVars["M_Phi_Lepton"] = -999; 
+        _floatVars["M_Mass_Lepton"]       = -999.;
+        _floatVars["M_DeltaRLeptonClostJet"] = 100.;
+        _floatVars["M_DeltaRmin_LeptonBJet"] = 100.;
+        _floatVars["M_relpt_Jet"] = -999.;
+        _floatVars["M_relE_Jet"] = -999.;
+        _floatVars["M_mindr_Jet"] = 100.;
+        _floatVars["M_minptrel_Jet"] = 10000.;
+        _floatVars["M_relIsoR04"] = -999.;
+        _floatVars["M_miniIsoR"] = -999.;
+         _floatVars["M_relIsoR_Ele"] =-999.;
+
+       _intVars["M_nJet"] = -999.;
+        _floatVars["M_E_Jet"]   =-999.;
+        _floatVars["M_Pt_Jet"]  = -999.;
+        _floatVars["M_Eta_Jet"] = -999.;
+        _floatVars["M_Phi_Jet"] = -999;
+        _floatVars["M_Mass_Jet"]       = -999.;
+
+        _intVars["M_nBJet"] = -999;
+        _floatVars["M_E_BJet"]   =-999.;
+        _floatVars["M_Pt_BJet"]  = -999.;
+        _floatVars["M_Eta_BJet"] = -999.;
+        _floatVars["M_Phi_BJet"] = -999;
+        _floatVars["M_Mass_BJet"]       = -999.;
+        _floatVars["M_E_LeadBJet"]   =-999.;
+        _floatVars["M_Pt_LeadBJet"]  = -999.;
+        _floatVars["M_Eta_LeadBJet"] = -999.;
+        _floatVars["M_Phi_LeadBJet"] = -999;
+        _floatVars["M_Mass_LeadBJet"]       = -999.;
+   _floatVars["M_DeltaRBLeadJetLepton"] =-999.;
+        _floatVars["M_DeltaRChosedBJetLepton"] =-999.;
+   _floatVars["M_E_BoostedJet"]          =-999.;
+        _floatVars["M_Pt_BoostedJet"]         = -999.;
+        _floatVars["M_Eta_BoostedJet"]        = -999.;
+        _floatVars["M_Phi_BoostedJet"]        = -999.;
+        _floatVars["M_Mass_BoostedJet"]       = -999.;
+        _floatVars["M_prunedmass_BoostedJet"]       = -999.;
+        _floatVars["M_softdropmass_BoostedJet"]       = -999.;
+        _floatVars["M_softdropmasscorr_BoostedJet"]       = -999.;
+        _floatVars["M_tau21_BoostedJet"]       = -999.0;
+        _floatVars["M_tau32_BoostedJet"]       = -999.0;
+
+        _intVars["M_nBoostedJet"] = -999;
+
+
+	_floatVars["M_E_W"]          = -999.;
+	_floatVars["M_Pt_W"]         = -999.;
+	_floatVars["M_Eta_W"]        = -999.;
+	_floatVars["M_Phi_W"]        = -999;
+	_floatVars["M_Mass_W"]       = -999.;
+	_floatVars["M_E_Top"]          =-999.;
+	_floatVars["M_Pt_Top"]         = -999.;
+	_floatVars["M_Eta_Top"]        = -999.;
+	_floatVars["M_Phi_Top"]        = -999.;
+	_floatVars["M_Mass_Top"] = -999.;
+	_floatVars["M_E_Topleadjet"]          =-999.;
+	_floatVars["M_Pt_Topleadjet"]         = -999.;
+	_floatVars["M_Eta_Topleadjet"]        = -999.;
+	_floatVars["M_Phi_Topleadjet"]        = -999;
+	_floatVars["M_Mass_Topleadjet"] = -999.;
+	//bstar Vars  
+	_floatVars["M_E_bstar"]          =-999.;
+	_floatVars["M_Pt_bstar"]         = -999.;
+	_floatVars["M_Eta_bstar"]        = -999.;
+	_floatVars["M_Phi_bstar"]        = -999;
+	_floatVars["M_Mass_bstar"] = -999.;
+	_floatVars["M_E_bstarleadjet"]          =-999.;
+	_floatVars["M_Pt_bstarleadjet"]         = -999.;
+	_floatVars["M_Eta_bstarleadjet"]        = -999.;
+	_floatVars["M_Phi_bstarleadjet"]        = -999.;
+	_floatVars["M_Mass_bstarleadjet"] = -999.;
+
+
+}
 
 void bstarVars::FillBranches(EventContainer * evtObj){
-
+	ResetVars();
 	//Initialise vectors;
 	//  BoostedJet.clear();
 	Jet.clear();
@@ -307,6 +393,11 @@ void bstarVars::FillBranches(EventContainer * evtObj){
 	TLorentzVector lep_neutrino(0,0,0,0);
 
 	met.SetPtEtaPhiE(evtObj->missingEt,0,evtObj->missingPhi,0.);
+//	met.SetPtEtaPhiE(evtObj->missingEt_xy_corr,0,evtObj->missingPhi_xy_corr,0.);
+	_floatVars["M_MET"]=(evtObj->missingEt) ;          
+	_floatVars["M_MET_xy"]=(evtObj->missingEt_xy_corr) ;          
+	_floatVars["M_MET_Phi"]=(evtObj->missingPhi) ;          
+	_floatVars["M_MET_xy_Phi"]=(evtObj->missingPhi_xy_corr) ;          
 	//Get W
 		double M_W  = 80.4;
 		double M_mu =  0.10566;
@@ -522,7 +613,7 @@ void bstarVars::FillBranches(EventContainer * evtObj){
 
 
 		for (auto const & mctop : *evtObj->mcTopsPtr){
-	if(mctop.TopIsDecay(mctop,*evtObj->mcParticlesPtr)&&mctop.PdgId()==6)	 _floatVecVars["M_Pt_MCTop"].push_back(mctop.Pt());
+	if(mctop.TopIsDecay(mctop,*evtObj->mcParticlesPtr)&&mctop.PdgId()==6 )	 _floatVecVars["M_Pt_MCTop"].push_back(mctop.Pt());
 }
 
 }

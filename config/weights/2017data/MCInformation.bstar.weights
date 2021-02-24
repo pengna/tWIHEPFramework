@@ -47,52 +47,53 @@ Events.Source.500008: 5825566
 PileUp.Source.500008: QCDHT2000Toinf
 
 # 500009 - RH_1200
-Weight.Source.500009: 1.936
+Weight.Source.500009: 1.98
+#Weight.Source.500009: 1.936
 Events.Source.500009: 93942
 PileUp.Source.500009: RH_1200
 
 # 500010 - RH_1400
-Weight.Source.500010: 0.7816
+Weight.Source.500010: 0.81
 Events.Source.500010: 95914
 PileUp.Source.500010: RH_1400
 
 # 500011 - RH_1600
-Weight.Source.500011: 0.3416
+Weight.Source.500011: 0.35
 Events.Source.500011: 99868
 PileUp.Source.500011: RH_1600
 
 # 500012 - RH_1800
-Weight.Source.500012: 0.1583
+Weight.Source.500012: 0.17
 Events.Source.500012: 93834
 PileUp.Source.500012: RH_1800
 
 # 500013 - RH_2000
-Weight.Source.500013: 0.07675
+Weight.Source.500013: 0.081
 Events.Source.500013: 99792
 PileUp.Source.500013: RH_2000
 
 # 500014 - RH_2200
-Weight.Source.500014: 0.03864
+Weight.Source.500014: 0.041
 Events.Source.500014: 99704
 PileUp.Source.500014: RH_2200
 
 # 500015 - RH_2400
-Weight.Source.500015: 0.02008
+Weight.Source.500015: 0.022
 Events.Source.500015: 99616
 PileUp.Source.500015: RH_2400
 
 # 500016 - RH_2600
-Weight.Source.500016: 0.01068
+Weight.Source.500016: 0.012
 Events.Source.500016: 99498
 PileUp.Source.500016: RH_2600
 
 # 500017 - RH_2800
-Weight.Source.500017: 0.005814
+Weight.Source.500017: 0.0067
 Events.Source.500017: 99414
 PileUp.Source.500017: RH_2800
 
 # 500018 - RH_3000
-Weight.Source.500018: 0.003224
+Weight.Source.500018: 0.0038
 Events.Source.500018: 99186
 PileUp.Source.500018: RH_3000
 
@@ -137,52 +138,52 @@ Events.Source.500023: 7916640
 PileUp.Source.500023: SaT
 
 # 500025 - LH_1200
-Weight.Source.500025: 1.944
+Weight.Source.500025: 1.98
 Events.Source.500025: 99950
 PileUp.Source.500025: LH_1200
 
 # 500026 - LH_1400
-Weight.Source.500026: 0.785
+Weight.Source.500026: 0.81
 Events.Source.500026: 99912
 PileUp.Source.500026: LH_1400
 
 # 500027 - LH_1600
-Weight.Source.500027: 0.343
+Weight.Source.500027: 0.35
 Events.Source.500027: 99864
 PileUp.Source.500027: LH_1600
 
 # 500028 - LH_1800
-Weight.Source.500028: 0.159
+Weight.Source.500028: 0.17
 Events.Source.500028: 99824
 PileUp.Source.500028: LH_1800
 
 # 500029 - LH_2000
-Weight.Source.500029: 0.077
+Weight.Source.500029: 0.081
 Events.Source.500029: 99756
 PileUp.Source.500029: LH_2000
 
 # 500030 - LH_2200
-Weight.Source.500030: 0.039
+Weight.Source.500030: 0.041
 Events.Source.500030: 96722
 PileUp.Source.500030: LH_2200
 
 # 500031 - LH_2400
-Weight.Source.500031: 0.02
+Weight.Source.500031: 0.022
 Events.Source.500031: 99620
 PileUp.Source.500031: LH_2400
 
 # 500032 - LH_2600
-Weight.Source.500032: 0.011
+Weight.Source.500032: 0.012
 Events.Source.500032: 99482
 PileUp.Source.500032: LH_2600
 
 # 500033 - LH_2800
-Weight.Source.500033: 0.006
+Weight.Source.500033: 0.0067
 Events.Source.500033: 99344
 PileUp.Source.500033: LH_2800
 
 # 500034 - LH_3000
-Weight.Source.500034: 0.003
+Weight.Source.500034: 0.0038
 Events.Source.500034: 95238
 PileUp.Source.500034: LH_3000
 

@@ -526,10 +526,12 @@ for (auto const & jet : selectedjets){
   // **************************************************************
  if(_bstar){
 	
-//      if(     "Tight"      == electronType) return(passIDnoIso  && passIso&&passMinPt && passMaxEta &&  passNoGapElectron && passd0dZ && passMuonEleDetaR&&passEleJet2Dcut); 
+      //if(     "Tight"      == electronType) return(passIDnoIso  && passIso&&passMinPt && passMaxEta &&  passNoGapElectron && passd0dZ && passMuonEleDetaR&&passEleJet2Dcut); 
+  //    if(     "Tight"      == electronType) return(passTightId()&&passMinPt && passMaxEta &&  passNoGapElectron && passd0dZ && passMuonEleDetaR&&passEleJet2Dcut); 
   //	else if(     "UnIsolated" == electronType) return(passIDnoIso && passIso && passMinPt && passMaxEta && passNoGapElectron && passd0dZ);
+  //	if(     "Tight"      == electronType) return(passMinPt && passMaxEta && passIDnoIso && passNoGapElectron && passd0dZ && passMuonEleDetaR&&passEleJet2Dcut); 
   	if(     "Tight"      == electronType) return(passMinPt && passMaxEta && passIDnoIso && passNoGapElectron && passd0dZ && passMuonEleDetaR&&passEleJet2Dcut); 
-  //	if(     "Tight"      == electronType) return(passMinPt && passMaxEta && passIDnoIso && passNoGapElectron && passd0dZ && passMuonEleDetaR); 
+  //	if(     "Tight"      == electronType) return(passIDnoIso  && passIso &&passMinPt && passMaxEta  && passNoGapElectron && passd0dZ && passMuonEleDetaR); 
   	else if(     "UnIsolated" == electronType) return( passMinPt && passMaxEta && passIDnoIso &&passNoGapElectron&& passd0dZ && passMuonEleDetaR);
 
  	else if("Veto"       == electronType) return( passMinPt && passMaxEta &&passIDLoosenoIso&passNoGapElectron&& passd0dZ && passMuonEleDetaR);//no tight or isolation req.

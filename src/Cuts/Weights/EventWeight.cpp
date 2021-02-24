@@ -495,16 +495,17 @@ if(_useTopPtreweight){
  if (_usebTagReshape){
    if (!isEfficbTag()) {
      for (auto const bSystName: _bTagSystNames) std::tie(bTagReshape[bSystName],misTagReshape[bSystName]) = getBTagReshape(EventContainerObj,bSystName);
-   wgt *= bTagReshape["central"];
-   wgt *= misTagReshape["central"];
+  // wgt *= bTagReshape["central"];
+  // wgt *= misTagReshape["central"];
    }
    else {
      for (auto const bSystName: _bTagSystNames) std::tie(bTag_bc_Reshape[bSystName],bTag_udsg_Reshape[bSystName],bTagReshape[bSystName],misTagReshape[bSystName]) = getEfficBTagReshape(EventContainerObj,bSystName);
-   //wgt *= bTag_bc_Reshape["central"];
+} 
+  //wgt *= bTag_bc_Reshape["central"];
    //wgt *= bTag_udsg_Reshape["central"];
      wgt *= bTagReshape["central"];
    wgt *= misTagReshape["central"];
-   }
+  // }
  //cout<<" jet SF is :"<<bTagReshape["central"]<<endl;
   //cout<<"(EventWeight.cpp)btag weight is :"<<bTagReshape["central"]<<"  ;mistag weight is :"<<misTagReshape["central"]<<endl;
    //cout<<"(EventWeight.cpp)the total weight is :"<<wgt<<endl;
@@ -999,6 +1000,9 @@ std::tuple<Double_t,Double_t,Double_t,Double_t,Double_t,Double_t,Double_t,Double
 	leptonWeight *= idSF;
 	leptonWeightUp *= (idSF + idUnc);
 	leptonWeightDown *= (idSF - idUnc);
+//	leptonWeight = idSF;
+//	leptonWeightUp = (idSF + idUnc);
+//	leptonWeightDown = (idSF - idUnc);
         IDWeight *= idSF;
         IDWeightUp *= (idSF + idUnc);
         IDWeightDown *= (idSF - idUnc);

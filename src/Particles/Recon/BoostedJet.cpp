@@ -513,11 +513,16 @@ if(closestBJet<_minBJetDetaR)passBJetOverlap= kFALSE ;
 	  if(_dataEra==2017){   passtau	= tau21<_tau21_2017;}
 	  if(_dataEra==2018){   passtau	= tau21<_tau21_2018;}
   }
-
+Bool_t passtag=kTRUE;
+if(_QCD_CR){
+passtag=passmasswindow && passtau;
+}
+else{
+passtag =passmasswindow && passtau;}
  // if (passPt && passEta  && passmasswindow && passtau &&passesJetID ) return kTRUE;
  // if("Baseline"== BoostedjetType) return (passPt && passEta  && passesJetID);
-  if("Baseline"== BoostedjetType) return (passPt && passEta  && passesJetID  );
-  else return (passPt && passEta  && passmasswindow && passtau &&passesJetID &&passBJetOverlap);
+  if("Baseline"== BoostedjetType) return (passPt && passEta  && passesJetID && passtag  );
+  else if("skim"==BoostedjetType) return (passPt && passEta  && passtag &&passesJetID &&passBJetOverlap);
   return kFALSE;
 
 } //Fill()

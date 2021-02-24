@@ -20,7 +20,7 @@ class bstarVars: public VarBase {
   
 public:
   bstarVars(bool makeHistos = false);
-  
+ void ResetVars();  
   //void BookBranches(TTree * skimTree);
   void FillBranches(EventContainer * evtObj);
  // bool AddAdditionalVariables(EventContainer * evtObj); 

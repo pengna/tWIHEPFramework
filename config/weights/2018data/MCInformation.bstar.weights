@@ -55,34 +55,34 @@ Events.Source.500007: 10887751
 Weight.Source.500008: 20.23
 Events.Source.500008: 5414545
 # 500009 - RH_1200
-Weight.Source.500009: 1.936
+Weight.Source.500009: 1.98
 Events.Source.500009: 99948
 # 500010 - RH_1400
-Weight.Source.500010: 0.7816
+Weight.Source.500010: 0.81
 Events.Source.500010: 99908
 # 500011 - RH_1600
-Weight.Source.500011: 0.3416
+Weight.Source.500011: 0.35
 Events.Source.500011: 99890
 # 500012 - RH_1800
-Weight.Source.500012: 0.1583
+Weight.Source.500012: 0.17
 Events.Source.500012: 99836
 # 500013 - RH_2000
-Weight.Source.500013: 0.07675
+Weight.Source.500013: 0.081
 Events.Source.500013: 99768
 # 500014 - RH_2200
-Weight.Source.500014: 0.03864
+Weight.Source.500014: 0.041
 Events.Source.500014: 99708
 # 500015 - RH_2400
-Weight.Source.500015: 0.02008
+Weight.Source.500015: 0.022
 Events.Source.500015: 99664
 # 500016 - RH_2600
-Weight.Source.500016: 0.01068
+Weight.Source.500016: 0.012
 Events.Source.500016: 95528
 # 500017 - RH_2800
-Weight.Source.500017: 0.005814
+Weight.Source.500017: 0.0067
 Events.Source.500017: 99374
 # 500018 - RH_3000
-Weight.Source.500018: 0.003224
+Weight.Source.500018: 0.0038
 Events.Source.500018: 99198
 # 5000191 - TTToSemiLeptonic
 Weight.Source.5000191: 365.34
@@ -106,34 +106,34 @@ Events.Source.500022: 9553912
 Weight.Source.500023: 34.97
 Events.Source.500023: 7588180
 # 500025 - LH_1200
-Weight.Source.500025: 1.944
+Weight.Source.500025: 1.98
 Events.Source.500025: 99940
 # 500026 - LH_1400
-Weight.Source.500026: 0.785
+Weight.Source.500026: 0.81
 Events.Source.500026: 99898
 # 500027 - LH_1600
-Weight.Source.500027: 0.343
+Weight.Source.500027: 0.35
 Events.Source.500027: 99872
 # 500028 - LH_1800
-Weight.Source.500028: 0.159
+Weight.Source.500028: 0.17
 Events.Source.500028: 99820
 # 500029 - LH_2000
-Weight.Source.500029: 0.077
+Weight.Source.500029: 0.081
 Events.Source.500029: 96768
 # 500030 - LH_2200
-Weight.Source.500030: 0.039
+Weight.Source.500030: 0.041
 Events.Source.500030: 83726
 # 500031 - LH_2400
-Weight.Source.500031: 0.02
+Weight.Source.500031: 0.022
 Events.Source.500031: 99642
 # 500032 - LH_2600
-Weight.Source.500032: 0.011
+Weight.Source.500032: 0.012
 Events.Source.500032: 99526
 # 500033 - LH_2800
-Weight.Source.500033: 0.006
+Weight.Source.500033: 0.0067
 Events.Source.500033: 99382
 # 500034 - LH_3000
-Weight.Source.500034: 0.003
+Weight.Source.500034: 0.0038
 Events.Source.500034: 99220
 # 5000193 - TTTo2L2Nu
 Weight.Source.5000193: 87.31
